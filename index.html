@@ -1,261 +1,538 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Room 1865</title>
-    
-    <!-- Supabase Library -->
+    <title>KingshotLab - Realtime Cloud Battle Station v6.9</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
+    <!-- PWA Setup -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#070b19">
+    
+    <script>
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            kingshot: {
+                                dark: '#070b19',
+                                card: '#0d152f',
+                                border: '#1e294b',
+                                blue: '#3b82f6',
+                                accent: '#60a5fa'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        /* التنسيق الأساسي المرتب */
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #121212; 
-            color: #fff; 
-            margin: 0; 
-            padding: 20px;
-            display: flex;
-            justify-content: center; /* توسيط الشاشة بالكامل */
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 500px; /* مقاس مثالي للجوال والكمبيوتر */
-            text-align: center;
-        }
-
-        .screen { display: none; }
-        .active-screen { display: block; animation: fadeIn 0.5s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .header { 
-            display: flex; justify-content: space-between; align-items: center; 
-            background: #1e1e1e; padding: 15px 25px; border-radius: 10px; 
-            margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-        
-        .status-light { 
-            width: 20px; height: 20px; border-radius: 50%; 
-            background-color: red; box-shadow: 0 0 10px red; transition: 0.3s; 
-        }
-        .status-light.connected { 
-            background-color: #00ff00; box-shadow: 0 0 15px #00ff00; 
-        }
-        
-        /* الأزرار بشكلها الجميل السابق */
-        .btn { 
-            background: #6200ea; color: white; border: none; 
-            padding: 15px; font-size: 18px; border-radius: 8px; 
-            cursor: pointer; margin: 10px 0; transition: 0.3s; font-weight: bold; 
-            width: 100%; display: block;
-        }
-        .btn:hover { background: #7c4dff; transform: scale(1.02); }
-        
-        .btn-leader { background: #ff9800; color: white; }
-        .btn-leader:hover { background: #ffb74d; }
-        
-        .btn-danger { background: #d50000; }
-        .btn-danger:hover { background: #ff1744; }
-        
-        .card { 
-            background: #1e1e1e; padding: 25px; border-radius: 10px; 
-            margin-top: 15px; box-sizing: border-box; text-align: center;
-        }
-        
-        input { 
-            padding: 15px; font-size: 16px; border-radius: 5px; 
-            border: 1px solid #333; margin-bottom: 15px; width: 100%; 
-            text-align: center; box-sizing: border-box; background: #2c2c2c; color: white;
-        }
-        
-        #log {
-            color: #bbb; height: 150px; overflow-y: auto; text-align: left; 
-            background: #000; padding: 15px; border-radius: 5px; font-size: 14px;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gaming-font { font-family: 'Rajdhani', sans-serif; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #070b19; }
+        ::-webkit-scrollbar-thumb { background: #1e294b; border-radius: 4px; }
     </style>
 </head>
-<body>
+<body class="bg-kingshot-dark text-slate-100 min-h-screen flex flex-col justify-between selection:bg-blue-500 selection:text-white">
 
-<div class="container">
+    <!-- Header -->
+    <header class="bg-kingshot-card border-b border-kingshot-border shadow-lg sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col gap-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shadow-lg border border-blue-400">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="gaming-font text-xl font-bold tracking-wider text-white uppercase flex items-center gap-1.5">
+                            KingshotLab <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">V6.9</span>
+                        </h1>
+                    </div>
+                </div>
 
-    <!-- 1️⃣ Welcome Screen -->
-    <div id="welcomeScreen" class="screen active-screen">
-        <h2 style="margin-bottom: 30px;">Welcome to Room 1865 🎮</h2>
-        <p style="margin-bottom: 20px; color: #ccc;">Please select your role:</p>
-        <button class="btn" onclick="joinAsPlayer()">🎮 I am a Player</button>
-        <button class="btn btn-leader" onclick="showPasswordScreen()">👑 I am the Leader</button>
-    </div>
+                <div class="flex items-center gap-2">
+                    <!-- Connection Status Indicator -->
+                    <span id="connection-status" class="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)] animate-pulse" title="Disconnected"></span>
+                    
+                    <div id="room-badge" class="bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-emerald-400 font-bold text-xs uppercase tracking-wider">
+                        ROOM: 1865
+                    </div>
+                </div>
+            </div>
 
-    <!-- 2️⃣ Password Screen -->
-    <div id="passwordScreen" class="screen">
-        <h2 style="margin-bottom: 20px;">🔒 Leader Login</h2>
-        <p style="color: #ccc;">Enter the leader password:</p>
-        <input type="password" id="adminPassword" placeholder="Password...">
-        <button class="btn btn-leader" onclick="checkPassword()">Login</button>
-        <button class="btn btn-danger" onclick="goBack()">🔙 Back</button>
-    </div>
+            <div class="flex items-center justify-between gap-2 pt-1 border-t border-kingshot-border/60">
+                <div class="bg-kingshot-dark border border-kingshot-border rounded-lg p-1 flex items-center gap-1 flex-1">
+                    <button id="mode-leader-btn" onclick="switchRole('leader')" class="flex-1 py-1.5 text-xs font-bold rounded-md transition-all flex items-center justify-center gap-1 bg-blue-600 text-white shadow">
+                        👑 Leader
+                    </button>
+                    <button id="mode-player-btn" onclick="switchRole('player')" class="flex-1 py-1.5 text-xs font-bold rounded-md transition-all flex items-center justify-center gap-1 text-slate-400 hover:text-white">
+                        🛡️ Player
+                    </button>
+                </div>
 
-    <!-- 3️⃣ Main Room Screen -->
-    <div id="mainRoomScreen" class="screen">
-        <div class="header">
-            <h2 id="roleTitle" style="margin: 0; font-size: 1.2rem;">ROOM: 1865</h2>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <span id="statusText" style="font-weight: bold; font-size: 14px;">Connecting...</span>
-                <div id="statusLight" class="status-light"></div>
+                <button id="enable-audio-btn" onclick="enableAndTestAudio()" class="px-3 py-1.5 text-xs font-bold rounded-md bg-amber-500 hover:bg-amber-400 text-slate-900 flex items-center gap-1 shadow transition-all animate-bounce whitespace-nowrap">
+                    📞 Enable Call Mode
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl w-full mx-auto px-4 py-4 flex-grow space-y-4">
+
+        <!-- TACTICAL SETTINGS (Leader Only) -->
+        <div class="leader-only bg-kingshot-card border border-blue-500/40 rounded-xl p-4 shadow-xl space-y-3">
+            <h2 class="gaming-font text-sm font-bold text-blue-400 uppercase tracking-wide">TACTICAL TIMING & QUICK AUDIO</h2>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[10px] uppercase text-slate-400 mb-1">Gap Between Players (Secs)</label>
+                    <input type="number" id="player-gap-input" min="0" value="1" class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs">
+                </div>
+                <div>
+                    <label class="block text-[10px] uppercase text-slate-400 mb-1">Gap Between Groups (Secs)</label>
+                    <input type="number" id="group-gap-input" min="0" value="3" class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs">
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2 pt-1">
+                <button onclick="speakCustomText('Get ready for battle')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-3 rounded-lg text-xs shadow transition-all border border-indigo-400 uppercase">
+                    📢 Get Ready
+                </button>
+                <button onclick="speakCustomText('Return to chat')" class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 px-3 rounded-lg text-xs shadow transition-all border border-purple-400 uppercase">
+                    💬 Return to Chat
+                </button>
             </div>
         </div>
 
-        <!-- Leader Controls -->
-        <div id="leaderControls" class="card" style="display: none;">
-            <h3 style="margin-top: 0;">👑 Leader Panel</h3>
-            <input type="text" id="playerName" placeholder="Enter player name...">
-            <button class="btn" onclick="sendName()">📢 Call Name</button>
-            <button class="btn btn-danger" onclick="sendCountdown()">⏱️ Start Countdown</button>
+        <!-- LIVE BATTLE STATION CONSOLE (Visible to All) -->
+        <div class="bg-kingshot-card border border-amber-500/50 rounded-xl p-4 shadow-2xl">
+            <div class="flex flex-col gap-2 mb-3">
+                <h2 class="gaming-font text-sm font-bold text-amber-400 uppercase tracking-wide flex items-center gap-2">
+                    <svg class="w-5 h-5 text-amber-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    Live Sequence Console
+                </h2>
+                <div class="leader-only flex items-center justify-between gap-2">
+                    <label class="text-[11px] text-slate-300 font-semibold uppercase">WAVE:</label>
+                    <select id="battle-wave-select" class="bg-kingshot-dark border border-amber-500/40 rounded-lg px-3 py-1 text-slate-100 text-xs flex-1">
+                        <option value="all">All Active Players</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3 bg-kingshot-dark/60 p-3 rounded-xl border border-kingshot-border">
+                <div>
+                    <div id="battle-status" class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">STATUS: STANDBY</div>
+                    <div id="battle-current-target" class="gaming-font text-base font-bold text-amber-400 mt-0.5">Waiting for Leader...</div>
+                </div>
+                <div class="leader-only flex items-center gap-2">
+                    <button id="start-battle-btn" class="flex-1 bg-amber-600 hover:bg-amber-500 text-white font-bold py-2 px-4 rounded-xl shadow-lg transition-all gaming-font text-xs uppercase tracking-wider border border-amber-400">
+                        🚀 Start Sequence
+                    </button>
+                    <button id="reset-battle-btn" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white font-semibold py-2 px-3 rounded-xl border border-red-500/30 transition-all text-xs">
+                        Reset
+                    </button>
+                </div>
+            </div>
+
+            <div id="battle-sequence-list" class="mt-3 space-y-2 max-h-48 overflow-y-auto"></div>
         </div>
 
-        <!-- Player View -->
-        <div id="playerView" class="card" style="display: none; background: #004d40;">
-            <h3 style="margin-top: 0;">🎧 Player Mode</h3>
-            <p style="color: #ccc;">Waiting for leader commands...</p>
+        <!-- Add / Edit Player Form (Leader Only) -->
+        <div class="leader-only bg-kingshot-card border border-kingshot-border rounded-xl p-4 shadow-xl">
+            <h3 id="form-title" class="gaming-font text-sm font-bold text-slate-200 uppercase mb-2.5">Add Player</h3>
+            <form id="add-player-form" class="space-y-3">
+                <input type="hidden" id="edit-player-id" value="">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[10px] uppercase text-slate-400 mb-1">Player Name</label>
+                        <input type="text" id="player-name" required placeholder="e.g. Rune" class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase text-slate-400 mb-1">Group</label>
+                        <input type="text" id="player-group" value="1" required class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[10px] uppercase text-slate-400 mb-1">March (Mins)</label>
+                        <input type="number" id="march-mins" min="0" value="1" required class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase text-slate-400 mb-1">Seconds</label>
+                        <input type="number" id="march-secs" min="0" max="59" value="30" required class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs">
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button type="submit" id="form-submit-btn" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 px-4 rounded-lg shadow-lg transition-all text-xs uppercase border border-blue-400">
+                        Add Player
+                    </button>
+                    <button type="button" id="cancel-edit-btn" onclick="cancelEdit()" class="hidden bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 px-3 rounded-lg text-xs uppercase">
+                        Cancel
+                    </button>
+                </div>
+            </form>
         </div>
 
-        <!-- Event Log -->
-        <div class="card" style="margin-top: 20px;">
-            <h3 style="margin-top: 0;">📜 Event Log</h3>
-            <div id="log"></div>
+        <!-- Player Table (Leader Only) -->
+        <div class="leader-only bg-kingshot-card border border-kingshot-border rounded-xl shadow-xl overflow-hidden mb-6">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-kingshot-dark/50 border-b border-kingshot-border uppercase text-slate-400 gaming-font">
+                            <th class="py-2 px-2 text-center">Order</th>
+                            <th class="py-2 px-3">Player Name</th>
+                            <th class="py-2 px-3 text-center">Status</th>
+                            <th class="py-2 px-3 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="player-table-body" class="divide-y divide-kingshot-border/60"></tbody>
+                </table>
+            </div>
+            <div id="empty-state" class="p-6 text-center text-xs text-slate-500">No players added yet.</div>
         </div>
-    </div>
 
-</div>
+    </main>
 
     <script>
-        const SECRET_PASSWORD = "123"; 
+        // ==========================================
+        // 🔴🔴 إعدادات سوبابيز (مدمجة وجاهزة) 🔴🔴
+        // ==========================================
+        const CONFIG = {
+            supabaseUrl: "https://rdadphlhonsoqghwwaua.supabase.co",
+            anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkYWRwaGxob25zb3FnaHd3YXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1MTIwNTMsImV4cCI6MjEwNjA4ODA1M30.mRwVaIH7RGl01rjntardLs8DyZIo0A0KYXqNNW0tJak", 
+            roomCode: "1865"
+        };
 
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
-            document.getElementById(screenId).classList.add('active-screen');
-        }
+        let supabaseClient = null;
+        let currentChannel = null;
+        let currentRole = localStorage.getItem('kingshot_role') || 'leader';
+        let backgroundAudioCtx = null;
+        let isCallActive = false;
+        const LEADER_PASSWORD = "1234";
 
-        function goBack() {
-            showScreen('welcomeScreen');
-            document.getElementById('adminPassword').value = ''; 
-        }
+        let state = {
+            players: JSON.parse(localStorage.getItem('kingshot_players_v69') || '[]')
+        };
 
-        function showPasswordScreen() {
-            showScreen('passwordScreen');
-        }
+        let battleEngine = {
+            queue: [],
+            currentIndex: 0,
+            timerInterval: null
+        };
 
-        function checkPassword() {
-            const pass = document.getElementById('adminPassword').value;
-            if (pass === SECRET_PASSWORD) {
-                joinAsLeader();
-            } else {
-                alert("❌ Wrong password!");
-            }
-        }
-
-        function joinAsPlayer() {
-            showScreen('mainRoomScreen');
-            document.getElementById('roleTitle').innerText = "Player 🎮";
-            document.getElementById('playerView').style.display = "block";
-            document.getElementById('leaderControls').style.display = "none";
-            startSupabase();
-            speakText("Joined the room");
-        }
-
-        function joinAsLeader() {
-            showScreen('mainRoomScreen');
-            document.getElementById('roleTitle').innerText = "Leader 👑";
-            document.getElementById('leaderControls').style.display = "block";
-            document.getElementById('playerView').style.display = "none";
-            startSupabase();
-        }
-
-        let roomChannel;
-        
-        function startSupabase() {
+        window.addEventListener('DOMContentLoaded', () => {
             try {
-                const CONFIG = {
-                    supabaseUrl: "https://rdadphlhonsoqghwwaua.supabase.co",
-                    anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkYWRwaGxob25zb3FnaHd3YXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1MTIwNTMsImV4cCI6MjEwNjA4ODA1M30.mRwVaIH7RGl01rjntardLs8DyZIo0A0KYXqNNW0tJak",
-                    roomCode: "1865"
-                };
+                // الاتصال بسوبابيز
+                supabaseClient = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.anonKey);
+                currentChannel = supabaseClient.channel('room_' + CONFIG.roomCode);
 
-                const supabase = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.anonKey);
-                roomChannel = supabase.channel('room_' + CONFIG.roomCode);
-
-                roomChannel
-                    .on('broadcast', { event: 'action' }, (payload) => {
-                        const data = payload.payload;
-                        if (data.type === 'name') {
-                            addLog(`🔊 Calling player: ${data.name}`);
-                            speakText(data.name);
-                        } 
-                        else if (data.type === 'countdown') {
-                            addLog(`⏱️ Countdown started!`);
-                            playCountdown();
+                currentChannel.on('broadcast', { event: 'battle_event' }, (payload) => {
+                    handleBroadcastEvent(payload.payload);
+                }).subscribe((status) => {
+                    const indicator = document.getElementById('connection-status');
+                    if (status === 'SUBSCRIBED') {
+                        if(indicator) {
+                            indicator.classList.remove('bg-red-500', 'shadow-[0_0_8px_rgba(239,68,68,0.8)]');
+                            indicator.classList.add('bg-emerald-500', 'shadow-[0_0_8px_rgba(16,185,129,0.8)]');
                         }
-                    })
-                    .subscribe((status) => {
-                        if (status === 'SUBSCRIBED') {
-                            document.getElementById('statusLight').classList.add('connected');
-                            document.getElementById('statusText').innerText = "Connected 🟢";
-                            document.getElementById('statusText').style.color = "#00ff00";
-                            addLog("✅ Successfully connected!");
+                    } else {
+                        if(indicator) {
+                            indicator.classList.remove('bg-emerald-500', 'shadow-[0_0_8px_rgba(16,185,129,0.8)]');
+                            indicator.classList.add('bg-red-500', 'shadow-[0_0_8px_rgba(239,68,68,0.8)]');
                         }
-                    });
-            } catch (error) {
-                console.error("Supabase Error:", error);
-                addLog("⚠️ Connection error.");
+                    }
+                });
+            } catch(e) {
+                console.error("Connection error", e);
             }
-        }
+        });
 
-        function sendName() {
-            const name = document.getElementById('playerName').value.trim();
-            if (!name) return alert("⚠️ Please enter a player name first!");
-            
-            if (roomChannel) {
-                roomChannel.send({ type: 'broadcast', event: 'action', payload: { type: 'name', name: name } });
-                addLog(`📤 Sent call command for: ${name}`);
+        // تفعيل وضع الاتصال المفتوح (لكي يعمل الصوت في الخلفية)
+        window.enableAndTestAudio = function() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                backgroundAudioCtx = new AudioContext();
+                const bufferSize = backgroundAudioCtx.sampleRate * 2;
+                const noiseBuffer = backgroundAudioCtx.createBuffer(1, bufferSize, backgroundAudioCtx.sampleRate);
+                const output = noiseBuffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) { output[i] = Math.random() * 0.000001; }
+                const whiteNoise = backgroundAudioCtx.createBufferSource();
+                whiteNoise.buffer = noiseBuffer;
+                whiteNoise.loop = true;
+                whiteNoise.connect(backgroundAudioCtx.destination);
+                whiteNoise.start(0);
+
+                isCallActive = true;
+                speakText("Connected", 'en-US');
+                
+                const btn = document.getElementById('enable-audio-btn');
+                btn.className = "px-3 py-1.5 text-xs font-bold rounded-md bg-emerald-500 text-slate-900 flex items-center gap-1 shadow transition-all whitespace-nowrap";
+                btn.innerHTML = "📞 Call Active";
+            } catch (e) {
+                alert("⚠️ Please tap again to allow audio.");
             }
-        }
+        };
 
-        function sendCountdown() {
-            if (roomChannel) {
-                roomChannel.send({ type: 'broadcast', event: 'action', payload: { type: 'countdown' } });
-                addLog(`📤 Sent countdown command`);
+        window.speakCustomText = function(text) {
+            broadcastState('CUSTOM_AUDIO', { text: text });
+        };
+
+        // بث الأوامر عبر سوبابيز
+        function broadcastState(eventType, data) {
+            const payload = { type: eventType, data: data };
+            if (currentChannel) {
+                currentChannel.send({
+                    type: 'broadcast',
+                    event: 'battle_event',
+                    payload: payload
+                });
             }
+            handleBroadcastEvent(payload); // تنفيذ محلي للقائد أيضاً
         }
 
-        function addLog(msg) {
-            const logDiv = document.getElementById('log');
-            const time = new Date().toLocaleTimeString('en-US');
-            logDiv.innerHTML += `<p style="margin: 5px 0; border-bottom: 1px solid #333; padding-bottom: 5px;">[${time}] ${msg}</p>`;
-            logDiv.scrollTop = logDiv.scrollHeight;
-        }
+        // استقبال الأوامر
+        function handleBroadcastEvent(msg) {
+            if (msg.type === 'START_SEQUENCE') {
+                updateLiveUI(msg.data.currentLauncher, msg.data.secs, msg.data.isPrep);
+                renderBattleQueueUI(msg.data.currentIndex, msg.data.queue);
 
-        function speakText(text) {
-            window.speechSynthesis.cancel(); 
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'en-US'; 
-            utterance.rate = 0.9; 
-            window.speechSynthesis.speak(utterance);
-        }
-
-        function playCountdown() {
-            let count = 5;
-            const interval = setInterval(() => {
-                if (count > 0) {
-                    speakText(count.toString());
-                    count--;
-                } else {
-                    clearInterval(interval);
-                    speakText("Go!"); 
+                if (msg.data.isPrep) {
+                    if (msg.data.secs > 0) speakText(msg.data.secs.toString());
+                } else if (msg.data.currentLauncher) {
+                    if (msg.data.secs > 0) {
+                        speakText(msg.data.secs.toString());
+                    } else if (msg.data.secs === 0) {
+                        speakText(msg.data.currentLauncher.name);
+                    }
                 }
-            }, 1000);
+            } else if (msg.type === 'CUSTOM_AUDIO') {
+                speakText(msg.data.text);
+                const targetDiv = document.getElementById('battle-current-target');
+                if(targetDiv) targetDiv.innerHTML = `📢 <span class="text-indigo-400 font-bold">${msg.data.text}</span>`;
+            } else if (msg.type === 'RESET') {
+                resetBattleEngineUI();
+            }
         }
+
+        function speakText(text, lang = 'en-US') {
+            if ('speechSynthesis' in window) {
+                try {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = lang;
+                    window.speechSynthesis.speak(utterance);
+                } catch (e) {}
+            }
+        }
+
+        // المحرك الرئيسي للوقت والتسلسل
+        const startBtn = document.getElementById('start-battle-btn');
+        if(startBtn) {
+            startBtn.addEventListener('click', () => {
+                const selectedWave = document.getElementById('battle-wave-select').value;
+                let activePlayers = state.players.filter(p => !p.frozen && (selectedWave === 'all' || String(p.group) === selectedWave));
+
+                if (activePlayers.length === 0) return alert('No active players found!');
+
+                const playerGap = parseInt(document.getElementById('player-gap-input').value) || 0;
+                const groupGap = parseInt(document.getElementById('group-gap-input').value) || 0;
+
+                let mapped = activePlayers.map(p => ({
+                    name: p.name,
+                    group: String(p.group),
+                    marchSec: (p.marchMins * 60) + p.marchSecs
+                }));
+
+                let maxMarch = Math.max(...mapped.map(m => m.marchSec));
+                let queue = [];
+                let lastGroup = null;
+                let cumulativeGroupDelay = 0;
+
+                mapped.forEach((m, index) => {
+                    let baseDelay = maxMarch - m.marchSec;
+                    if (index === 0) { lastGroup = m.group; } 
+                    else if (m.group !== lastGroup) {
+                        cumulativeGroupDelay += groupGap;
+                        lastGroup = m.group;
+                    }
+                    let finalDelay = baseDelay + cumulativeGroupDelay + (index * playerGap);
+                    queue.push({ name: m.name, group: m.group, delay: finalDelay });
+                });
+
+                battleEngine.queue = queue;
+                battleEngine.currentIndex = 0;
+
+                let prepRemaining = 3;
+                if (battleEngine.timerInterval) clearInterval(battleEngine.timerInterval);
+
+                broadcastState('START_SEQUENCE', { queue: battleEngine.queue, currentIndex: 0, currentLauncher: battleEngine.queue[0], secs: prepRemaining, isPrep: true });
+                prepRemaining--;
+
+                battleEngine.timerInterval = setInterval(() => {
+                    if (prepRemaining > 0) {
+                        broadcastState('START_SEQUENCE', { queue: battleEngine.queue, currentIndex: 0, currentLauncher: battleEngine.queue[0], secs: prepRemaining, isPrep: true });
+                        prepRemaining--;
+                    } else {
+                        clearInterval(battleEngine.timerInterval);
+                        runSequentialTimer();
+                    }
+                }, 1000);
+            });
+        }
+
+        function runSequentialTimer() {
+            if (battleEngine.currentIndex >= battleEngine.queue.length) {
+                broadcastState('START_SEQUENCE', { queue: battleEngine.queue, currentIndex: -1, currentLauncher: null, secs: 0, isPrep: false });
+                return;
+            }
+
+            const currentLauncher = battleEngine.queue[battleEngine.currentIndex];
+            let prevDelay = battleEngine.currentIndex === 0 ? 0 : battleEngine.queue[battleEngine.currentIndex - 1].delay;
+            let waitTime = currentLauncher.delay - prevDelay;
+
+            if (waitTime <= 0) {
+                broadcastState('START_SEQUENCE', { queue: battleEngine.queue, currentIndex: battleEngine.currentIndex, currentLauncher: currentLauncher, secs: 0, isPrep: false });
+                battleEngine.currentIndex++;
+                setTimeout(runSequentialTimer, 1500); 
+            } else {
+                let remaining = waitTime;
+                
+                broadcastState('START_SEQUENCE', { queue: battleEngine.queue, currentIndex: battleEngine.currentIndex, currentLauncher: currentLauncher, secs: remaining, isPrep: false });
+                remaining--;
+
+                if (battleEngine.timerInterval) clearInterval(battleEngine.timerInterval);
+                battleEngine.timerInterval = setInterval(() => {
+                    broadcastState('START_SEQUENCE', { queue: battleEngine.queue, currentIndex: battleEngine.currentIndex, currentLauncher: currentLauncher, secs: remaining, isPrep: false });
+                    
+                    if (remaining === 0) {
+                        clearInterval(battleEngine.timerInterval);
+                        battleEngine.currentIndex++;
+                        setTimeout(runSequentialTimer, 1500);
+                    } else {
+                        remaining--;
+                    }
+                }, 1000);
+            }
+        }
+
+        function updateLiveUI(launcher, secs, isPrep) {
+            if (!launcher && !isPrep) return;
+            const statusDiv = document.getElementById('battle-status');
+            const targetDiv = document.getElementById('battle-current-target');
+            if(!statusDiv || !targetDiv) return;
+            
+            statusDiv.textContent = 'STATUS: LIVE SEQUENCE IN PROGRESS';
+            statusDiv.className = "text-[10px] uppercase tracking-wider text-emerald-400 font-bold animate-pulse";
+
+            if (isPrep) {
+                targetDiv.innerHTML = `⚠️ PREP: <span class="text-amber-400 text-xl">${secs}s</span>`;
+            } else if (secs > 0) {
+                targetDiv.innerHTML = `⏳ <b class="text-white">${launcher.name}</b> (G${launcher.group}) in: <span class="text-cyan-400 text-xl">${secs}s</span>`;
+            } else {
+                targetDiv.innerHTML = `🔥 <span class="text-white underline font-extrabold text-xl">${launcher.name}</span> LAUNCH! 🔥`;
+            }
+        }
+
+        const resetBtn = document.getElementById('reset-battle-btn');
+        if(resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                if (battleEngine.timerInterval) clearInterval(battleEngine.timerInterval);
+                broadcastState('RESET', {});
+            });
+        }
+
+        function resetBattleEngineUI() {
+            const statusDiv = document.getElementById('battle-status');
+            const targetDiv = document.getElementById('battle-current-target');
+            if(!statusDiv || !targetDiv) return;
+            statusDiv.textContent = "STATUS: STANDBY";
+            statusDiv.className = "text-[10px] uppercase tracking-wider text-slate-400 font-bold";
+            targetDiv.textContent = "Waiting for Leader...";
+            document.getElementById('battle-sequence-list').innerHTML = '';
+        }
+
+        function renderBattleQueueUI(activeIndex, queueList) {
+            const container = document.getElementById('battle-sequence-list');
+            if(!container || !queueList) return;
+            let html = '';
+            queueList.forEach((item, idx) => {
+                let badge = idx < activeIndex || activeIndex === -1 ? 'bg-emerald-500/20 text-emerald-400' : (idx === activeIndex ? 'bg-amber-500/20 text-amber-400 font-bold border-amber-500' : 'text-slate-400');
+                html += `<div class="flex items-center justify-between p-2.5 rounded border border-kingshot-border text-xs ${badge}"><span>#${idx+1} ${item.name} (G${item.group})</span><span class="font-bold">${idx === activeIndex ? '🔥 LAUNCH' : 'Pending'}</span></div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // إدارة اللاعبين والأدوار
+        window.switchRole = function(role) {
+            if (role === 'leader' && prompt("Leader Password:") !== LEADER_PASSWORD) return alert("❌ Wrong Password!");
+            currentRole = role;
+            localStorage.setItem('kingshot_role', role);
+            document.querySelectorAll('.leader-only').forEach(el => role === 'player' ? el.classList.add('hidden') : el.classList.remove('hidden'));
+            document.getElementById('mode-player-btn').className = role === 'player' ? "flex-1 py-1.5 text-xs font-bold rounded-md bg-emerald-600 text-white shadow" : "flex-1 py-1.5 text-xs font-bold rounded-md text-slate-400";
+            document.getElementById('mode-leader-btn').className = role === 'leader' ? "flex-1 py-1.5 text-xs font-bold rounded-md bg-blue-600 text-white shadow" : "flex-1 py-1.5 text-xs font-bold rounded-md text-slate-400";
+        };
+
+        document.getElementById('add-player-form').addEventListener('submit', function(e) {
+            e.preventDefault(); 
+            const editId = document.getElementById('edit-player-id').value;
+            const name = document.getElementById('player-name').value.trim();
+            const group = document.getElementById('player-group').value.trim();
+            const mins = parseInt(document.getElementById('march-mins').value) || 0;
+            const secs = parseInt(document.getElementById('march-secs').value) || 0;
+            if (!name) return;
+
+            if (editId) {
+                let p = state.players.find(p => p.id === editId);
+                if (p) { p.name = name; p.group = group; p.marchMins = mins; p.marchSecs = secs; }
+                cancelEdit();
+            } else {
+                state.players.push({ id: Date.now().toString(), name, group, marchMins: mins, marchSecs: secs, frozen: false });
+            }
+            savePlayers(); renderPlayerTable(); this.reset();
+        });
+
+        function renderPlayerTable() {
+            const tbody = document.getElementById('player-table-body');
+            const emptyState = document.getElementById('empty-state');
+            if(!tbody) return; tbody.innerHTML = '';
+            if (state.players.length === 0) emptyState.classList.remove('hidden');
+            else {
+                emptyState.classList.add('hidden');
+                state.players.forEach((p, i) => {
+                    tbody.innerHTML += `
+                        <tr class="border-b border-kingshot-border/60 ${p.frozen ? 'opacity-50 bg-blue-950/20' : ''}">
+                            <td class="py-2.5 px-2 text-center text-amber-400 font-bold text-[10px]">#${i+1}</td>
+                            <td class="py-2.5 px-3 text-white font-semibold">G${p.group} - ${p.name} <br><span class="text-[10px] text-slate-400">March: ${p.marchMins}m ${p.marchSecs}s</span></td>
+                            <td class="py-2.5 px-3 text-center"><button onclick="toggleFreeze('${p.id}')" class="px-2 py-1 rounded text-[10px] border ${p.frozen ? 'text-blue-400 border-blue-500' : 'text-emerald-400 border-emerald-500'}">${p.frozen ? 'Frozen' : 'Active'}</button></td>
+                            <td class="py-2.5 px-3 text-center"><button onclick="deletePlayer('${p.id}')" class="text-red-400 border border-red-500/50 px-2 py-1 rounded text-[10px]">Del</button></td>
+                        </tr>`;
+                });
+            }
+            updateWaveSelect();
+        }
+
+        window.toggleFreeze = function(id) { let p = state.players.find(i => i.id === id); if (p) { p.frozen = !p.frozen; savePlayers(); renderPlayerTable(); } };
+        window.deletePlayer = function(id) { state.players = state.players.filter(i => i.id !== id); savePlayers(); renderPlayerTable(); };
+        function updateWaveSelect() {
+            const s = document.getElementById('battle-wave-select'); if(!s) return;
+            const groups = [...new Set(state.players.map(p => p.group))];
+            s.innerHTML = '<option value="all">All Active Players</option>' + groups.map(g => `<option value="${g}">Group ${g}</option>`).join('');
+        }
+        function savePlayers() { localStorage.setItem('kingshot_players_v69', JSON.stringify(state.players)); }
+        
+        renderPlayerTable();
+        switchRole(currentRole);
     </script>
 </body>
 </html>
