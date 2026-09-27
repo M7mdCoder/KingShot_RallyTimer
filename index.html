@@ -44,8 +44,33 @@
 </head>
 <body class="bg-kingshot-dark text-slate-100 min-h-screen flex flex-col justify-between selection:bg-blue-500 selection:text-white">
 
+    <!-- Role Selection Modal / Screen -->
+    <div id="role-modal" class="fixed inset-0 bg-kingshot-dark/95 z-50 flex items-center justify-center p-4">
+        <div class="bg-kingshot-card border border-kingshot-border rounded-2xl p-6 max-w-md w-full shadow-2xl text-center space-y-6">
+            <div class="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center mx-auto shadow-lg border border-blue-400">
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+            </div>
+            <div>
+                <h2 class="gaming-font text-2xl font-bold tracking-wider text-white uppercase">KingshotLab V6.9</h2>
+                <p class="text-xs text-slate-400 mt-1">Please select your operational role to continue</p>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="handleRoleSelection('leader')" class="p-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition-all border border-blue-400 flex flex-col items-center gap-2 shadow-lg">
+                    <span class="text-2xl">👑</span>
+                    <span class="gaming-font uppercase text-sm">Leader</span>
+                </button>
+                <button onclick="handleRoleSelection('player')" class="p-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition-all border border-emerald-400 flex flex-col items-center gap-2 shadow-lg">
+                    <span class="text-2xl">🛡️</span>
+                    <span class="gaming-font uppercase text-sm">Player</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Header -->
-    <header class="bg-kingshot-card border-b border-kingshot-border shadow-lg sticky top-0 z-50">
+    <header class="bg-kingshot-card border-b border-kingshot-border shadow-lg sticky top-0 z-40">
         <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col gap-3">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-2">
@@ -62,9 +87,7 @@
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <!-- Connection Status Indicator -->
                     <span id="connection-status" class="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)] animate-pulse" title="Disconnected"></span>
-                    
                     <div id="room-badge" class="bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-emerald-400 font-bold text-xs uppercase tracking-wider">
                         ROOM: 1865
                     </div>
@@ -72,17 +95,13 @@
             </div>
 
             <div class="flex items-center justify-between gap-2 pt-1 border-t border-kingshot-border/60">
-                <div class="bg-kingshot-dark border border-kingshot-border rounded-lg p-1 flex items-center gap-1 flex-1">
-                    <button id="mode-leader-btn" onclick="switchRole('leader')" class="flex-1 py-1.5 text-xs font-bold rounded-md transition-all flex items-center justify-center gap-1 bg-blue-600 text-white shadow">
-                        👑 Leader
-                    </button>
-                    <button id="mode-player-btn" onclick="switchRole('player')" class="flex-1 py-1.5 text-xs font-bold rounded-md transition-all flex items-center justify-center gap-1 text-slate-400 hover:text-white">
-                        🛡️ Player
-                    </button>
+                <div class="flex items-center gap-2">
+                    <span id="current-role-badge" class="text-xs font-bold px-2.5 py-1 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30 uppercase">Role: Leader</span>
+                    <button onclick="resetRoleSelection()" class="text-[10px] text-slate-400 hover:text-white underline uppercase">Switch Role</button>
                 </div>
 
                 <button id="enable-audio-btn" onclick="enableAndTestAudio()" class="px-3 py-1.5 text-xs font-bold rounded-md bg-amber-500 hover:bg-amber-400 text-slate-900 flex items-center gap-1 shadow transition-all animate-bounce whitespace-nowrap">
-                    📞 Enable Call Mode
+                    📞 Enable Background Audio
                 </button>
             </div>
         </div>
@@ -205,9 +224,6 @@
     </main>
 
     <script>
-        // ==========================================
-        // 🔴🔴 إعدادات سوبابيز (مدمجة وجاهزة) 🔴🔴
-        // ==========================================
         const CONFIG = {
             supabaseUrl: "https://rdadphlhonsoqghwwaua.supabase.co",
             anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkYWRwaGxob25zb3FnaHd3YXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1MTIwNTMsImV4cCI6MjEwNjA4ODA1M30.mRwVaIH7RGl01rjntardLs8DyZIo0A0KYXqNNW0tJak", 
@@ -216,10 +232,10 @@
 
         let supabaseClient = null;
         let currentChannel = null;
-        let currentRole = localStorage.getItem('kingshot_role') || 'leader';
+        let currentRole = localStorage.getItem('kingshot_role') || '';
         let backgroundAudioCtx = null;
-        let isCallActive = false;
-        const LEADER_PASSWORD = "1234";
+        let audioSourceNode = null;
+        const LEADER_PASSWORD = "123";
 
         let state = {
             players: JSON.parse(localStorage.getItem('kingshot_players_v69') || '[]')
@@ -232,8 +248,9 @@
         };
 
         window.addEventListener('DOMContentLoaded', () => {
+            checkRolePrompt();
+
             try {
-                // الاتصال بسوبابيز
                 supabaseClient = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.anonKey);
                 currentChannel = supabaseClient.channel('room_' + CONFIG.roomCode);
 
@@ -258,37 +275,97 @@
             }
         });
 
-        // تفعيل وضع الاتصال المفتوح (لكي يعمل الصوت في الخلفية)
+        function checkRolePrompt() {
+            const modal = document.getElementById('role-modal');
+            if (!currentRole || (currentRole !== 'leader' && currentRole !== 'player')) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+                applyRoleUI(currentRole);
+            }
+        }
+
+        window.handleRoleSelection = function(role) {
+            if (role === 'leader') {
+                const pass = prompt("Please enter leader password:");
+                if (pass !== LEADER_PASSWORD) {
+                    alert("❌ Incorrect password!");
+                    return;
+                }
+            }
+            currentRole = role;
+            localStorage.setItem('kingshot_role', role);
+            document.getElementById('role-modal').classList.add('hidden');
+            applyRoleUI(role);
+        }
+
+        window.resetRoleSelection = function() {
+            localStorage.removeItem('kingshot_role');
+            currentRole = '';
+            document.getElementById('role-modal').classList.remove('hidden');
+        }
+
+        function applyRoleUI(role) {
+            const roleBadge = document.getElementById('current-role-badge');
+            roleBadge.textContent = `Role: ${role.toUpperCase()}`;
+            
+            document.querySelectorAll('.leader-only').forEach(el => {
+                if (role === 'player') {
+                    el.classList.add('hidden');
+                } else {
+                    el.classList.remove('hidden');
+                }
+            });
+        }
+
         window.enableAndTestAudio = function() {
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
-                backgroundAudioCtx = new AudioContext();
+                if (!backgroundAudioCtx) {
+                    backgroundAudioCtx = new AudioContext();
+                } else if (backgroundAudioCtx.state === 'suspended') {
+                    backgroundAudioCtx.resume();
+                }
+
+                if (audioSourceNode) {
+                    try { audioSourceNode.stop(); } catch(e){}
+                }
+
                 const bufferSize = backgroundAudioCtx.sampleRate * 2;
                 const noiseBuffer = backgroundAudioCtx.createBuffer(1, bufferSize, backgroundAudioCtx.sampleRate);
                 const output = noiseBuffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) { output[i] = Math.random() * 0.000001; }
-                const whiteNoise = backgroundAudioCtx.createBufferSource();
-                whiteNoise.buffer = noiseBuffer;
-                whiteNoise.loop = true;
-                whiteNoise.connect(backgroundAudioCtx.destination);
-                whiteNoise.start(0);
+                for (let i = 0; i < bufferSize; i++) { 
+                    output[i] = (Math.random() * 2 - 1) * 0.00001;
+                }
 
-                isCallActive = true;
-                speakText("Connected", 'en-US');
+                audioSourceNode = backgroundAudioCtx.createBufferSource();
+                audioSourceNode.buffer = noiseBuffer;
+                audioSourceNode.loop = true;
+                audioSourceNode.connect(backgroundAudioCtx.destination);
+                audioSourceNode.start(0);
+
+                speakText("Background mode active. Ready for battle.", 'en-US');
                 
                 const btn = document.getElementById('enable-audio-btn');
                 btn.className = "px-3 py-1.5 text-xs font-bold rounded-md bg-emerald-500 text-slate-900 flex items-center gap-1 shadow transition-all whitespace-nowrap";
-                btn.innerHTML = "📞 Call Active";
+                btn.innerHTML = "📞 Background Active";
             } catch (e) {
-                alert("⚠️ Please tap again to allow audio.");
+                alert("⚠️ Please tap again to allow audio permissions.");
             }
         };
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                if (backgroundAudioCtx && backgroundAudioCtx.state === 'suspended') {
+                    backgroundAudioCtx.resume();
+                }
+            }
+        });
 
         window.speakCustomText = function(text) {
             broadcastState('CUSTOM_AUDIO', { text: text });
         };
 
-        // بث الأوامر عبر سوبابيز
         function broadcastState(eventType, data) {
             const payload = { type: eventType, data: data };
             if (currentChannel) {
@@ -298,10 +375,9 @@
                     payload: payload
                 });
             }
-            handleBroadcastEvent(payload); // تنفيذ محلي للقائد أيضاً
+            handleBroadcastEvent(payload);
         }
 
-        // استقبال الأوامر
         function handleBroadcastEvent(msg) {
             if (msg.type === 'START_SEQUENCE') {
                 updateLiveUI(msg.data.currentLauncher, msg.data.secs, msg.data.isPrep);
@@ -331,12 +407,12 @@
                     window.speechSynthesis.cancel();
                     const utterance = new SpeechSynthesisUtterance(text);
                     utterance.lang = lang;
+                    utterance.rate = 1.0;
                     window.speechSynthesis.speak(utterance);
                 } catch (e) {}
             }
         }
 
-        // المحرك الرئيسي للوقت والتسلسل
         const startBtn = document.getElementById('start-battle-btn');
         if(startBtn) {
             startBtn.addEventListener('click', () => {
@@ -473,16 +549,6 @@
             container.innerHTML = html;
         }
 
-        // إدارة اللاعبين والأدوار
-        window.switchRole = function(role) {
-            if (role === 'leader' && prompt("Leader Password:") !== LEADER_PASSWORD) return alert("❌ Wrong Password!");
-            currentRole = role;
-            localStorage.setItem('kingshot_role', role);
-            document.querySelectorAll('.leader-only').forEach(el => role === 'player' ? el.classList.add('hidden') : el.classList.remove('hidden'));
-            document.getElementById('mode-player-btn').className = role === 'player' ? "flex-1 py-1.5 text-xs font-bold rounded-md bg-emerald-600 text-white shadow" : "flex-1 py-1.5 text-xs font-bold rounded-md text-slate-400";
-            document.getElementById('mode-leader-btn').className = role === 'leader' ? "flex-1 py-1.5 text-xs font-bold rounded-md bg-blue-600 text-white shadow" : "flex-1 py-1.5 text-xs font-bold rounded-md text-slate-400";
-        };
-
         document.getElementById('add-player-form').addEventListener('submit', function(e) {
             e.preventDefault(); 
             const editId = document.getElementById('edit-player-id').value;
@@ -506,9 +572,9 @@
             const tbody = document.getElementById('player-table-body');
             const emptyState = document.getElementById('empty-state');
             if(!tbody) return; tbody.innerHTML = '';
-            if (state.players.length === 0) emptyState.classList.remove('hidden');
+            if (state.players.length === 0) emptyState.classList.add('hidden');
             else {
-                emptyState.classList.add('hidden');
+                emptyState.classList.remove('hidden');
                 state.players.forEach((p, i) => {
                     tbody.innerHTML += `
                         <tr class="border-b border-kingshot-border/60 ${p.frozen ? 'opacity-50 bg-blue-950/20' : ''}">
@@ -532,7 +598,6 @@
         function savePlayers() { localStorage.setItem('kingshot_players_v69', JSON.stringify(state.players)); }
         
         renderPlayerTable();
-        switchRole(currentRole);
     </script>
 </body>
 </html>
