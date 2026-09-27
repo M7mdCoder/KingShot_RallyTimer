@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KingshotLab - Realtime Cloud Battle Station v6.4</title>
+    <title>KingshotLab - Realtime Cloud Battle Station v6.6</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS CDN -->
@@ -71,14 +71,14 @@
                     </div>
                     <div>
                         <h1 class="gaming-font text-xl font-bold tracking-wider text-white uppercase flex items-center gap-1.5">
-                            KingshotLab <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">V6.4</span>
+                            KingshotLab <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">V6.6</span>
                         </h1>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <div id="room-badge" class="hidden bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-emerald-400 font-bold text-xs uppercase tracking-wider">
-                        ROOM: <span id="current-room-id">--</span>
+                    <div id="room-badge" class="bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-emerald-400 font-bold text-xs uppercase tracking-wider">
+                        ROOM: <span id="current-room-id">1865</span>
                     </div>
                     <div class="bg-kingshot-dark border border-kingshot-border px-3 py-1.5 rounded-lg flex items-center space-x-2 shadow-inner">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -107,35 +107,8 @@
     <!-- Main Content -->
     <main class="max-w-6xl w-full mx-auto px-4 py-4 flex-grow space-y-4">
 
-        <!-- Cloud Room Setup -->
-        <div class="bg-kingshot-card border border-emerald-500/40 rounded-xl p-4 shadow-xl">
-            <h2 class="gaming-font text-sm font-bold text-emerald-400 uppercase tracking-wide flex items-center gap-2 mb-3">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-                ROOM & SUPABASE SETUP
-            </h2>
-            <div class="space-y-3">
-                <div>
-                    <label class="block text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-1">SUPABASE URL</label>
-                    <input type="text" id="supabase-url-input" placeholder="https://xxx.supabase.co" class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:outline-none focus:border-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-1">SUPABASE ANON KEY</label>
-                    <input type="password" id="anon-key-input" placeholder="Paste anon key here..." class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:outline-none focus:border-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-1">ROOM CODE</label>
-                    <input type="text" id="room-code-input" placeholder="e.g. 1865" class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:outline-none focus:border-emerald-500">
-                </div>
-                <div>
-                    <button type="button" id="join-room-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-lg shadow-lg shadow-emerald-600/30 transition-all gaming-font text-sm uppercase tracking-wider border border-emerald-400">
-                        SAVE & CONNECT ROOM
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- TACTICAL SETTINGS & QUICK AUDIO BUTTONS -->
-        <div class="bg-kingshot-card border border-blue-500/40 rounded-xl p-4 shadow-xl space-y-3">
+        <!-- TACTICAL SETTINGS & QUICK AUDIO BUTTONS (Leader Only) -->
+        <div class="leader-only bg-kingshot-card border border-blue-500/40 rounded-xl p-4 shadow-xl space-y-3">
             <h2 class="gaming-font text-sm font-bold text-blue-400 uppercase tracking-wide flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 TACTICAL TIMING & QUICK AUDIO BUTTONS
@@ -161,7 +134,7 @@
             </div>
         </div>
 
-        <!-- LIVE BATTLE STATION CONSOLE -->
+        <!-- LIVE BATTLE STATION CONSOLE (Visible to All) -->
         <div class="bg-kingshot-card border border-amber-500/50 rounded-xl p-4 shadow-2xl">
             <div class="flex flex-col gap-2 mb-3">
                 <h2 class="gaming-font text-sm font-bold text-amber-400 uppercase tracking-wide flex items-center gap-2">
@@ -264,13 +237,22 @@
     </main>
 
     <script>
+        // بيانات Supabase مثبتة كدائمة في الكود (Hardcoded) لضمان عدم الاحتياج للنسخ كل يوم
+        const CONFIG = {
+            supabaseUrl: "https://rdadphlhonsoqghwwaua.supabase.co",
+            anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkYWRwaGxob25zb3FnaHd3YXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyNDQzMTYsImV4cCI6MjA1NjgxNDMxNn0.your_actual_key_placeholder", // يمكنك استبداله بالكامل بالرمز الخاص بك لو احتجت
+            roomCode: "1865"
+        };
+
         let supabaseClient = null;
         let currentChannel = null;
         let currentRole = localStorage.getItem('kingshot_role') || 'leader';
         let audioContextUnlocked = false;
 
+        const LEADER_PASSWORD = "1234";
+
         let state = {
-            players: JSON.parse(localStorage.getItem('kingshot_players_v64') || '[]')
+            players: JSON.parse(localStorage.getItem('kingshot_players_v66') || '[]')
         };
 
         let battleEngine = {
@@ -279,12 +261,26 @@
             timerInterval: null
         };
 
+        // الاتصال التلقائي المباشر عند التحميل دون الحاجة لإدخال يدوي
         window.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('supabase-url-input').value = localStorage.getItem('ks_supabase_url') || 'https://rdadphlhonsoqghwwaua.supabase.co';
-            document.getElementById('anon-key-input').value = localStorage.getItem('ks_anon_key') || '';
-            document.getElementById('room-code-input').value = localStorage.getItem('ks_room_code') || '';
-            document.getElementById('player-gap-input').value = localStorage.getItem('ks_player_gap') || '1';
-            document.getElementById('group-gap-input').value = localStorage.getItem('ks_group_gap') || '3';
+            // استخدام مفتاح حقيقي أو مؤقت لو موجود
+            const storedKey = localStorage.getItem('ks_anon_key_fixed') || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkYWRwaGxob25zb3FnaHd3YXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyNDQzMTYsImV4cCI6MjA1NjgxNDMxNn0.2XQ...";
+            
+            // تهيئة Supabase تلقائياً
+            try {
+                supabaseClient = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.anonKey);
+                currentChannel = supabaseClient.channel('room_' + CONFIG.roomCode);
+
+                currentChannel.on('broadcast', { event: 'battle_event' }, (payload) => {
+                    handleBroadcastEvent(payload.payload);
+                }).subscribe((status) => {
+                    if (status === 'SUBSCRIBED') {
+                        console.log('🟢 Auto-connected to Room:', CONFIG.roomCode);
+                    }
+                });
+            } catch(e) {
+                console.error("Connection error", e);
+            }
         });
 
         window.speakGetReady = function() {
@@ -308,8 +304,6 @@
 
             navigator.clipboard.writeText(text).then(() => {
                 alert('✅ Roster and marches copied to clipboard successfully!');
-            }).catch(err => {
-                alert('❌ Failed to copy roster.');
             });
         };
 
@@ -324,12 +318,21 @@
         };
 
         window.switchRole = function(role) {
+            const leaderBtn = document.getElementById('mode-leader-btn');
+            const playerBtn = document.getElementById('mode-player-btn');
+
+            if (role === 'leader') {
+                let pass = prompt("الرجاء إدخال كلمة مرور القائد (Leader Password):");
+                if (pass !== LEADER_PASSWORD) {
+                    alert("❌ كلمة المرور غير صحيحة!");
+                    return;
+                }
+            }
+
             currentRole = role;
             localStorage.setItem('kingshot_role', role);
 
             const leaderElements = document.querySelectorAll('.leader-only');
-            const leaderBtn = document.getElementById('mode-leader-btn');
-            const playerBtn = document.getElementById('mode-player-btn');
 
             if (role === 'player') {
                 leaderElements.forEach(el => el.classList.add('hidden'));
@@ -342,37 +345,6 @@
             }
         };
 
-        document.getElementById('join-room-btn').addEventListener('click', () => {
-            const url = document.getElementById('supabase-url-input').value.trim();
-            const anonKey = document.getElementById('anon-key-input').value.trim();
-            const roomCode = document.getElementById('room-code-input').value.trim();
-            
-            if (!url) return alert('Please enter Supabase URL');
-            if (!anonKey) return alert('Please enter Supabase Anon Key');
-            if (!roomCode) return alert('Please enter Room Code');
-
-            localStorage.setItem('ks_supabase_url', url);
-            localStorage.setItem('ks_anon_key', anonKey);
-            localStorage.setItem('ks_room_code', roomCode);
-            
-            supabaseClient = window.supabase.createClient(url, anonKey);
-
-            if (currentChannel) supabaseClient.removeChannel(currentChannel);
-
-            currentChannel = supabaseClient.channel('room_' + roomCode);
-
-            currentChannel.on('broadcast', { event: 'battle_event' }, (payload) => {
-                handleBroadcastEvent(payload.payload);
-            }).subscribe((status) => {
-                if (status === 'SUBSCRIBED') {
-                    document.getElementById('room-badge').classList.remove('hidden');
-                    document.getElementById('current-room-id').textContent = roomCode;
-                    alert('🟢 Connected successfully to Room: ' + roomCode);
-                }
-            });
-        });
-
-        // دوال الترتيب اليدوي (تحريك للأعلى أو للأسفل)
         window.movePlayerUp = function(index) {
             if (index <= 0) return;
             let temp = state.players[index];
@@ -432,6 +404,7 @@
         function renderPlayerTable() {
             const tbody = document.getElementById('player-table-body');
             const emptyState = document.getElementById('empty-state');
+            if(!tbody) return;
             tbody.innerHTML = '';
 
             if (state.players.length === 0) {
@@ -510,6 +483,7 @@
 
         function updateWaveSelect() {
             const select = document.getElementById('battle-wave-select');
+            if(!select) return;
             const groups = [...new Set(state.players.map(p => p.group))];
             select.innerHTML = '<option value="all">All Active Players</option>';
             groups.forEach(g => {
@@ -517,7 +491,7 @@
             });
         }
 
-        function savePlayers() { localStorage.setItem('kingshot_players_v64', JSON.stringify(state.players)); }
+        function savePlayers() { localStorage.setItem('kingshot_players_v66', JSON.stringify(state.players)); }
 
         function broadcastState(eventType, data) {
             const payload = { type: eventType, data: data };
@@ -552,7 +526,7 @@
             } else if (msg.type === 'CUSTOM_AUDIO') {
                 speakText(msg.data.text, 'en-US');
                 const targetDiv = document.getElementById('battle-current-target');
-                targetDiv.innerHTML = `📢 <span class="text-indigo-400 font-bold">${msg.data.text}</span>`;
+                if(targetDiv) targetDiv.innerHTML = `📢 <span class="text-indigo-400 font-bold">${msg.data.text}</span>`;
             } else if (msg.type === 'RESET') {
                 resetBattleEngineUI();
             }
@@ -594,75 +568,71 @@
             } catch (e) {}
         }
 
-        // محرك حساب الترتيب اليدوي والفوارق الزمنية
-        document.getElementById('start-battle-btn').addEventListener('click', () => {
-            if (!currentChannel) return alert('⚠️ Please connect to a room first!');
+        const startBtn = document.getElementById('start-battle-btn');
+        if(startBtn) {
+            startBtn.addEventListener('click', () => {
+                if (!currentChannel) return alert('⚠️ Please connect to a room first!');
 
-            const selectedWave = document.getElementById('battle-wave-select').value;
-            // استخدام الترتيب اليدوي الحالي للمصفوفة كما رتبها المستخدم
-            let activePlayers = state.players.filter(p => !p.frozen && (selectedWave === 'all' || String(p.group) === selectedWave));
+                const selectedWave = document.getElementById('battle-wave-select').value;
+                let activePlayers = state.players.filter(p => !p.frozen && (selectedWave === 'all' || String(p.group) === selectedWave));
 
-            if (activePlayers.length === 0) return alert('No active (non-frozen) players found!');
+                if (activePlayers.length === 0) return alert('No active (non-frozen) players found!');
 
-            const playerGap = parseInt(document.getElementById('player-gap-input').value) || 0;
-            const groupGap = parseInt(document.getElementById('group-gap-input').value) || 0;
+                const playerGap = parseInt(document.getElementById('player-gap-input').value) || 0;
+                const groupGap = parseInt(document.getElementById('group-gap-input').value) || 0;
 
-            localStorage.setItem('ks_player_gap', playerGap);
-            localStorage.setItem('ks_group_gap', groupGap);
+                let mapped = activePlayers.map(p => ({
+                    name: p.name,
+                    group: String(p.group),
+                    marchSec: (p.marchMins * 60) + p.marchSecs
+                }));
 
-            let mapped = activePlayers.map(p => ({
-                name: p.name,
-                group: String(p.group),
-                marchSec: (p.marchMins * 60) + p.marchSecs
-            }));
+                let maxMarch = Math.max(...mapped.map(m => m.marchSec));
+                let queue = [];
+                let lastGroup = null;
+                let cumulativeGroupDelay = 0;
 
-            // الحفاظ على الترتيب اليدوي الذي حدده القائد في الجدول مع تطبيق الفوارق الزمنية
-            let maxMarch = Math.max(...mapped.map(m => m.marchSec));
-            let queue = [];
-            let lastGroup = null;
-            let cumulativeGroupDelay = 0;
+                mapped.forEach((m, index) => {
+                    let baseDelay = maxMarch - m.marchSec;
+                    if (index === 0) {
+                        lastGroup = m.group;
+                    } else if (m.group !== lastGroup) {
+                        cumulativeGroupDelay += groupGap;
+                        lastGroup = m.group;
+                    }
 
-            mapped.forEach((m, index) => {
-                let baseDelay = maxMarch - m.marchSec;
-                if (index === 0) {
-                    lastGroup = m.group;
-                } else if (m.group !== lastGroup) {
-                    cumulativeGroupDelay += groupGap;
-                    lastGroup = m.group;
-                }
-
-                let finalDelay = baseDelay + cumulativeGroupDelay + (index * playerGap);
-                queue.push({
-                    name: m.name,
-                    group: m.group,
-                    marchSec: m.marchSec,
-                    delay: finalDelay
-                });
-            });
-
-            // ترتيب الطابور بناءً على الجدول اليدوي المعتمد
-            battleEngine.queue = queue;
-            battleEngine.currentIndex = 0;
-
-            let prepRemaining = 3;
-            if (battleEngine.timerInterval) clearInterval(battleEngine.timerInterval);
-
-            battleEngine.timerInterval = setInterval(() => {
-                if (prepRemaining > 0) {
-                    broadcastState('START_SEQUENCE', {
-                        queue: battleEngine.queue,
-                        currentIndex: 0,
-                        currentLauncher: battleEngine.queue[0],
-                        secs: prepRemaining,
-                        isPrep: true
+                    let finalDelay = baseDelay + cumulativeGroupDelay + (index * playerGap);
+                    queue.push({
+                        name: m.name,
+                        group: m.group,
+                        marchSec: m.marchSec,
+                        delay: finalDelay
                     });
-                    prepRemaining--;
-                } else {
-                    clearInterval(battleEngine.timerInterval);
-                    runSequentialTimer();
-                }
-            }, 1000);
-        });
+                });
+
+                battleEngine.queue = queue;
+                battleEngine.currentIndex = 0;
+
+                let prepRemaining = 3;
+                if (battleEngine.timerInterval) clearInterval(battleEngine.timerInterval);
+
+                battleEngine.timerInterval = setInterval(() => {
+                    if (prepRemaining > 0) {
+                        broadcastState('START_SEQUENCE', {
+                            queue: battleEngine.queue,
+                            currentIndex: 0,
+                            currentLauncher: battleEngine.queue[0],
+                            secs: prepRemaining,
+                            isPrep: true
+                        });
+                        prepRemaining--;
+                    } else {
+                        clearInterval(battleEngine.timerInterval);
+                        runSequentialTimer();
+                    }
+                }, 1000);
+            });
+        }
 
         function runSequentialTimer() {
             if (battleEngine.currentIndex >= battleEngine.queue.length) {
@@ -712,6 +682,7 @@
             if (!launcher && !isPrep) return;
             const statusDiv = document.getElementById('battle-status');
             const targetDiv = document.getElementById('battle-current-target');
+            if(!statusDiv || !targetDiv) return;
             
             statusDiv.textContent = 'STATUS: LIVE SEQUENCE IN PROGRESS';
             statusDiv.className = "text-[10px] uppercase tracking-wider text-emerald-400 font-bold animate-pulse";
@@ -725,22 +696,28 @@
             }
         }
 
-        document.getElementById('reset-battle-btn').addEventListener('click', () => {
-            if (battleEngine.timerInterval) clearInterval(battleEngine.timerInterval);
-            resetBattleEngineUI();
-            broadcastState('RESET', {});
-        });
+        const resetBtn = document.getElementById('reset-battle-btn');
+        if(resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                if (battleEngine.timerInterval) clearInterval(battleEngine.timerInterval);
+                resetBattleEngineUI();
+                broadcastState('RESET', {});
+            });
+        }
 
         function resetBattleEngineUI() {
             const statusDiv = document.getElementById('battle-status');
+            const targetDiv = document.getElementById('battle-current-target');
+            if(!statusDiv || !targetDiv) return;
             statusDiv.textContent = "STATUS: STANDBY";
             statusDiv.className = "text-[10px] uppercase tracking-wider text-slate-400 font-bold";
-            document.getElementById('battle-current-target').textContent = "Waiting for Leader to start...";
+            targetDiv.textContent = "Waiting for Leader to start...";
             document.getElementById('battle-sequence-list').innerHTML = `<div class="p-3 text-center text-xs text-slate-500 italic border border-dashed border-kingshot-border rounded-lg">No active sequence loaded.</div>`;
         }
 
         function renderBattleQueueUI(activeIndex) {
             const container = document.getElementById('battle-sequence-list');
+            if(!container) return;
             let html = '';
             battleEngine.queue.forEach((item, idx) => {
                 let badge = idx < activeIndex || activeIndex === -1 ? 'bg-emerald-500/20 text-emerald-400' : (idx === activeIndex ? 'bg-amber-500/20 text-amber-400 font-bold border-amber-500' : 'text-slate-400');
@@ -749,7 +726,10 @@
             container.innerHTML = html;
         }
 
-        function updateClock() { document.getElementById('utc-clock').textContent = new Date().toISOString().substr(11, 8); }
+        function updateClock() { 
+            const clockEl = document.getElementById('utc-clock');
+            if(clockEl) clockEl.textContent = new Date().toISOString().substr(11, 8); 
+        }
         setInterval(updateClock, 1000);
         updateClock();
         renderPlayerTable();
