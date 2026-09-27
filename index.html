@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KingshotLab - Realtime Cloud Battle Station v6.6</title>
+    <title>KingshotLab - Realtime Cloud Battle Station v6.7</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS CDN -->
@@ -71,7 +71,7 @@
                     </div>
                     <div>
                         <h1 class="gaming-font text-xl font-bold tracking-wider text-white uppercase flex items-center gap-1.5">
-                            KingshotLab <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">V6.6</span>
+                            KingshotLab <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">V6.7 CallMode</span>
                         </h1>
                     </div>
                 </div>
@@ -98,7 +98,7 @@
                 </div>
 
                 <button id="enable-audio-btn" onclick="enableAndTestAudio()" class="px-3 py-1.5 text-xs font-bold rounded-md bg-amber-500 hover:bg-amber-400 text-slate-900 flex items-center gap-1 shadow transition-all animate-bounce whitespace-nowrap">
-                    🔊 Activate Audio
+                    📞 Enable Background Call
                 </button>
             </div>
         </div>
@@ -237,22 +237,22 @@
     </main>
 
     <script>
-        // بيانات Supabase مثبتة كدائمة في الكود (Hardcoded) لضمان عدم الاحتياج للنسخ كل يوم
         const CONFIG = {
             supabaseUrl: "https://rdadphlhonsoqghwwaua.supabase.co",
-            anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkYWRwaGxob25zb3FnaHd3YXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyNDQzMTYsImV4cCI6MjA1NjgxNDMxNn0.your_actual_key_placeholder", // يمكنك استبداله بالكامل بالرمز الخاص بك لو احتجت
+            anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkYWRwaGxob25zb3FnaHd3YXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyNDQzMTYsImV4cCI6MjA1NjgxNDMxNn0.your_actual_key_placeholder", 
             roomCode: "1865"
         };
 
         let supabaseClient = null;
         let currentChannel = null;
         let currentRole = localStorage.getItem('kingshot_role') || 'leader';
-        let audioContextUnlocked = false;
+        let backgroundAudioCtx = null;
+        let isCallActive = false;
 
         const LEADER_PASSWORD = "1234";
 
         let state = {
-            players: JSON.parse(localStorage.getItem('kingshot_players_v66') || '[]')
+            players: JSON.parse(localStorage.getItem('kingshot_players_v67') || '[]')
         };
 
         let battleEngine = {
@@ -261,12 +261,7 @@
             timerInterval: null
         };
 
-        // الاتصال التلقائي المباشر عند التحميل دون الحاجة لإدخال يدوي
         window.addEventListener('DOMContentLoaded', () => {
-            // استخدام مفتاح حقيقي أو مؤقت لو موجود
-            const storedKey = localStorage.getItem('ks_anon_key_fixed') || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkYWRwaGxob25zb3FnaHd3YXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyNDQzMTYsImV4cCI6MjA1NjgxNDMxNn0.2XQ...";
-            
-            // تهيئة Supabase تلقائياً
             try {
                 supabaseClient = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.anonKey);
                 currentChannel = supabaseClient.channel('room_' + CONFIG.roomCode);
@@ -282,6 +277,45 @@
                 console.error("Connection error", e);
             }
         });
+
+        // تشغيل محرك الاتصال الخلفي (مثل المكالمات) لمنع التجميد في الخلفية
+        window.enableAndTestAudio = function() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                backgroundAudioCtx = new AudioContext();
+                
+                // تشغيل تردد صامت خفي بشكل دوري لإبقاء قناة الصوت مفتوحة ونشطة كالمكالمة
+                const bufferSize = backgroundAudioCtx.sampleRate * 2;
+                const noiseBuffer = backgroundAudioCtx.createBuffer(1, bufferSize, backgroundAudioCtx.sampleRate);
+                const output = noiseBuffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    output[i] = Math.random() * 0.000001; // صوت صامت جداً لا يُسمع لكن يبقي المعالج نشطاً
+                }
+
+                const whiteNoise = backgroundAudioCtx.createBufferSource();
+                whiteNoise.buffer = noiseBuffer;
+                whiteNoise.loop = true;
+                whiteNoise.connect(backgroundAudioCtx.destination);
+                whiteNoise.start(0);
+
+                // تفعيل MediaSession لإقناع النظام بأن التطبيق مكالمة أو بث صوتي نشط
+                if ('mediaSession' in navigator) {
+                    navigator.mediaSession.playbackState = 'playing';
+                    navigator.mediaSession.setActionHandler('play', () => {});
+                    navigator.mediaSession.setActionHandler('pause', () => {});
+                }
+
+                isCallActive = true;
+                playBeep();
+                speakText("Background call active", 'en-US');
+                
+                const btn = document.getElementById('enable-audio-btn');
+                btn.className = "px-3 py-1.5 text-xs font-bold rounded-md bg-emerald-500 text-slate-900 flex items-center gap-1 shadow transition-all whitespace-nowrap";
+                btn.innerHTML = "📞 Call Mode Active";
+            } catch (e) {
+                alert("⚠️ Please tap again to allow audio.");
+            }
+        };
 
         window.speakGetReady = function() {
             broadcastState('CUSTOM_AUDIO', { text: "Get ready for battle" });
@@ -305,16 +339,6 @@
             navigator.clipboard.writeText(text).then(() => {
                 alert('✅ Roster and marches copied to clipboard successfully!');
             });
-        };
-
-        window.enableAndTestAudio = function() {
-            audioContextUnlocked = true;
-            playBeep();
-            speakText("Audio system active", 'en-US');
-            
-            const btn = document.getElementById('enable-audio-btn');
-            btn.className = "px-3 py-1.5 text-xs font-bold rounded-md bg-emerald-500 text-slate-900 flex items-center gap-1 shadow transition-all whitespace-nowrap";
-            btn.innerHTML = "🔊 Audio Active";
         };
 
         window.switchRole = function(role) {
@@ -491,7 +515,7 @@
             });
         }
 
-        function savePlayers() { localStorage.setItem('kingshot_players_v66', JSON.stringify(state.players)); }
+        function savePlayers() { localStorage.setItem('kingshot_players_v67', JSON.stringify(state.players)); }
 
         function broadcastState(eventType, data) {
             const payload = { type: eventType, data: data };
@@ -719,6 +743,7 @@
             const container = document.getElementById('battle-sequence-list');
             if(!container) return;
             let html = '';
+            battleEngine.queue.graph.forEach?.(item => {}) // safe
             battleEngine.queue.forEach((item, idx) => {
                 let badge = idx < activeIndex || activeIndex === -1 ? 'bg-emerald-500/20 text-emerald-400' : (idx === activeIndex ? 'bg-amber-500/20 text-amber-400 font-bold border-amber-500' : 'text-slate-400');
                 html += `<div class="flex items-center justify-between p-2.5 rounded border border-kingshot-border text-xs ${badge}"><span>#${idx+1} ${item.name} (G${item.group})</span><span class="font-bold">${idx === activeIndex ? '🔥 LAUNCH' : 'Pending'}</span></div>`;
