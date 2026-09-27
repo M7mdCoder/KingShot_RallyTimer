@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KingshotLab - Realtime Cloud Battle Station v6.7</title>
+    <title>KingshotLab - Realtime Cloud Battle Station v6.8</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS CDN -->
@@ -71,7 +71,7 @@
                     </div>
                     <div>
                         <h1 class="gaming-font text-xl font-bold tracking-wider text-white uppercase flex items-center gap-1.5">
-                            KingshotLab <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">V6.7 CallMode</span>
+                            KingshotLab <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">V6.8</span>
                         </h1>
                     </div>
                 </div>
@@ -252,7 +252,7 @@
         const LEADER_PASSWORD = "1234";
 
         let state = {
-            players: JSON.parse(localStorage.getItem('kingshot_players_v67') || '[]')
+            players: JSON.parse(localStorage.getItem('kingshot_players_v68') || '[]')
         };
 
         let battleEngine = {
@@ -278,18 +278,17 @@
             }
         });
 
-        // تشغيل محرك الاتصال الخلفي (مثل المكالمات) لمنع التجميد في الخلفية
+        // تشغيل محرك الاتصال الخلفي الصامت لمنع التجميد في الخلفية مثل المكالمات
         window.enableAndTestAudio = function() {
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 backgroundAudioCtx = new AudioContext();
                 
-                // تشغيل تردد صامت خفي بشكل دوري لإبقاء قناة الصوت مفتوحة ونشطة كالمكالمة
                 const bufferSize = backgroundAudioCtx.sampleRate * 2;
                 const noiseBuffer = backgroundAudioCtx.createBuffer(1, bufferSize, backgroundAudioCtx.sampleRate);
                 const output = noiseBuffer.getChannelData(0);
                 for (let i = 0; i < bufferSize; i++) {
-                    output[i] = Math.random() * 0.000001; // صوت صامت جداً لا يُسمع لكن يبقي المعالج نشطاً
+                    output[i] = Math.random() * 0.000001;
                 }
 
                 const whiteNoise = backgroundAudioCtx.createBufferSource();
@@ -298,7 +297,6 @@
                 whiteNoise.connect(backgroundAudioCtx.destination);
                 whiteNoise.start(0);
 
-                // تفعيل MediaSession لإقناع النظام بأن التطبيق مكالمة أو بث صوتي نشط
                 if ('mediaSession' in navigator) {
                     navigator.mediaSession.playbackState = 'playing';
                     navigator.mediaSession.setActionHandler('play', () => {});
@@ -306,8 +304,7 @@
                 }
 
                 isCallActive = true;
-                playBeep();
-                speakText("Background call active", 'en-US');
+                speakText("Call mode active", 'en-US');
                 
                 const btn = document.getElementById('enable-audio-btn');
                 btn.className = "px-3 py-1.5 text-xs font-bold rounded-md bg-emerald-500 text-slate-900 flex items-center gap-1 shadow transition-all whitespace-nowrap";
@@ -515,7 +512,7 @@
             });
         }
 
-        function savePlayers() { localStorage.setItem('kingshot_players_v67', JSON.stringify(state.players)); }
+        function savePlayers() { localStorage.setItem('kingshot_players_v68', JSON.stringify(state.players)); }
 
         function broadcastState(eventType, data) {
             const payload = { type: eventType, data: data };
@@ -543,7 +540,6 @@
                     if (msg.data.secs > 0) {
                         speakText(msg.data.secs.toString(), 'en-US');
                     } else if (msg.data.secs === 0) {
-                        playBeep();
                         speakText(msg.data.currentLauncher.name, 'en-US');
                     }
                 }
@@ -565,31 +561,9 @@
                     utterance.rate = 1.0;
                     utterance.volume = 1.0;
                     utterance.pitch = 1.0;
-                    utterance.onerror = () => playBeep();
                     window.speechSynthesis.speak(utterance);
-                } catch (e) {
-                    playBeep();
-                }
-            } else {
-                playBeep();
+                } catch (e) {}
             }
-        }
-
-        function playBeep() {
-            try {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                if (!AudioContext) return;
-                const audioCtx = new AudioContext();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.2);
-            } catch (e) {}
         }
 
         const startBtn = document.getElementById('start-battle-btn');
@@ -743,7 +717,6 @@
             const container = document.getElementById('battle-sequence-list');
             if(!container) return;
             let html = '';
-            battleEngine.queue.graph.forEach?.(item => {}) // safe
             battleEngine.queue.forEach((item, idx) => {
                 let badge = idx < activeIndex || activeIndex === -1 ? 'bg-emerald-500/20 text-emerald-400' : (idx === activeIndex ? 'bg-amber-500/20 text-amber-400 font-bold border-amber-500' : 'text-slate-400');
                 html += `<div class="flex items-center justify-between p-2.5 rounded border border-kingshot-border text-xs ${badge}"><span>#${idx+1} ${item.name} (G${item.group})</span><span class="font-bold">${idx === activeIndex ? '🔥 LAUNCH' : 'Pending'}</span></div>`;
