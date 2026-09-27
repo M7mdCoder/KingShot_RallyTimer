@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة الغرفة - 1865</title>
+    <title>Room 1865</title>
     
-    <!-- مكتبة سوبابيز -->
+    <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
@@ -17,7 +17,6 @@
             padding: 20px; 
             margin: 0;
         }
-        /* إعدادات الشاشات المخفية والظاهرة */
         .screen { display: none; }
         .active-screen { display: block; animation: fadeIn 0.5s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -55,89 +54,68 @@
             border: 1px solid #333; margin-bottom: 15px; width: 90%; text-align: center;
         }
         #log {
-            color: #bbb; height: 150px; overflow-y: auto; text-align: right; 
+            color: #bbb; height: 150px; overflow-y: auto; text-align: left; 
             background: #000; padding: 15px; border-radius: 5px; font-size: 14px;
         }
     </style>
 </head>
 <body>
 
-    <!-- ========================================== -->
-    <!-- 1️⃣ شاشة البداية (اختيار لاعب أو قائد) -->
-    <!-- ========================================== -->
+    <!-- 1️⃣ Welcome Screen -->
     <div id="welcomeScreen" class="screen active-screen">
-        <h2>أهلاً بك في غرفة 1865 🎮</h2>
-        <p>الرجاء اختيار دورك للدخول:</p>
-        <button class="btn" onclick="joinAsPlayer()">🎮 أنا لاعب (Player)</button>
+        <h2>Welcome to Room 1865 🎮</h2>
+        <p>Please select your role:</p>
+        <button class="btn" onclick="joinAsPlayer()">🎮 I am a Player</button>
         <br>
-        <button class="btn btn-leader" onclick="showPasswordScreen()">👑 أنا القائد (Leader)</button>
+        <button class="btn btn-leader" onclick="showPasswordScreen()">👑 I am the Leader</button>
     </div>
 
-    <!-- ========================================== -->
-    <!-- 2️⃣ شاشة كلمة المرور للقائد -->
-    <!-- ========================================== -->
+    <!-- 2️⃣ Password Screen -->
     <div id="passwordScreen" class="screen">
-        <h2>🔒 دخول القائد</h2>
-        <p>أدخل كلمة المرور الخاصة بالقائد:</p>
-        <input type="password" id="adminPassword" placeholder="كلمة المرور...">
+        <h2>🔒 Leader Login</h2>
+        <p>Enter the leader password:</p>
+        <input type="password" id="adminPassword" placeholder="Password...">
         <br>
-        <button class="btn btn-leader" onclick="checkPassword()">دخول</button>
-        <button class="btn btn-danger" onclick="goBack()">🔙 رجوع</button>
+        <button class="btn btn-leader" onclick="checkPassword()">Login</button>
+        <button class="btn btn-danger" onclick="goBack()">🔙 Back</button>
     </div>
 
-    <!-- ========================================== -->
-    <!-- 3️⃣ شاشة الغرفة (تظهر للاعب والقائد باختلافات) -->
-    <!-- ========================================== -->
+    <!-- 3️⃣ Main Room Screen -->
     <div id="mainRoomScreen" class="screen">
         <div class="header">
             <h2 id="roleTitle">ROOM: 1865</h2>
             <div style="display: flex; align-items: center; gap: 10px;">
-                <span id="statusText" style="font-weight: bold;">جاري الاتصال...</span>
+                <span id="statusText" style="font-weight: bold;">Connecting...</span>
                 <div id="statusLight" class="status-light"></div>
             </div>
         </div>
 
-        <!-- لوحة التحكم (تظهر للقائد فقط) -->
+        <!-- Leader Controls -->
         <div id="leaderControls" class="card" style="display: none;">
-            <h3>👑 لوحة تحكم القائد</h3>
-            <input type="text" id="playerName" placeholder="اكتب اسم اللاعب هنا...">
+            <h3>👑 Leader Panel</h3>
+            <input type="text" id="playerName" placeholder="Enter player name...">
             <br>
-            <button class="btn" onclick="sendName()">📢 نطق الاسم</button>
-            <button class="btn btn-danger" onclick="sendCountdown()">⏱️ بدء العد التنازلي</button>
+            <button class="btn" onclick="sendName()">📢 Call Name</button>
+            <button class="btn btn-danger" onclick="sendCountdown()">⏱️ Start Countdown</button>
         </div>
 
-        <!-- شاشة اللاعب (تظهر للاعب فقط) -->
+        <!-- Player View -->
         <div id="playerView" class="card" style="display: none; background: #004d40;">
-            <h3>🎧 أنت الآن تستمع كلاعب</h3>
-            <p>انتظر أوامر القائد...</p>
+            <h3>🎧 You are listening as a Player</h3>
+            <p>Waiting for leader commands...</p>
         </div>
 
-        <!-- سجل الأحداث (يظهر للجميع) -->
+        <!-- Event Log -->
         <div class="card" style="margin-top: 20px;">
-            <h3>📜 سجل الأحداث</h3>
+            <h3>📜 Event Log</h3>
             <div id="log"></div>
         </div>
     </div>
 
     <script>
-        // كلمة المرور الخاصة بالقائد (تقدر تغيرها من هنا)
+        // UI Navigation Setup
         const SECRET_PASSWORD = "123"; 
 
-        // ==========================================
-        // 🔴 إعدادات سوبابيز
-        // ==========================================
-        const CONFIG = {
-            supabaseUrl: "https://rdadphlhonsoqghwwaua.supabase.co",
-            anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkYWRwaGxob25zb3FnaHd3YXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1MTIwNTMsImV4cCI6MjEwNjA4ODA1M30.mRwVaIH7RGl01rjntardLs8DyZIo0A0KYXqNNW0tJak",
-            roomCode: "1865"
-        };
-
-        const supabase = supabase.createClient(CONFIG.supabaseUrl, CONFIG.anonKey);
-        const roomChannel = supabase.channel('room_' + CONFIG.roomCode);
-
-        // ==========================================
-        // 🔄 التنقل بين الشاشات
-        // ==========================================
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
             document.getElementById(screenId).classList.add('active-screen');
@@ -145,7 +123,7 @@
 
         function goBack() {
             showScreen('welcomeScreen');
-            document.getElementById('adminPassword').value = ''; // تفريغ كلمة المرور
+            document.getElementById('adminPassword').value = ''; 
         }
 
         function showPasswordScreen() {
@@ -157,82 +135,89 @@
             if (pass === SECRET_PASSWORD) {
                 joinAsLeader();
             } else {
-                alert("❌ كلمة المرور خاطئة!");
+                alert("❌ Wrong password!");
             }
         }
 
-        // ==========================================
-        // 🎮 دخول اللاعب
-        // ==========================================
         function joinAsPlayer() {
             showScreen('mainRoomScreen');
-            document.getElementById('roleTitle').innerText = "أنت لاعب 🎮";
+            document.getElementById('roleTitle').innerText = "Player 🎮";
             document.getElementById('playerView').style.display = "block";
             document.getElementById('leaderControls').style.display = "none";
             startSupabase();
-            
-            // تهيئة الصوت (لأن المتصفح يطلب تفاعل المستخدم أولاً)
-            speakText("تم الدخول للغرفة");
+            speakText("Joined the room");
         }
 
-        // ==========================================
-        // 👑 دخول القائد
-        // ==========================================
         function joinAsLeader() {
             showScreen('mainRoomScreen');
-            document.getElementById('roleTitle').innerText = "أنت القائد 👑";
+            document.getElementById('roleTitle').innerText = "Leader 👑";
             document.getElementById('leaderControls').style.display = "block";
             document.getElementById('playerView').style.display = "none";
             startSupabase();
         }
 
         // ==========================================
-        // 📡 الاتصال بسوبابيز (يعمل للطرفين)
+        // Supabase & Voice Logic
         // ==========================================
+        let roomChannel;
+        
         function startSupabase() {
-            roomChannel
-                .on('broadcast', { event: 'action' }, (payload) => {
-                    const data = payload.payload;
-                    if (data.type === 'name') {
-                        addLog(`🔊 نداء للاعب: ${data.name}`);
-                        speakText(data.name);
-                    } 
-                    else if (data.type === 'countdown') {
-                        addLog(`⏱️ بدء العد التنازلي!`);
-                        playCountdown();
-                    }
-                })
-                .subscribe((status) => {
-                    if (status === 'SUBSCRIBED') {
-                        document.getElementById('statusLight').classList.add('connected');
-                        document.getElementById('statusText').innerText = "متصل 🟢";
-                        document.getElementById('statusText').style.color = "#00ff00";
-                    }
-                });
+            try {
+                const CONFIG = {
+                    supabaseUrl: "https://rdadphlhonsoqghwwaua.supabase.co",
+                    anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkYWRwaGxob25zb3FnaHd3YXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1MTIwNTMsImV4cCI6MjEwNjA4ODA1M30.mRwVaIH7RGl01rjntardLs8DyZIo0A0KYXqNNW0tJak",
+                    roomCode: "1865"
+                };
+
+                const supabase = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.anonKey);
+                roomChannel = supabase.channel('room_' + CONFIG.roomCode);
+
+                roomChannel
+                    .on('broadcast', { event: 'action' }, (payload) => {
+                        const data = payload.payload;
+                        if (data.type === 'name') {
+                            addLog(`🔊 Calling player: ${data.name}`);
+                            speakText(data.name);
+                        } 
+                        else if (data.type === 'countdown') {
+                            addLog(`⏱️ Countdown started!`);
+                            playCountdown();
+                        }
+                    })
+                    .subscribe((status) => {
+                        if (status === 'SUBSCRIBED') {
+                            document.getElementById('statusLight').classList.add('connected');
+                            document.getElementById('statusText').innerText = "Connected 🟢";
+                            document.getElementById('statusText').style.color = "#00ff00";
+                            addLog("✅ Successfully connected to Room 1865!");
+                        }
+                    });
+            } catch (error) {
+                console.error("Supabase Error:", error);
+                addLog("⚠️ Connection error. Please check your network.");
+            }
         }
 
-        // ==========================================
-        // 📤 إرسال الأوامر (للقائد فقط)
-        // ==========================================
         function sendName() {
             const name = document.getElementById('playerName').value.trim();
-            if (!name) return alert("⚠️ اكتب اسم اللاعب أولاً!");
+            if (!name) return alert("⚠️ Please enter a player name first!");
             
-            roomChannel.send({ type: 'broadcast', event: 'action', payload: { type: 'name', name: name } });
-            addLog(`📤 أرسلت أمر نداء لـ: ${name}`);
+            if (roomChannel) {
+                roomChannel.send({ type: 'broadcast', event: 'action', payload: { type: 'name', name: name } });
+                addLog(`📤 Sent call command for: ${name}`);
+            }
         }
 
         function sendCountdown() {
-            roomChannel.send({ type: 'broadcast', event: 'action', payload: { type: 'countdown' } });
-            addLog(`📤 أرسلت أمر العد التنازلي`);
+            if (roomChannel) {
+                roomChannel.send({ type: 'broadcast', event: 'action', payload: { type: 'countdown' } });
+                addLog(`📤 Sent countdown command`);
+            }
         }
 
-        // ==========================================
-        // 🗣️ وظائف الصوت والسجل
-        // ==========================================
         function addLog(msg) {
             const logDiv = document.getElementById('log');
-            const time = new Date().toLocaleTimeString('ar-SA');
+            const time = new Date().toLocaleTimeString('en-US');
             logDiv.innerHTML += `<p style="margin: 5px 0; border-bottom: 1px solid #333; padding-bottom: 5px;">[${time}] ${msg}</p>`;
             logDiv.scrollTop = logDiv.scrollHeight;
         }
@@ -240,7 +225,7 @@
         function speakText(text) {
             window.speechSynthesis.cancel(); 
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'ar-SA'; 
+            utterance.lang = 'en-US'; // صوت إنجليزي
             utterance.rate = 0.9; 
             window.speechSynthesis.speak(utterance);
         }
@@ -253,7 +238,7 @@
                     count--;
                 } else {
                     clearInterval(interval);
-                    speakText("انطلق!");
+                    speakText("Go!"); // كلمة الانطلاق بالإنجليزية
                 }
             }, 1000);
         }
