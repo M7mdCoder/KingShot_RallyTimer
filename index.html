@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KingshotLab - Realtime Cloud Battle Station v6.9</title>
+    <title>KingshotLab - Realtime Cloud Battle Station v6.10</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS CDN -->
@@ -53,7 +53,7 @@
                 </svg>
             </div>
             <div>
-                <h2 class="gaming-font text-2xl font-bold tracking-wider text-white uppercase">KingshotLab V6.9</h2>
+                <h2 class="gaming-font text-2xl font-bold tracking-wider text-white uppercase">KingshotLab V6.10</h2>
                 <p class="text-xs text-slate-400 mt-1">Please select your operational role to continue</p>
             </div>
             <div class="grid grid-cols-2 gap-3">
@@ -81,7 +81,7 @@
                     </div>
                     <div>
                         <h1 class="gaming-font text-xl font-bold tracking-wider text-white uppercase flex items-center gap-1.5">
-                            KingshotLab <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">V6.9</span>
+                            KingshotLab <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">V6.10</span>
                         </h1>
                     </div>
                 </div>
@@ -238,7 +238,7 @@
         const LEADER_PASSWORD = "123";
 
         let state = {
-            players: JSON.parse(localStorage.getItem('kingshot_players_v69') || '[]')
+            players: JSON.parse(localStorage.getItem('kingshot_players_v610') || '[]')
         };
 
         let battleEngine = {
@@ -302,7 +302,7 @@
         window.resetRoleSelection = function() {
             localStorage.removeItem('kingshot_role');
             currentRole = '';
-            document.getElementById('role-modal').classList.remove('hidden');
+            document.getElementById('role-modal').classList.add('hidden');
         }
 
         function applyRoleUI(role) {
@@ -335,7 +335,7 @@
                 const noiseBuffer = backgroundAudioCtx.createBuffer(1, bufferSize, backgroundAudioCtx.sampleRate);
                 const output = noiseBuffer.getChannelData(0);
                 for (let i = 0; i < bufferSize; i++) { 
-                    output[i] = (Math.random() * 2 - 1) * 0.00001;
+                    output[i] = (Math.random() * 2 - 1) * 0.00001; // صامت تقريباً لمنع إزعاج المستخدم
                 }
 
                 audioSourceNode = backgroundAudioCtx.createBufferSource();
@@ -344,7 +344,7 @@
                 audioSourceNode.connect(backgroundAudioCtx.destination);
                 audioSourceNode.start(0);
 
-                speakText("Background mode active. Ready for battle.", 'en-US');
+                speakText("Background audio active. Ready for game.", 'en-US');
                 
                 const btn = document.getElementById('enable-audio-btn');
                 btn.className = "px-3 py-1.5 text-xs font-bold rounded-md bg-emerald-500 text-slate-900 flex items-center gap-1 shadow transition-all whitespace-nowrap";
@@ -354,6 +354,7 @@
             }
         };
 
+        // الحفاظ على نشاط الـ AudioContext عند الخروج والخلفية
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') {
                 if (backgroundAudioCtx && backgroundAudioCtx.state === 'suspended') {
@@ -404,12 +405,18 @@
         function speakText(text, lang = 'en-US') {
             if ('speechSynthesis' in window) {
                 try {
+                    // إلغاء أي نطق سابق فوراً ليتم نطق الكلمة الجديدة بوضوح وبدون تأخير
                     window.speechSynthesis.cancel();
+                    
                     const utterance = new SpeechSynthesisUtterance(text);
                     utterance.lang = lang;
-                    utterance.rate = 1.0;
+                    utterance.rate = 1.1; // زيادة السرعة قليلاً لتناسب الأجواء الحماسية
+                    utterance.volume = 1.0;
+                    
                     window.speechSynthesis.speak(utterance);
-                } catch (e) {}
+                } catch (e) {
+                    console.error("Speech error", e);
+                }
             }
         }
 
@@ -595,7 +602,7 @@
             const groups = [...new Set(state.players.map(p => p.group))];
             s.innerHTML = '<option value="all">All Active Players</option>' + groups.map(g => `<option value="${g}">Group ${g}</option>`).join('');
         }
-        function savePlayers() { localStorage.setItem('kingshot_players_v69', JSON.stringify(state.players)); }
+        function savePlayers() { localStorage.setItem('kingshot_players_v610', JSON.stringify(state.players)); }
         
         renderPlayerTable();
     </script>
