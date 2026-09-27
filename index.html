@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KingshotLab - Realtime Cloud Battle Station v6.24</title>
+    <title>KingshotLab - Realtime Cloud Battle Station v6.28</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS CDN -->
@@ -53,7 +53,7 @@
                 </svg>
             </div>
             <div>
-                <h2 class="gaming-font text-2xl font-bold tracking-wider text-white uppercase">KingshotLab V6.24</h2>
+                <h2 class="gaming-font text-2xl font-bold tracking-wider text-white uppercase">KingshotLab V6.28</h2>
                 <p class="text-xs text-slate-400 mt-1">Select your operational role to continue</p>
             </div>
             <div class="grid grid-cols-2 gap-3">
@@ -80,7 +80,7 @@
                         </svg>
                     </div>
                     <h1 class="gaming-font text-lg font-bold tracking-wider text-white uppercase flex items-center gap-1.5">
-                        KingshotLab <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">V6.24</span>
+                        KingshotLab <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">V6.28</span>
                     </h1>
                 </div>
 
@@ -94,7 +94,7 @@
 
             <div class="flex items-center justify-between gap-2 pt-2 border-t border-kingshot-border/60">
                 <div class="flex items-center gap-2">
-                    <span id="current-role-badge" class="text-xs font-bold px-2.5 py-1 rounded-md bg-blue-500/20 text-blue-400 border border-blue-500/30 uppercase">Role: Leader</span>
+                    <span id="current-role-badge" class="text-xs font-bold px-2.5 py-1 rounded-md bg-blue-500/20 text-blue-400 border border-blue-500/30 uppercase">Role: -</span>
                     <button onclick="resetRoleSelection()" class="text-[10px] text-slate-400 hover:text-white transition-colors underline uppercase cursor-pointer">Switch</button>
                 </div>
 
@@ -108,21 +108,14 @@
     <!-- Main Content -->
     <main class="max-w-6xl w-full mx-auto px-4 py-4 flex-grow space-y-4">
 
-        <!-- TACTICAL SETTINGS (Leader Only) -->
+        <!-- GROUP CUSTOMIZATION PANEL (Leader Only) -->
         <div class="leader-only bg-kingshot-card border border-blue-500/30 rounded-xl p-4 shadow-lg space-y-3">
-            <h2 class="gaming-font text-xs font-bold text-blue-400 uppercase tracking-wider">Tactical Timing & Audio Controls</h2>
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Player Gap (Secs)</label>
-                    <input type="number" id="player-gap-input" min="0" value="1" oninput="renderPlayerTable()" class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Group Gap (Secs)</label>
-                    <input type="number" id="group-gap-input" min="0" value="3" oninput="renderPlayerTable()" class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none">
-                </div>
+            <h2 class="gaming-font text-xs font-bold text-blue-400 uppercase tracking-wider">Groups Flexible Control Panel</h2>
+            <div id="group-settings-container" class="space-y-2">
+                <!-- Dynamically populated per group -->
             </div>
             
-            <div class="grid grid-cols-2 gap-2 pt-1">
+            <div class="grid grid-cols-2 gap-2 pt-1 border-t border-kingshot-border/60">
                 <button onclick="speakCustomText('Get ready for battle')" class="bg-indigo-600/30 hover:bg-indigo-600 text-indigo-300 hover:text-white font-semibold py-2 px-3 rounded-lg text-xs transition-all border border-indigo-500/40 uppercase active:scale-95 cursor-pointer">
                     📢 Get Ready
                 </button>
@@ -231,13 +224,14 @@
 
         let supabaseClient = null;
         let currentChannel = null;
-        let currentRole = localStorage.getItem('kingshot_role') || '';
+        let currentRole = ''; // يبدأ فارغاً تماماً لضمان ظهور نافذة الاختيار دائماً عند فتح الرابط
         let backgroundAudioCtx = null;
         let audioUnlocked = false;
         const LEADER_PASSWORD = "123";
 
         let state = {
-            players: JSON.parse(localStorage.getItem('kingshot_players_v624') || '[]')
+            players: JSON.parse(localStorage.getItem('kingshot_players_v628') || '[]'),
+            groupSettings: JSON.parse(localStorage.getItem('kingshot_group_settings_v628') || '{}')
         };
 
         let battleEngine = {
@@ -250,6 +244,7 @@
         let isSpeaking = false;
 
         window.addEventListener('DOMContentLoaded', () => {
+            // إجبار ظهور نافذة اختيار الدور فور دخول الرابط
             checkRolePrompt();
 
             try {
@@ -281,38 +276,41 @@
 
         function checkRolePrompt() {
             const modal = document.getElementById('role-modal');
-            if (!currentRole || (currentRole !== 'leader' && currentRole !== 'player')) {
+            // مسح أي دور قديم مخزن لضمان ظهور النافذة عند فتح الرابط كطلبك
+            currentRole = ''; 
+            if (modal) {
                 modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
-                applyRoleUI(currentRole);
             }
         }
 
         window.handleRoleSelection = function(role) {
             if (role === 'leader') {
-                const pass = prompt("Please enter leader password:");
+                const pass = prompt("🔐 Please enter leader password:");
                 if (pass !== LEADER_PASSWORD) {
                     alert("❌ Incorrect password!");
                     return;
                 }
             }
             currentRole = role;
-            localStorage.setItem('kingshot_role', role);
-            document.getElementById('role-modal').classList.add('hidden');
+            const modal = document.getElementById('role-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
             applyRoleUI(role);
             unlockAudioMobile();
         }
 
         window.resetRoleSelection = function() {
-            localStorage.removeItem('kingshot_role');
             currentRole = '';
-            document.getElementById('role-modal').classList.remove('hidden');
+            const modal = document.getElementById('role-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
         }
 
         function applyRoleUI(role) {
             const roleBadge = document.getElementById('current-role-badge');
-            roleBadge.textContent = `Role: ${role.toUpperCase()}`;
+            if(roleBadge) roleBadge.textContent = `Role: ${role.toUpperCase()}`;
             
             document.querySelectorAll('.leader-only').forEach(el => {
                 if (role === 'player') {
@@ -464,9 +462,6 @@
             let activePlayers = state.players.filter(p => !p.frozen);
             if (activePlayers.length === 0) return [];
 
-            const playerGap = parseInt(document.getElementById('player-gap-input').value) || 0;
-            const groupGap = parseInt(document.getElementById('group-gap-input').value) || 0;
-
             let mapped = activePlayers.map(p => ({
                 id: p.id,
                 name: p.name,
@@ -475,25 +470,46 @@
             }));
 
             let maxMarch = Math.max(...mapped.map(m => m.marchSec));
-            let targetArrivals = [];
-            let currentGroup = null;
-            let baseArrival = maxMarch;
+            let uniqueGroups = [...new Set(mapped.map(m => m.group))];
 
-            mapped.forEach((m, index) => {
-                if (index === 0) {
-                    currentGroup = m.group;
-                    targetArrivals.push(baseArrival);
+            let groupArrivals = {};
+            let currentBaseArrival = maxMarch;
+
+            uniqueGroups.forEach((g, idx) => {
+                let settings = state.groupSettings[g] || { mode: 'staggered', gap: 1 };
+                
+                if (idx === 0) {
+                    groupArrivals[g] = currentBaseArrival;
                 } else {
-                    let prevArrival = targetArrivals[index - 1];
-                    if (m.group !== currentGroup) {
-                        targetArrivals.push(prevArrival + groupGap);
-                        currentGroup = m.group;
-                    } else {
-                        targetArrivals.push(prevArrival + playerGap);
-                    }
+                    let prevGroup = uniqueGroups[idx - 1];
+                    let prevSettings = state.groupSettings[prevGroup] || { mode: 'staggered', gap: 1 };
+                    
+                    let transitionGap = prevSettings.gap || 2;
+                    groupArrivals[g] = groupArrivals[prevGroup] + transitionGap;
                 }
             });
 
+            let playerArrivals = {};
+            
+            uniqueGroups.forEach(g => {
+                let gPlayers = mapped.filter(m => m.group === g);
+                let settings = state.groupSettings[g] || { mode: 'staggered', gap: 1 };
+
+                if (settings.mode === 'simultaneous') {
+                    let targetTime = groupArrivals[g];
+                    gPlayers.forEach(p => {
+                        playerArrivals[p.id] = targetTime;
+                    });
+                } else {
+                    let baseTime = groupArrivals[g];
+                    let intraGap = settings.gap || 1;
+                    gPlayers.forEach((p, pIdx) => {
+                        playerArrivals[p.id] = baseTime + (pIdx * intraGap);
+                    });
+                }
+            });
+
+            let targetArrivals = mapped.map(m => playerArrivals[m.id]);
             let rawLaunches = mapped.map((m, index) => targetArrivals[index] - m.marchSec);
             let minLaunch = Math.min(...rawLaunches);
             let delays = rawLaunches.map(l => l - minLaunch);
@@ -503,7 +519,7 @@
                 name: m.name,
                 group: m.group,
                 marchSec: m.marchSec,
-                arrivalSec: delays[index] + m.marchSec,
+                arrivalSec: targetArrivals[index],
                 delay: delays[index]
             }));
         }
@@ -641,7 +657,7 @@
                 } else {
                     state.players.push({ id: Date.now().toString(), name, group, marchMins: mins, marchSecs: secs, frozen: false });
                 }
-                savePlayers(); renderPlayerTable(); this.reset();
+                savePlayers(); renderPlayerTable(); renderGroupSettingsUI(); this.reset();
             });
         }
 
@@ -682,6 +698,52 @@
             renderPlayerTable();
         }
 
+        function renderGroupSettingsUI() {
+            const container = document.getElementById('group-settings-container');
+            if (!container) return;
+            
+            const groups = [...new Set(state.players.map(p => p.group))];
+            if (groups.length === 0) {
+                container.innerHTML = '<div class="text-xs text-slate-500">Add players to configure group settings.</div>';
+                return;
+            }
+
+            let html = '';
+            groups.forEach(g => {
+                let setting = state.groupSettings[g] || { mode: 'staggered', gap: 1 };
+                html += `
+                    <div class="bg-kingshot-dark p-2.5 rounded-lg border border-kingshot-border flex flex-col gap-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-200">Group ${g}</span>
+                            <select onchange="updateGroupMode('${g}', this.value)" class="bg-kingshot-card border border-kingshot-border rounded px-2 py-1 text-[11px] text-slate-200 outline-none">
+                                <option value="staggered" ${setting.mode === 'staggered' ? 'selected' : ''}>Staggered (Sequential)</option>
+                                <option value="simultaneous" ${setting.mode === 'simultaneous' ? 'selected' : ''}>Simultaneous (All Together)</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-[10px] text-slate-400">Gap / Interval (Secs):</span>
+                            <input type="number" min="0" value="${setting.gap}" onchange="updateGroupGap('${g}', this.value)" class="w-20 bg-kingshot-card border border-kingshot-border rounded px-2 py-1 text-[11px] text-slate-100 outline-none text-center">
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        window.updateGroupMode = function(group, mode) {
+            if (!state.groupSettings[group]) state.groupSettings[group] = { mode: 'staggered', gap: 1 };
+            state.groupSettings[group].mode = mode;
+            saveGroupSettings();
+            renderPlayerTable();
+        }
+
+        window.updateGroupGap = function(group, gap) {
+            if (!state.groupSettings[group]) state.groupSettings[group] = { mode: 'staggered', gap: 1 };
+            state.groupSettings[group].gap = parseInt(gap) || 0;
+            saveGroupSettings();
+            renderPlayerTable();
+        }
+
         function renderPlayerTable() {
             const tbody = document.getElementById('player-table-body');
             const emptyState = document.getElementById('empty-state');
@@ -713,12 +775,13 @@
                                     <button onclick="movePlayer('${p.id}', 1)" class="bg-slate-700/60 hover:bg-slate-600 text-white px-2 py-1 rounded text-[10px] transition-all cursor-pointer" title="Move Down">⬇️</button>
                                     <button onclick="editPlayer('${p.id}')" class="bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/40 px-2.5 py-1 rounded text-[10px] transition-all font-semibold cursor-pointer">Edit</button>
                                     <button onclick="deletePlayer('${p.id}')" class="bg-red-500/10 hover:bg-red-500/30 text-red-400 border border-red-500/30 px-2.5 py-1 rounded text-[10px] transition-all font-semibold cursor-pointer">Del</button>
-                                </div>
+                                    </div>
                             </td>
                         </tr>`;
                 });
             }
             updateWaveSelect();
+            renderGroupSettingsUI();
         }
 
         window.toggleFreeze = function(id) { 
@@ -738,7 +801,8 @@
             s.innerHTML = '<option value="all">All Active Players</option>' + groups.map(g => `<option value="${g}">Group ${g}</option>`).join('');
         }
 
-        function savePlayers() { localStorage.setItem('kingshot_players_v624', JSON.stringify(state.players)); }
+        function savePlayers() { localStorage.setItem('kingshot_players_v628', JSON.stringify(state.players)); }
+        function saveGroupSettings() { localStorage.setItem('kingshot_group_settings_v628', JSON.stringify(state.groupSettings)); }
         
         renderPlayerTable();
     </script>
