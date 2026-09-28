@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,9 +34,8 @@
         }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Rajdhani:wght@500;600;700&display=swap');
-        body { font-family: 'Cairo', sans-serif; }
-        .gaming-font { font-family: 'Rajdhani', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap');
+        body { font-family: 'Rajdhani', sans-serif; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #070b19; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
@@ -49,8 +48,8 @@
         <div class="w-20 h-20 mb-4 rounded-full bg-red-600/20 flex items-center justify-center border border-red-500/50 animate-pulse">
             <span class="text-4xl">🛑</span>
         </div>
-        <h1 class="gaming-font text-4xl font-bold text-red-500 tracking-wider mb-2 uppercase">المحطة معطلة</h1>
-        <p class="text-red-300 text-sm">أوقف القائد محطتك. انتظر التعليمات الإضافية.</p>
+        <h1 class="text-4xl font-bold text-red-500 tracking-wider mb-2 uppercase">Station Disabled</h1>
+        <p class="text-red-300 text-sm">The leader has locked your station. Wait for further instructions.</p>
     </div>
 
     <!-- Role Selection Modal -->
@@ -63,58 +62,58 @@
             </div>
             
             <div id="role-selection-buttons">
-                <h2 class="gaming-font text-2xl font-bold tracking-wider text-white uppercase mb-1">KingshotLab V7.1</h2>
-                <p class="text-xs text-slate-400 mb-6">حدد دورك التشغيلي للمتابعة (حماية مشفرة)</p>
+                <h2 class="text-2xl font-bold tracking-wider text-white uppercase mb-1">KingshotLab V7.1</h2>
+                <p class="text-xs text-slate-400 mb-6">Select your operational role to continue (Secure Auth)</p>
                 <div class="grid grid-cols-2 gap-3">
                     <button onclick="showLeaderLoginForm()" class="p-4 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold transition-all border border-blue-400/30 flex flex-col items-center gap-2 shadow-lg shadow-blue-600/20 active:scale-95 cursor-pointer">
                         <span class="text-2xl">👑</span>
-                        <span class="gaming-font uppercase text-sm tracking-wide">قائد</span>
+                        <span class="uppercase text-sm tracking-wide">Leader</span>
                     </button>
                     <button onclick="showPlayerRegistration()" class="p-4 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold transition-all border border-emerald-400/30 flex flex-col items-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-95 cursor-pointer">
                         <span class="text-2xl">🛡️</span>
-                        <span class="gaming-font uppercase text-sm tracking-wide">لاعب</span>
+                        <span class="uppercase text-sm tracking-wide">Player</span>
                     </button>
                 </div>
             </div>
 
             <!-- Leader Secure Login Form -->
-            <div id="leader-login-form" class="hidden flex-col gap-4 text-right">
-                <h2 class="gaming-font text-xl font-bold tracking-wider text-blue-400 uppercase text-center border-b border-kingshot-border pb-3">تسجيل دخول القائد الآمن</h2>
+            <div id="leader-login-form" class="hidden flex-col gap-4 text-left">
+                <h2 class="text-xl font-bold tracking-wider text-blue-400 uppercase text-center border-b border-kingshot-border pb-3">Leader Secure Login</h2>
                 <div>
-                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">بريد القائد الإلكتروني</label>
+                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Leader Email</label>
                     <input type="email" id="leader-email" placeholder="leader@kingshot.com" required class="w-full bg-kingshot-dark border border-blue-500/30 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-blue-500 outline-none">
                 </div>
                 <div>
-                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">كلمة المرور المشفرة</label>
+                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Secure Password</label>
                     <input type="password" id="leader-password" placeholder="••••••••" required class="w-full bg-kingshot-dark border border-blue-500/30 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-blue-500 outline-none">
                 </div>
                 <div class="flex gap-2 pt-2">
                     <button onclick="backToRoleSelect()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 rounded-lg text-xs uppercase transition-all active:scale-95 cursor-pointer">
-                        رجوع
+                        Back
                     </button>
                     <button onclick="loginAsLeaderSecure()" class="flex-[2] bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg text-xs uppercase shadow-md shadow-blue-600/20 transition-all border border-blue-400/30 active:scale-95 cursor-pointer">
-                        دخول القائد
+                        Leader Login
                     </button>
                 </div>
             </div>
 
             <!-- Player Registration Form (With Room Code) -->
-            <div id="player-registration-form" class="hidden flex-col gap-4 text-right">
-                <h2 class="gaming-font text-xl font-bold tracking-wider text-emerald-400 uppercase text-center border-b border-kingshot-border pb-3">تسجيل لاعب</h2>
+            <div id="player-registration-form" class="hidden flex-col gap-4 text-left">
+                <h2 class="text-xl font-bold tracking-wider text-emerald-400 uppercase text-center border-b border-kingshot-border pb-3">Player Registration</h2>
                 <div>
-                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">اسمك / المعرف</label>
-                    <input type="text" id="reg-name" placeholder="مثال: Ghost" required class="w-full bg-kingshot-dark border border-emerald-500/30 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-emerald-500 outline-none">
+                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Your Name / Handle</label>
+                    <input type="text" id="reg-name" placeholder="e.g. Ghost" required class="w-full bg-kingshot-dark border border-emerald-500/30 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-emerald-500 outline-none">
                 </div>
                 <div>
-                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">رقم الغرفة السرية</label>
-                    <input type="text" id="reg-room-code" placeholder="أدخل رقم الغرفة (مثال: 1865)" required class="w-full bg-kingshot-dark border border-emerald-500/30 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-emerald-500 outline-none text-center gaming-font font-bold tracking-widest">
+                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Secret Room Code</label>
+                    <input type="text" id="reg-room-code" placeholder="Enter Room Code (e.g. 1865)" required class="w-full bg-kingshot-dark border border-emerald-500/30 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-emerald-500 outline-none text-center font-bold tracking-widest">
                 </div>
                 <div class="flex gap-2 pt-2">
                     <button onclick="backToRoleSelect()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 rounded-lg text-xs uppercase transition-all active:scale-95 cursor-pointer">
-                        رجوع
+                        Back
                     </button>
                     <button onclick="registerAndJoinAsPlayer()" class="flex-[2] bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-lg text-xs uppercase shadow-md shadow-emerald-600/20 transition-all border border-emerald-400/30 active:scale-95 cursor-pointer">
-                        اتصال بالمحطة
+                        Connect Station
                     </button>
                 </div>
             </div>
@@ -125,13 +124,13 @@
     <header class="bg-kingshot-card border-b border-kingshot-border shadow-md sticky top-0 z-40">
         <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col gap-3">
             <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-2 space-x-reverse">
+                <div class="flex items-center space-x-2">
                     <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shadow-md border border-blue-400/30">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                         </svg>
                     </div>
-                    <h1 class="gaming-font text-lg font-bold tracking-wider text-white uppercase flex items-center gap-1.5">
+                    <h1 class="text-lg font-bold tracking-wider text-white uppercase flex items-center gap-1.5">
                         KingshotLab <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">V7.1</span>
                     </h1>
                 </div>
@@ -139,19 +138,19 @@
                 <div class="flex items-center gap-2">
                     <span id="connection-status" class="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)] animate-pulse" title="Disconnected"></span>
                     <div class="bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-emerald-400 font-bold text-xs uppercase tracking-wider">
-                        غرفة: <span id="header-room-display">1865</span>
+                        Room: <span id="header-room-display">1865</span>
                     </div>
                 </div>
             </div>
 
             <div class="flex items-center justify-between gap-2 pt-2 border-t border-kingshot-border/60">
                 <div class="flex items-center gap-2">
-                    <span id="current-role-badge" class="text-xs font-bold px-2.5 py-1 rounded-md bg-blue-500/20 text-blue-400 border border-blue-500/30 uppercase">الدور: -</span>
-                    <button onclick="resetRoleSelection()" class="text-[10px] text-slate-400 hover:text-white transition-colors underline uppercase cursor-pointer">تبديل</button>
+                    <span id="current-role-badge" class="text-xs font-bold px-2.5 py-1 rounded-md bg-blue-500/20 text-blue-400 border border-blue-500/30 uppercase">Role: -</span>
+                    <button onclick="resetRoleSelection()" class="text-[10px] text-slate-400 hover:text-white transition-colors underline uppercase cursor-pointer">Switch</button>
                 </div>
 
                 <button id="enable-audio-btn" onclick="enableAndTestAudio(event)" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition-all active:scale-95 whitespace-nowrap cursor-pointer">
-                    🔊 تفعيل الصوت
+                    🔊 Enable Audio
                 </button>
             </div>
         </div>
@@ -162,42 +161,42 @@
 
         <!-- Custom Messaging & Quick Commands (Leader Only) -->
         <div class="leader-only bg-kingshot-card border border-indigo-500/30 rounded-xl p-4 shadow-lg space-y-3">
-            <h2 class="gaming-font text-xs font-bold text-indigo-400 uppercase tracking-wider">القيادة والاتصالات</h2>
+            <h2 class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Command & Communications</h2>
             
             <div class="flex gap-2">
-                <input type="text" id="custom-msg-input" placeholder="اكتب رسالة لجميع اللاعبين (مثال، استعدوا يا فريق أ!)" class="flex-1 bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-indigo-500 outline-none text-right">
+                <input type="text" id="custom-msg-input" placeholder="Broadcast message to all players (e.g. Prepare team Alpha!)" class="flex-1 bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-indigo-500 outline-none">
                 <button onclick="sendTypedMessage()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-4 rounded-lg text-xs transition-all uppercase shadow-md shadow-indigo-600/20 active:scale-95 cursor-pointer border border-indigo-400/30">
-                    إرسال رسالة
+                    Send Broadcast
                 </button>
             </div>
 
             <div class="grid grid-cols-2 gap-2 pt-2 border-t border-kingshot-border/60">
                 <button onclick="speakCustomText('Get ready for battle')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-semibold py-2 px-3 rounded-lg text-xs transition-all border border-slate-600 uppercase active:scale-95 cursor-pointer">
-                    📢 سريع: استعد
+                    📢 Quick: Get Ready
                 </button>
                 <button onclick="speakCustomText('Return to chat')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-semibold py-2 px-3 rounded-lg text-xs transition-all border border-slate-600 uppercase active:scale-95 cursor-pointer">
-                    💬 سريع: ارجع للدردشة
+                    💬 Quick: Return to Chat
                 </button>
             </div>
         </div>
 
         <!-- GROUP CUSTOMIZATION PANEL (Leader Only) -->
         <div class="leader-only bg-kingshot-card border border-blue-500/30 rounded-xl p-4 shadow-lg space-y-3">
-            <h2 class="gaming-font text-xs font-bold text-blue-400 uppercase tracking-wider">لوحة تحكم مرنة للمجموعات</h2>
+            <h2 class="text-xs font-bold text-blue-400 uppercase tracking-wider">Flexible Group Settings</h2>
             <div id="group-settings-container" class="space-y-2"></div>
         </div>
 
         <!-- LIVE BATTLE STATION CONSOLE -->
         <div class="bg-kingshot-card border border-amber-500/40 rounded-xl p-4 shadow-xl space-y-3">
             <div class="flex flex-col gap-2">
-                <h2 class="gaming-font text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                <h2 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
                     <svg class="w-4 h-4 text-amber-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    وحدة تحكم التسلسل المباشر
+                    Live Sequential Launch Console
                 </h2>
                 <div class="leader-only flex items-center justify-between gap-2">
-                    <label class="text-[11px] text-slate-300 font-semibold uppercase">موجة:</label>
-                    <select id="battle-wave-select" class="bg-kingshot-dark border border-amber-500/30 rounded-lg px-3 py-1.5 text-slate-100 text-xs flex-1 outline-none text-right">
-                        <option value="all">جميع اللاعبين النشطين</option>
+                    <label class="text-[11px] text-slate-300 font-semibold uppercase">Wave Filter:</label>
+                    <select id="battle-wave-select" class="bg-kingshot-dark border border-amber-500/30 rounded-lg px-3 py-1.5 text-slate-100 text-xs flex-1 outline-none">
+                        <option value="all">All Active Players</option>
                     </select>
                 </div>
             </div>
@@ -208,16 +207,16 @@
                 </div>
                 
                 <div>
-                    <div id="battle-status" class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">الحالة: وضع الاستعداد</div>
-                    <div id="battle-current-target" class="gaming-font text-base font-bold text-amber-400 mt-0.5">في انتظار القائد...</div>
+                    <div id="battle-status" class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Status: Standby</div>
+                    <div id="battle-current-target" class="text-base font-bold text-amber-400 mt-0.5">Waiting for leader...</div>
                 </div>
                 
                 <div class="leader-only flex items-center gap-2 pt-1">
-                    <button id="start-battle-btn" class="flex-1 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg shadow-amber-600/20 transition-all gaming-font text-xs uppercase tracking-wider border border-amber-400/30 active:scale-95 cursor-pointer">
-                        🚀 بدء التسلسل
+                    <button id="start-battle-btn" class="flex-1 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg shadow-amber-600/20 transition-all text-xs uppercase tracking-wider border border-amber-400/30 active:scale-95 cursor-pointer">
+                        🚀 Start Sequence
                     </button>
                     <button id="reset-battle-btn" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 font-semibold py-2.5 px-3 rounded-xl border border-red-500/30 transition-all text-xs active:scale-95 cursor-pointer">
-                        إعادة تعيين
+                        Reset
                     </button>
                 </div>
             </div>
@@ -227,35 +226,35 @@
 
         <!-- Add / Edit Player Form (Leader Only) -->
         <div class="leader-only bg-kingshot-card border border-kingshot-border rounded-xl p-4 shadow-xl">
-            <h3 id="form-title" class="gaming-font text-xs font-bold text-slate-200 uppercase tracking-wider mb-2.5">إضافة لاعب يدويًا</h3>
+            <h3 id="form-title" class="text-xs font-bold text-slate-200 uppercase tracking-wider mb-2.5">Add Player Manually</h3>
             <form id="add-player-form" class="space-y-3">
                 <input type="hidden" id="edit-player-id" value="">
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">اسم اللاعب</label>
-                        <input type="text" id="player-name" required placeholder="مثال: sweet" class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none text-right">
+                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Player Name</label>
+                        <input type="text" id="player-name" required placeholder="e.g. sweet" class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none">
                     </div>
                     <div>
-                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">المجموعة</label>
-                        <input type="text" id="player-group" value="1" required class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none text-right">
+                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Group</label>
+                        <input type="text" id="player-group" value="1" required class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">مسيرة (دقائق)</label>
-                        <input type="number" id="march-mins" min="0" value="1" required class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none text-right">
+                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">March (Mins)</label>
+                        <input type="number" id="march-mins" min="0" value="1" required class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none">
                     </div>
                     <div>
-                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">ثواني</label>
-                        <input type="number" id="march-secs" min="0" max="59" value="20" required class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none text-right">
+                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Secs</label>
+                        <input type="number" id="march-secs" min="0" max="59" value="20" required class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none">
                     </div>
                 </div>
                 <div class="flex gap-2 pt-1">
                     <button type="submit" id="form-submit-btn" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md shadow-blue-600/20 transition-all text-xs uppercase border border-blue-400/30 active:scale-95 cursor-pointer">
-                        إضافة لاعب
+                        Add Player
                     </button>
                     <button type="button" id="cancel-edit-btn" onclick="cancelEdit()" class="hidden bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 px-3 rounded-xl text-xs uppercase active:scale-95 cursor-pointer">
-                        إلغاء
+                        Cancel
                     </button>
                 </div>
             </form>
@@ -264,24 +263,24 @@
         <!-- Player Table (Leader Only) -->
         <div class="leader-only bg-kingshot-card border border-kingshot-border rounded-xl shadow-xl overflow-hidden mb-6 mt-4">
             <div class="bg-kingshot-dark/50 p-3 border-b border-kingshot-border flex justify-between items-center">
-                <h3 class="gaming-font text-sm font-bold text-slate-200 uppercase tracking-wider">اللاعبون المتصلون</h3>
-                <span class="text-[10px] text-slate-400">🟢 متصل | 🔴 غير متصل</span>
+                <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider">Connected Players</h3>
+                <span class="text-[10px] text-slate-400">🟢 Online | 🔴 Offline</span>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-right border-collapse text-xs">
+                <table class="w-full text-left border-collapse text-xs">
                     <thead>
-                        <tr class="bg-kingshot-dark/80 border-b border-kingshot-border uppercase text-slate-400 gaming-font">
-                            <th class="py-2.5 px-2 text-center">الحالة</th>
-                            <th class="py-2.5 px-3">اللاعب والمسيرة</th>
-                            <th class="py-2.5 px-3 text-center">جدول الإطلاق</th>
-                            <th class="py-2.5 px-3 text-center">التحكم</th>
-                            <th class="py-2.5 px-3 text-center">إجراءات</th>
+                        <tr class="bg-kingshot-dark/80 border-b border-kingshot-border uppercase text-slate-400">
+                            <th class="py-2.5 px-2 text-center">Status</th>
+                            <th class="py-2.5 px-3">Player & March</th>
+                            <th class="py-2.5 px-3 text-center">Launch Schedule</th>
+                            <th class="py-2.5 px-3 text-center">Control</th>
+                            <th class="py-2.5 px-3 text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="player-table-body" class="divide-y divide-kingshot-border/60"></tbody>
                 </table>
             </div>
-            <div id="empty-state" class="p-6 text-center text-xs text-slate-500">لم يتم اتصال أو إضافة أي لاعبين حتى الآن.</div>
+            <div id="empty-state" class="p-6 text-center text-xs text-slate-500">No players connected or added yet.</div>
         </div>
 
     </main>
@@ -385,12 +384,12 @@
             const password = document.getElementById('leader-password').value.trim();
 
             if (!email || !password) {
-                alert("❌ يرجى إدخال البريد الإلكتروني وكلمة المرور.");
+                alert("❌ Please enter your email and password.");
                 return;
             }
 
             const btn = event.target;
-            btn.textContent = "جاري التحقق...";
+            btn.textContent = "Verifying...";
             btn.disabled = true;
 
             try {
@@ -400,8 +399,8 @@
                 });
 
                 if (error) {
-                    alert("❌ فشل المصادقة: بيانات الدخول غير صحيحة أو ليس لديك صلاحية قائد.");
-                    btn.textContent = "دخول القائد";
+                    alert("❌ Authentication failed: Invalid credentials or not a leader account.");
+                    btn.textContent = "Leader Login";
                     btn.disabled = false;
                     return;
                 }
@@ -417,8 +416,8 @@
                 renderPlayerTable();
                 syncStateToPlayers();
             } catch(err) {
-                alert("حدث خطأ في الاتصال بخادم المصادقة.");
-                btn.textContent = "دخول القائد";
+                alert("Connection error with authentication server.");
+                btn.textContent = "Leader Login";
                 btn.disabled = false;
             }
         }
@@ -430,11 +429,11 @@
             const mins = 1;
             const secs = 20;
 
-            if(!name) { alert("رجاء إدخال اسمك."); return; }
-            if(!inputRoomCode) { alert("رجاء إدخال رقم الغرفة."); return; }
+            if(!name) { alert("Please enter your name."); return; }
+            if(!inputRoomCode) { alert("Please enter the room code."); return; }
 
             if (inputRoomCode !== CONFIG.roomCode) {
-                alert("❌ رقم الغرفة غير صحيح! يرجى التأكد من القائد للحصول على الرقم السري الصحيح.");
+                alert("❌ Incorrect room code! Please ask the leader for the correct secret code.");
                 return;
             }
 
@@ -468,8 +467,8 @@
 
         function applyRoleUI(role) {
             const roleBadge = document.getElementById('current-role-badge');
-            let roleDisplay = role === 'leader' ? 'قائد (محمي)' : 'لاعب';
-            if(roleBadge) roleBadge.textContent = `الدور: ${roleDisplay}`;
+            let roleDisplay = role === 'leader' ? 'Leader (Secure)' : 'Player';
+            if(roleBadge) roleBadge.textContent = `Role: ${roleDisplay}`;
             
             document.querySelectorAll('.leader-only').forEach(el => {
                 if (role === 'player') el.classList.add('hidden');
@@ -499,7 +498,7 @@
                 const btn = document.getElementById('enable-audio-btn');
                 if(btn) {
                     btn.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-500 text-slate-950 flex items-center gap-1.5 shadow-md transition-all whitespace-nowrap cursor-pointer";
-                    btn.innerHTML = "🎧 الصوت مفعل";
+                    btn.innerHTML = "🎧 Audio Enabled";
                 }
             } catch(e) {}
         }
@@ -507,7 +506,7 @@
         window.enableAndTestAudio = function(e) {
             if(e) e.stopPropagation();
             unlockAudioMobile();
-            speakText("تم تفعيل الصوت", true);
+            speakText("Audio enabled successfully", true);
         };
 
         window.sendTypedMessage = function() {
@@ -708,12 +707,12 @@
             startBtn.addEventListener('click', () => {
                 clearSpeechQueue();
                 let schedule = calculateSchedule();
-                if (schedule.length === 0) return alert('لم يتم العثور على لاعبين نشطين!');
+                if (schedule.length === 0) return alert('No active players found!');
 
                 const selectedWave = document.getElementById('battle-wave-select').value;
                 let queue = schedule.filter(s => selectedWave === 'all' || s.group === selectedWave);
 
-                if (queue.length === 0) return alert('لا يوجد لاعبين في هذه الموجة!');
+                if (queue.length === 0) return alert('No players in this wave!');
 
                 battleEngine.queue = queue;
                 battleEngine.currentIndex = 0;
@@ -774,15 +773,15 @@
             const targetDiv = document.getElementById('battle-current-target');
             if(!statusDiv || !targetDiv) return;
             
-            statusDiv.textContent = 'الحالة: تسلسل مباشر قيد التقدم';
+            statusDiv.textContent = 'Status: Live Sequence in Progress';
             statusDiv.className = "text-[10px] uppercase tracking-wider text-emerald-400 font-bold animate-pulse";
 
             if (isPrep) {
-                targetDiv.innerHTML = `⚠️ استعداد: <span class="text-amber-400 text-xl">${secs}ث</span>`;
+                targetDiv.innerHTML = `⚠️ Prep: <span class="text-amber-400 text-xl">${secs}s</span>`;
             } else if (secs > 0) {
-                targetDiv.innerHTML = `⏳ <b class="text-white">${launcher.name}</b> (م${launcher.group}) في: <span class="text-cyan-400 text-xl">${secs}ث</span>`;
+                targetDiv.innerHTML = `⏳ <b class="text-white">${launcher.name}</b> (G${launcher.group}) in: <span class="text-cyan-400 text-xl">${secs}s</span>`;
             } else {
-                targetDiv.innerHTML = `🔥 <span class="text-white underline font-extrabold text-xl">${launcher.name}</span> إطلاق! 🔥`;
+                targetDiv.innerHTML = `🔥 <span class="text-white underline font-extrabold text-xl">${launcher.name}</span> Launch! 🔥`;
             }
         }
 
@@ -798,9 +797,9 @@
             const statusDiv = document.getElementById('battle-status');
             const targetDiv = document.getElementById('battle-current-target');
             if(!statusDiv || !targetDiv) return;
-            statusDiv.textContent = "الحالة: وضع الاستعداد";
+            statusDiv.textContent = "Status: Standby";
             statusDiv.className = "text-[10px] uppercase tracking-wider text-slate-400 font-bold";
-            targetDiv.textContent = "في انتظار القائد...";
+            targetDiv.textContent = "Waiting for leader...";
             document.getElementById('battle-sequence-list').innerHTML = '';
         }
 
@@ -810,7 +809,7 @@
             let html = '';
             queueList.forEach((item, idx) => {
                 let badge = idx < activeIndex || activeIndex === -1 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : (idx === activeIndex ? 'bg-amber-500/20 text-amber-400 font-bold border-amber-500' : 'bg-kingshot-dark text-slate-400 border-kingshot-border');
-                html += `<div class="flex items-center justify-between p-2.5 rounded-lg border text-xs ${badge}"><span>#${idx+1} ${item.name} (م${item.group})</span><span class="font-bold">${idx === activeIndex ? '🔥 إطلاق' : 'قيد الانتظار'}</span></div>`;
+                html += `<div class="flex items-center justify-between p-2.5 rounded-lg border text-xs ${badge}"><span>#${idx+1} ${item.name} (G${item.group})</span><span class="font-bold">${idx === activeIndex ? '🔥 Launch' : 'Pending'}</span></div>`;
             });
             container.innerHTML = html;
         }
@@ -847,8 +846,8 @@
             document.getElementById('march-mins').value = p.marchMins;
             document.getElementById('march-secs').value = p.marchSecs;
             
-            document.getElementById('form-title').textContent = 'تعديل لاعب';
-            document.getElementById('form-submit-btn').textContent = 'تحديث اللاعب';
+            document.getElementById('form-title').textContent = 'Edit Player';
+            document.getElementById('form-submit-btn').textContent = 'Update Player';
             document.getElementById('cancel-edit-btn').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -856,8 +855,8 @@
         window.cancelEdit = function() {
             document.getElementById('edit-player-id').value = '';
             document.getElementById('add-player-form').reset();
-            document.getElementById('form-title').textContent = 'إضافة لاعب يدويًا';
-            document.getElementById('form-submit-btn').textContent = 'إضافة لاعب';
+            document.getElementById('form-title').textContent = 'Add Player Manually';
+            document.getElementById('form-submit-btn').textContent = 'Add Player';
             document.getElementById('cancel-edit-btn').classList.add('hidden');
         }
 
@@ -882,7 +881,7 @@
             
             const groups = [...new Set(state.players.map(p => p.group))];
             if (groups.length === 0) {
-                container.innerHTML = '<div class="text-xs text-slate-500">أضف لاعبين لتهيئة إعدادات المجموعة.</div>';
+                container.innerHTML = '<div class="text-xs text-slate-500">Add players to configure group settings.</div>';
                 return;
             }
 
@@ -892,14 +891,14 @@
                 html += `
                     <div class="bg-kingshot-dark p-2.5 rounded-lg border border-kingshot-border flex flex-col gap-2">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-slate-200">مجموعة ${g}</span>
-                            <select onchange="updateGroupMode('${g}', this.value)" class="bg-kingshot-card border border-kingshot-border rounded px-2 py-1 text-[11px] text-slate-200 outline-none text-right">
-                                <option value="staggered" ${setting.mode === 'staggered' ? 'selected' : ''}>متدرج (تسلسلي)</option>
-                                <option value="simultaneous" ${setting.mode === 'simultaneous' ? 'selected' : ''}>متزامن (معاً)</option>
+                            <span class="text-xs font-bold text-slate-200">Group ${g}</span>
+                            <select onchange="updateGroupMode('${g}', this.value)" class="bg-kingshot-card border border-kingshot-border rounded px-2 py-1 text-[11px] text-slate-200 outline-none">
+                                <option value="staggered" ${setting.mode === 'staggered' ? 'selected' : ''}>Staggered (Sequential)</option>
+                                <option value="simultaneous" ${setting.mode === 'simultaneous' ? 'selected' : ''}>Simultaneous (Together)</option>
                             </select>
                         </div>
                         <div class="flex items-center justify-between gap-2">
-                            <span class="text-[10px] text-slate-400">فجوة / فاصل (ثواني):</span>
+                            <span class="text-[10px] text-slate-400">Gap / Interval (secs):</span>
                             <input type="number" min="0" value="${setting.gap}" onchange="updateGroupGap('${g}', this.value)" class="w-20 bg-kingshot-card border border-kingshot-border rounded px-2 py-1 text-[11px] text-slate-100 outline-none text-center">
                         </div>
                     </div>
@@ -954,7 +953,7 @@
                 emptyState.classList.add('hidden');
                 state.players.forEach((p, i) => {
                     let calc = scheduleMap[p.id];
-                    let calcText = p.frozen ? '<span class="text-slate-500">مجمد</span>' : (calc ? `L: <b class="text-cyan-400">+${calc.delay}ث</b><br>A: <b class="text-amber-400">${calc.arrivalSec}ث</b>` : '-');
+                    let calcText = p.frozen ? '<span class="text-slate-500">Frozen</span>' : (calc ? `L: <b class="text-cyan-400">+${calc.delay}s</b><br>A: <b class="text-amber-400">${calc.arrivalSec}s</b>` : '-');
                     
                     const isOnline = (now - (p.lastSeen || 0)) < 12000;
                     const dotClass = isOnline ? "bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.8)]" : "bg-red-500 opacity-60";
@@ -964,17 +963,17 @@
                             <td class="py-3 px-2 text-center">
                                 <div id="status-dot-${p.id}" class="w-2.5 h-2.5 rounded-full mx-auto ${dotClass}"></div>
                             </td>
-                            <td class="py-3 px-3 text-white font-semibold">م${p.group} - ${p.name} <br><span class="text-[10px] text-slate-400 font-normal">د: ${p.marchMins}د ${p.marchSecs}ث</span></td>
+                            <td class="py-3 px-3 text-white font-semibold">G${p.group} - ${p.name} <br><span class="text-[10px] text-slate-400 font-normal">March: ${p.marchMins}m ${p.marchSecs}s</span></td>
                             <td class="py-3 px-3 text-center text-[11px]">${calcText}</td>
                             <td class="py-3 px-3 text-center">
-                                <button onclick="toggleFreeze('${p.id}')" class="px-2 py-1 rounded text-[10px] font-bold border transition-all cursor-pointer ${p.frozen ? 'text-red-400 border-red-500/40 bg-red-500/10' : 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10'}">${p.frozen ? 'معطل' : 'نشط'}</button>
+                                <button onclick="toggleFreeze('${p.id}')" class="px-2 py-1 rounded text-[10px] font-bold border transition-all cursor-pointer ${p.frozen ? 'text-red-400 border-red-500/40 bg-red-500/10' : 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10'}">${p.frozen ? 'Disabled' : 'Active'}</button>
                             </td>
                             <td class="py-3 px-3 text-center">
-                                <div class="flex flex-wrap items-content justify-center gap-1">
+                                <div class="flex flex-wrap items-center justify-center gap-1">
                                     <button onclick="movePlayer('${p.id}', -1)" class="bg-slate-700/60 hover:bg-slate-600 text-white px-2 py-1 rounded text-[10px] transition-all cursor-pointer">⬆️</button>
                                     <button onclick="movePlayer('${p.id}', 1)" class="bg-slate-700/60 hover:bg-slate-600 text-white px-2 py-1 rounded text-[10px] transition-all cursor-pointer">⬇️</button>
-                                    <button onclick="editPlayer('${p.id}')" class="bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/40 px-2 py-1 rounded text-[10px] transition-all font-semibold cursor-pointer">تعديل</button>
-                                    <button onclick="deletePlayer('${p.id}')" class="bg-red-500/10 hover:bg-red-500/30 text-red-400 border border-red-500/30 px-2 py-1 rounded text-[10px] transition-all font-semibold cursor-pointer">حذف</button>
+                                    <button onclick="editPlayer('${p.id}')" class="bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/40 px-2 py-1 rounded text-[10px] transition-all font-semibold cursor-pointer">Edit</button>
+                                    <button onclick="deletePlayer('${p.id}')" class="bg-red-500/10 hover:bg-red-500/30 text-red-400 border border-red-500/30 px-2 py-1 rounded text-[10px] transition-all font-semibold-semibold cursor-pointer">Delete</button>
                                 </div>
                             </td>
                         </tr>`;
@@ -1004,7 +1003,7 @@
         function updateWaveSelect() {
             const s = document.getElementById('battle-wave-select'); if(!s) return;
             const groups = [...new Set(state.players.map(p => p.group))];
-            s.innerHTML = '<option value="all">جميع اللاعبين النشطين</option>' + groups.map(g => `<option value="${g}">مجموعة ${g}</option>`).join('');
+            s.innerHTML = '<option value="all">All Active Players</option>' + groups.map(g => `<option value="${g}">Group ${g}</option>`).join('');
         }
 
         function savePlayers() { localStorage.setItem('kingshot_players_v7', JSON.stringify(state.players)); }
