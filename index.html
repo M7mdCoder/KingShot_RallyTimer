@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KingshotLab - Realtime Cloud Battle Station v6.29</title>
+    <title>KingshotLab - Realtime Cloud Battle Station v7.1 Secure</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS CDN -->
@@ -34,8 +34,8 @@
         }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Rajdhani:wght@500;600;700&display=swap');
+        body { font-family: 'Cairo', sans-serif; }
         .gaming-font { font-family: 'Rajdhani', sans-serif; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #070b19; }
@@ -43,6 +43,15 @@
     </style>
 </head>
 <body class="bg-kingshot-dark text-slate-100 min-h-screen flex flex-col justify-between selection:bg-blue-500 selection:text-white" onclick="unlockAudioMobile()">
+
+    <!-- Disabled Overlay for Players -->
+    <div id="disabled-overlay" class="hidden fixed inset-0 bg-red-950/95 z-[100] flex flex-col items-center justify-center p-4 backdrop-blur-md">
+        <div class="w-20 h-20 mb-4 rounded-full bg-red-600/20 flex items-center justify-center border border-red-500/50 animate-pulse">
+            <span class="text-4xl">🛑</span>
+        </div>
+        <h1 class="gaming-font text-4xl font-bold text-red-500 tracking-wider mb-2 uppercase">المحطة معطلة</h1>
+        <p class="text-red-300 text-sm">أوقف القائد محطتك. انتظر التعليمات الإضافية.</p>
+    </div>
 
     <!-- Role Selection Modal -->
     <div id="role-modal" class="fixed inset-0 bg-kingshot-dark/95 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
@@ -52,19 +61,62 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                 </svg>
             </div>
-            <div>
-                <h2 class="gaming-font text-2xl font-bold tracking-wider text-white uppercase">KingshotLab V6.29</h2>
-                <p class="text-xs text-slate-400 mt-1">Select your operational role to continue</p>
+            
+            <div id="role-selection-buttons">
+                <h2 class="gaming-font text-2xl font-bold tracking-wider text-white uppercase mb-1">KingshotLab V7.1</h2>
+                <p class="text-xs text-slate-400 mb-6">حدد دورك التشغيلي للمتابعة (حماية مشفرة)</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="showLeaderLoginForm()" class="p-4 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold transition-all border border-blue-400/30 flex flex-col items-center gap-2 shadow-lg shadow-blue-600/20 active:scale-95 cursor-pointer">
+                        <span class="text-2xl">👑</span>
+                        <span class="gaming-font uppercase text-sm tracking-wide">قائد</span>
+                    </button>
+                    <button onclick="showPlayerRegistration()" class="p-4 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold transition-all border border-emerald-400/30 flex flex-col items-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-95 cursor-pointer">
+                        <span class="text-2xl">🛡️</span>
+                        <span class="gaming-font uppercase text-sm tracking-wide">لاعب</span>
+                    </button>
+                </div>
             </div>
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="handleRoleSelection('leader')" class="p-4 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold transition-all border border-blue-400/30 flex flex-col items-center gap-2 shadow-lg shadow-blue-600/20 active:scale-95 cursor-pointer">
-                    <span class="text-2xl">👑</span>
-                    <span class="gaming-font uppercase text-sm tracking-wide">Leader</span>
-                </button>
-                <button onclick="handleRoleSelection('player')" class="p-4 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold transition-all border border-emerald-400/30 flex flex-col items-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-95 cursor-pointer">
-                    <span class="text-2xl">🛡️</span>
-                    <span class="gaming-font uppercase text-sm tracking-wide">Player</span>
-                </button>
+
+            <!-- Leader Secure Login Form -->
+            <div id="leader-login-form" class="hidden flex-col gap-4 text-right">
+                <h2 class="gaming-font text-xl font-bold tracking-wider text-blue-400 uppercase text-center border-b border-kingshot-border pb-3">تسجيل دخول القائد الآمن</h2>
+                <div>
+                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">بريد القائد الإلكتروني</label>
+                    <input type="email" id="leader-email" placeholder="leader@kingshot.com" required class="w-full bg-kingshot-dark border border-blue-500/30 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">كلمة المرور المشفرة</label>
+                    <input type="password" id="leader-password" placeholder="••••••••" required class="w-full bg-kingshot-dark border border-blue-500/30 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-blue-500 outline-none">
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button onclick="backToRoleSelect()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 rounded-lg text-xs uppercase transition-all active:scale-95 cursor-pointer">
+                        رجوع
+                    </button>
+                    <button onclick="loginAsLeaderSecure()" class="flex-[2] bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg text-xs uppercase shadow-md shadow-blue-600/20 transition-all border border-blue-400/30 active:scale-95 cursor-pointer">
+                        دخول القائد
+                    </button>
+                </div>
+            </div>
+
+            <!-- Player Registration Form (With Room Code) -->
+            <div id="player-registration-form" class="hidden flex-col gap-4 text-right">
+                <h2 class="gaming-font text-xl font-bold tracking-wider text-emerald-400 uppercase text-center border-b border-kingshot-border pb-3">تسجيل لاعب</h2>
+                <div>
+                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">اسمك / المعرف</label>
+                    <input type="text" id="reg-name" placeholder="مثال: Ghost" required class="w-full bg-kingshot-dark border border-emerald-500/30 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-emerald-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">رقم الغرفة السرية</label>
+                    <input type="text" id="reg-room-code" placeholder="أدخل رقم الغرفة (مثال: 1865)" required class="w-full bg-kingshot-dark border border-emerald-500/30 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-emerald-500 outline-none text-center gaming-font font-bold tracking-widest">
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button onclick="backToRoleSelect()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 rounded-lg text-xs uppercase transition-all active:scale-95 cursor-pointer">
+                        رجوع
+                    </button>
+                    <button onclick="registerAndJoinAsPlayer()" class="flex-[2] bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-lg text-xs uppercase shadow-md shadow-emerald-600/20 transition-all border border-emerald-400/30 active:scale-95 cursor-pointer">
+                        اتصال بالمحطة
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -73,33 +125,33 @@
     <header class="bg-kingshot-card border-b border-kingshot-border shadow-md sticky top-0 z-40">
         <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col gap-3">
             <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-2">
+                <div class="flex items-center space-x-2 space-x-reverse">
                     <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shadow-md border border-blue-400/30">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                         </svg>
                     </div>
                     <h1 class="gaming-font text-lg font-bold tracking-wider text-white uppercase flex items-center gap-1.5">
-                        KingshotLab <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">V6.29</span>
+                        KingshotLab <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">V7.1</span>
                     </h1>
                 </div>
 
                 <div class="flex items-center gap-2">
                     <span id="connection-status" class="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)] animate-pulse" title="Disconnected"></span>
                     <div class="bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-emerald-400 font-bold text-xs uppercase tracking-wider">
-                        ROOM: 1865
+                        غرفة: <span id="header-room-display">1865</span>
                     </div>
                 </div>
             </div>
 
             <div class="flex items-center justify-between gap-2 pt-2 border-t border-kingshot-border/60">
                 <div class="flex items-center gap-2">
-                    <span id="current-role-badge" class="text-xs font-bold px-2.5 py-1 rounded-md bg-blue-500/20 text-blue-400 border border-blue-500/30 uppercase">Role: -</span>
-                    <button onclick="resetRoleSelection()" class="text-[10px] text-slate-400 hover:text-white transition-colors underline uppercase cursor-pointer">Switch</button>
+                    <span id="current-role-badge" class="text-xs font-bold px-2.5 py-1 rounded-md bg-blue-500/20 text-blue-400 border border-blue-500/30 uppercase">الدور: -</span>
+                    <button onclick="resetRoleSelection()" class="text-[10px] text-slate-400 hover:text-white transition-colors underline uppercase cursor-pointer">تبديل</button>
                 </div>
 
                 <button id="enable-audio-btn" onclick="enableAndTestAudio(event)" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition-all active:scale-95 whitespace-nowrap cursor-pointer">
-                    🔊 Enable Audio
+                    🔊 تفعيل الصوت
                 </button>
             </div>
         </div>
@@ -108,21 +160,31 @@
     <!-- Main Content -->
     <main class="max-w-6xl w-full mx-auto px-4 py-4 flex-grow space-y-4">
 
+        <!-- Custom Messaging & Quick Commands (Leader Only) -->
+        <div class="leader-only bg-kingshot-card border border-indigo-500/30 rounded-xl p-4 shadow-lg space-y-3">
+            <h2 class="gaming-font text-xs font-bold text-indigo-400 uppercase tracking-wider">القيادة والاتصالات</h2>
+            
+            <div class="flex gap-2">
+                <input type="text" id="custom-msg-input" placeholder="اكتب رسالة لجميع اللاعبين (مثال، استعدوا يا فريق أ!)" class="flex-1 bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-indigo-500 outline-none text-right">
+                <button onclick="sendTypedMessage()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-4 rounded-lg text-xs transition-all uppercase shadow-md shadow-indigo-600/20 active:scale-95 cursor-pointer border border-indigo-400/30">
+                    إرسال رسالة
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-kingshot-border/60">
+                <button onclick="speakCustomText('Get ready for battle')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-semibold py-2 px-3 rounded-lg text-xs transition-all border border-slate-600 uppercase active:scale-95 cursor-pointer">
+                    📢 سريع: استعد
+                </button>
+                <button onclick="speakCustomText('Return to chat')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-semibold py-2 px-3 rounded-lg text-xs transition-all border border-slate-600 uppercase active:scale-95 cursor-pointer">
+                    💬 سريع: ارجع للدردشة
+                </button>
+            </div>
+        </div>
+
         <!-- GROUP CUSTOMIZATION PANEL (Leader Only) -->
         <div class="leader-only bg-kingshot-card border border-blue-500/30 rounded-xl p-4 shadow-lg space-y-3">
-            <h2 class="gaming-font text-xs font-bold text-blue-400 uppercase tracking-wider">Groups Flexible Control Panel</h2>
-            <div id="group-settings-container" class="space-y-2">
-                <!-- Dynamically populated per group -->
-            </div>
-            
-            <div class="grid grid-cols-2 gap-2 pt-1 border-t border-kingshot-border/60">
-                <button onclick="speakCustomText('Get ready for battle')" class="bg-indigo-600/30 hover:bg-indigo-600 text-indigo-300 hover:text-white font-semibold py-2 px-3 rounded-lg text-xs transition-all border border-indigo-500/40 uppercase active:scale-95 cursor-pointer">
-                    📢 Get Ready
-                </button>
-                <button onclick="speakCustomText('Return to chat')" class="bg-purple-600/30 hover:bg-purple-600 text-purple-300 hover:text-white font-semibold py-2 px-3 rounded-lg text-xs transition-all border border-purple-500/40 uppercase active:scale-95 cursor-pointer">
-                    💬 Return to Chat
-                </button>
-            </div>
+            <h2 class="gaming-font text-xs font-bold text-blue-400 uppercase tracking-wider">لوحة تحكم مرنة للمجموعات</h2>
+            <div id="group-settings-container" class="space-y-2"></div>
         </div>
 
         <!-- LIVE BATTLE STATION CONSOLE -->
@@ -130,27 +192,32 @@
             <div class="flex flex-col gap-2">
                 <h2 class="gaming-font text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
                     <svg class="w-4 h-4 text-amber-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    Live Sequence Console
+                    وحدة تحكم التسلسل المباشر
                 </h2>
                 <div class="leader-only flex items-center justify-between gap-2">
-                    <label class="text-[11px] text-slate-300 font-semibold uppercase">WAVE:</label>
-                    <select id="battle-wave-select" class="bg-kingshot-dark border border-amber-500/30 rounded-lg px-3 py-1.5 text-slate-100 text-xs flex-1 outline-none">
-                        <option value="all">All Active Players</option>
+                    <label class="text-[11px] text-slate-300 font-semibold uppercase">موجة:</label>
+                    <select id="battle-wave-select" class="bg-kingshot-dark border border-amber-500/30 rounded-lg px-3 py-1.5 text-slate-100 text-xs flex-1 outline-none text-right">
+                        <option value="all">جميع اللاعبين النشطين</option>
                     </select>
                 </div>
             </div>
 
-            <div class="flex flex-col gap-2.5 bg-kingshot-dark/70 p-3 rounded-xl border border-kingshot-border">
-                <div>
-                    <div id="battle-status" class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">STATUS: STANDBY</div>
-                    <div id="battle-current-target" class="gaming-font text-base font-bold text-amber-400 mt-0.5">Waiting for Leader...</div>
+            <div class="flex flex-col gap-2.5 bg-kingshot-dark/70 p-3 rounded-xl border border-kingshot-border relative overflow-hidden">
+                <div id="msg-overlay" class="absolute inset-0 bg-indigo-900/90 hidden items-center justify-center p-2 z-10 text-center transition-all">
+                    <p id="msg-overlay-text" class="text-white font-bold text-sm uppercase tracking-wide"></p>
                 </div>
+                
+                <div>
+                    <div id="battle-status" class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">الحالة: وضع الاستعداد</div>
+                    <div id="battle-current-target" class="gaming-font text-base font-bold text-amber-400 mt-0.5">في انتظار القائد...</div>
+                </div>
+                
                 <div class="leader-only flex items-center gap-2 pt-1">
                     <button id="start-battle-btn" class="flex-1 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg shadow-amber-600/20 transition-all gaming-font text-xs uppercase tracking-wider border border-amber-400/30 active:scale-95 cursor-pointer">
-                        🚀 Start Sequence
+                        🚀 بدء التسلسل
                     </button>
                     <button id="reset-battle-btn" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 font-semibold py-2.5 px-3 rounded-xl border border-red-500/30 transition-all text-xs active:scale-95 cursor-pointer">
-                        Reset
+                        إعادة تعيين
                     </button>
                 </div>
             </div>
@@ -160,57 +227,61 @@
 
         <!-- Add / Edit Player Form (Leader Only) -->
         <div class="leader-only bg-kingshot-card border border-kingshot-border rounded-xl p-4 shadow-xl">
-            <h3 id="form-title" class="gaming-font text-xs font-bold text-slate-200 uppercase tracking-wider mb-2.5">Add Player</h3>
+            <h3 id="form-title" class="gaming-font text-xs font-bold text-slate-200 uppercase tracking-wider mb-2.5">إضافة لاعب يدويًا</h3>
             <form id="add-player-form" class="space-y-3">
                 <input type="hidden" id="edit-player-id" value="">
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Player Name</label>
-                        <input type="text" id="player-name" required placeholder="e.g. sweet" class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none">
+                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">اسم اللاعب</label>
+                        <input type="text" id="player-name" required placeholder="مثال: sweet" class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none text-right">
                     </div>
                     <div>
-                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Group</label>
-                        <input type="text" id="player-group" value="1" required class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none">
+                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">المجموعة</label>
+                        <input type="text" id="player-group" value="1" required class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none text-right">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">March (Mins)</label>
-                        <input type="number" id="march-mins" min="0" value="1" required class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none">
+                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">مسيرة (دقائق)</label>
+                        <input type="number" id="march-mins" min="0" value="1" required class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none text-right">
                     </div>
                     <div>
-                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Seconds</label>
-                        <input type="number" id="march-secs" min="0" max="59" value="20" required class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none">
+                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">ثواني</label>
+                        <input type="number" id="march-secs" min="0" max="59" value="20" required class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none text-right">
                     </div>
                 </div>
                 <div class="flex gap-2 pt-1">
                     <button type="submit" id="form-submit-btn" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md shadow-blue-600/20 transition-all text-xs uppercase border border-blue-400/30 active:scale-95 cursor-pointer">
-                        Add Player
+                        إضافة لاعب
                     </button>
                     <button type="button" id="cancel-edit-btn" onclick="cancelEdit()" class="hidden bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 px-3 rounded-xl text-xs uppercase active:scale-95 cursor-pointer">
-                        Cancel
+                        إلغاء
                     </button>
                 </div>
             </form>
         </div>
 
         <!-- Player Table (Leader Only) -->
-        <div class="leader-only bg-kingshot-card border border-kingshot-border rounded-xl shadow-xl overflow-hidden mb-6">
+        <div class="leader-only bg-kingshot-card border border-kingshot-border rounded-xl shadow-xl overflow-hidden mb-6 mt-4">
+            <div class="bg-kingshot-dark/50 p-3 border-b border-kingshot-border flex justify-between items-center">
+                <h3 class="gaming-font text-sm font-bold text-slate-200 uppercase tracking-wider">اللاعبون المتصلون</h3>
+                <span class="text-[10px] text-slate-400">🟢 متصل | 🔴 غير متصل</span>
+            </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs">
+                <table class="w-full text-right border-collapse text-xs">
                     <thead>
-                        <tr class="bg-kingshot-dark/50 border-b border-kingshot-border uppercase text-slate-400 gaming-font">
-                            <th class="py-2.5 px-2 text-center">Order</th>
-                            <th class="py-2.5 px-3">Player & March</th>
-                            <th class="py-2.5 px-3 text-center">Schedule (Launch / Arrival)</th>
-                            <th class="py-2.5 px-3 text-center">Status</th>
-                            <th class="py-2.5 px-3 text-center">Actions</th>
+                        <tr class="bg-kingshot-dark/80 border-b border-kingshot-border uppercase text-slate-400 gaming-font">
+                            <th class="py-2.5 px-2 text-center">الحالة</th>
+                            <th class="py-2.5 px-3">اللاعب والمسيرة</th>
+                            <th class="py-2.5 px-3 text-center">جدول الإطلاق</th>
+                            <th class="py-2.5 px-3 text-center">التحكم</th>
+                            <th class="py-2.5 px-3 text-center">إجراءات</th>
                         </tr>
                     </thead>
                     <tbody id="player-table-body" class="divide-y divide-kingshot-border/60"></tbody>
                 </table>
             </div>
-            <div id="empty-state" class="p-6 text-center text-xs text-slate-500">No players added yet.</div>
+            <div id="empty-state" class="p-6 text-center text-xs text-slate-500">لم يتم اتصال أو إضافة أي لاعبين حتى الآن.</div>
         </div>
 
     </main>
@@ -225,31 +296,42 @@
         let supabaseClient = null;
         let currentChannel = null;
         let currentRole = ''; 
+        let myPlayerId = null; 
         let backgroundAudioCtx = null;
         let audioUnlocked = false;
-        const LEADER_PASSWORD = "123";
 
         let state = {
-            players: JSON.parse(localStorage.getItem('kingshot_players_v629') || '[]'),
-            groupSettings: JSON.parse(localStorage.getItem('kingshot_group_settings_v629') || '{}')
+            players: JSON.parse(localStorage.getItem('kingshot_players_v7') || '[]'),
+            groupSettings: JSON.parse(localStorage.getItem('kingshot_group_settings_v7') || '{}')
         };
 
-        let battleEngine = {
-            queue: [],
-            currentIndex: 0,
-            timerInterval: null
-        };
-
+        let battleEngine = { queue: [], currentIndex: 0, timerInterval: null };
         let speechQueue = [];
         let isSpeaking = false;
+        let heartbeatInterval = null;
+        let uiRefreshInterval = null;
 
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('header-room-display').textContent = CONFIG.roomCode;
             checkRolePrompt();
 
             try {
                 if (window.supabase) {
                     supabaseClient = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.anonKey);
-                    currentChannel = supabaseClient.channel('room_' + CONFIG.roomCode);
+                    
+                    const { data: { session } } = await supabaseClient.auth.getSession();
+                    if (session) {
+                        currentRole = 'leader';
+                        document.getElementById('role-modal').classList.add('hidden');
+                        applyRoleUI('leader');
+                        if(uiRefreshInterval) clearInterval(uiRefreshInterval);
+                        uiRefreshInterval = setInterval(updateOnlineIndicators, 3000);
+                        renderPlayerTable();
+                    }
+
+                    currentChannel = supabaseClient.channel('room_' + CONFIG.roomCode, {
+                        config: { broadcast: { self: true } }
+                    });
 
                     currentChannel.on('broadcast', { event: 'battle_event' }, (payload) => {
                         handleBroadcastEvent(payload.payload);
@@ -275,48 +357,123 @@
 
         function checkRolePrompt() {
             const modal = document.getElementById('role-modal');
-            currentRole = ''; 
-            if (modal) {
-                modal.classList.remove('hidden');
+            if (!currentRole && modal) modal.classList.remove('hidden');
+        }
+
+        window.showLeaderLoginForm = function() {
+            document.getElementById('role-selection-buttons').classList.add('hidden');
+            document.getElementById('leader-login-form').classList.remove('hidden');
+            document.getElementById('leader-login-form').classList.add('flex');
+        }
+
+        window.showPlayerRegistration = function() {
+            document.getElementById('role-selection-buttons').classList.add('hidden');
+            document.getElementById('player-registration-form').classList.remove('hidden');
+            document.getElementById('player-registration-form').classList.add('flex');
+        }
+
+        window.backToRoleSelect = function() {
+            document.getElementById('role-selection-buttons').classList.remove('hidden');
+            document.getElementById('leader-login-form').classList.add('hidden');
+            document.getElementById('leader-login-form').classList.remove('flex');
+            document.getElementById('player-registration-form').classList.add('hidden');
+            document.getElementById('player-registration-form').classList.remove('flex');
+        }
+
+        window.loginAsLeaderSecure = async function() {
+            const email = document.getElementById('leader-email').value.trim();
+            const password = document.getElementById('leader-password').value.trim();
+
+            if (!email || !password) {
+                alert("❌ يرجى إدخال البريد الإلكتروني وكلمة المرور.");
+                return;
+            }
+
+            const btn = event.target;
+            btn.textContent = "جاري التحقق...";
+            btn.disabled = true;
+
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) {
+                    alert("❌ فشل المصادقة: بيانات الدخول غير صحيحة أو ليس لديك صلاحية قائد.");
+                    btn.textContent = "دخول القائد";
+                    btn.disabled = false;
+                    return;
+                }
+
+                currentRole = 'leader';
+                document.getElementById('role-modal').classList.add('hidden');
+                applyRoleUI('leader');
+                unlockAudioMobile();
+
+                if(uiRefreshInterval) clearInterval(uiRefreshInterval);
+                uiRefreshInterval = setInterval(updateOnlineIndicators, 3000);
+
+                renderPlayerTable();
+                syncStateToPlayers();
+            } catch(err) {
+                alert("حدث خطأ في الاتصال بخادم المصادقة.");
+                btn.textContent = "دخول القائد";
+                btn.disabled = false;
             }
         }
 
-        window.handleRoleSelection = function(role) {
-            if (role === 'leader') {
-                const pass = prompt("🔐 Please enter leader password:");
-                if (pass !== LEADER_PASSWORD) {
-                    alert("❌ Incorrect password!");
-                    return;
-                }
+        window.registerAndJoinAsPlayer = function() {
+            const name = document.getElementById('reg-name').value.trim();
+            const inputRoomCode = document.getElementById('reg-room-code').value.trim();
+            const group = "1";
+            const mins = 1;
+            const secs = 20;
+
+            if(!name) { alert("رجاء إدخال اسمك."); return; }
+            if(!inputRoomCode) { alert("رجاء إدخال رقم الغرفة."); return; }
+
+            if (inputRoomCode !== CONFIG.roomCode) {
+                alert("❌ رقم الغرفة غير صحيح! يرجى التأكد من القائد للحصول على الرقم السري الصحيح.");
+                return;
             }
-            currentRole = role;
+
+            myPlayerId = "PLY_" + Date.now().toString();
+            currentRole = 'player';
+            
+            broadcastState('PLAYER_JOIN', { id: myPlayerId, name, group, marchMins: mins, marchSecs: secs });
+            
+            if(heartbeatInterval) clearInterval(heartbeatInterval);
+            heartbeatInterval = setInterval(() => {
+                broadcastState('HEARTBEAT', { id: myPlayerId });
+            }, 5000);
+
             const modal = document.getElementById('role-modal');
-            if (modal) {
-                modal.classList.add('hidden');
-            }
-            applyRoleUI(role);
+            if (modal) modal.classList.add('hidden');
+            
+            applyRoleUI('player');
             unlockAudioMobile();
         }
 
-        window.resetRoleSelection = function() {
-            currentRole = '';
-            const modal = document.getElementById('role-modal');
-            if (modal) {
-                modal.classList.remove('hidden');
+        window.resetRoleSelection = async function() {
+            if (currentRole === 'leader' && supabaseClient) {
+                await supabaseClient.auth.signOut();
             }
+            currentRole = '';
+            if(heartbeatInterval) clearInterval(heartbeatInterval);
+            if(uiRefreshInterval) clearInterval(uiRefreshInterval);
+            document.getElementById('role-modal').classList.remove('hidden');
+            backToRoleSelect();
         }
 
         function applyRoleUI(role) {
             const roleBadge = document.getElementById('current-role-badge');
-            if(roleBadge) roleBadge.textContent = `Role: ${role.toUpperCase()}`;
+            let roleDisplay = role === 'leader' ? 'قائد (محمي)' : 'لاعب';
+            if(roleBadge) roleBadge.textContent = `الدور: ${roleDisplay}`;
             
             document.querySelectorAll('.leader-only').forEach(el => {
-                if (role === 'player') {
-                    el.classList.add('hidden');
-                } else {
-                    el.classList.add('block');
-                    el.classList.remove('hidden');
-                }
+                if (role === 'player') el.classList.add('hidden');
+                else { el.classList.add('block'); el.classList.remove('hidden'); }
             });
         }
 
@@ -324,12 +481,8 @@
             if (audioUnlocked) return;
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
-                if (!backgroundAudioCtx) {
-                    backgroundAudioCtx = new AudioContext();
-                }
-                if (backgroundAudioCtx.state === 'suspended') {
-                    backgroundAudioCtx.resume();
-                }
+                if (!backgroundAudioCtx) backgroundAudioCtx = new AudioContext();
+                if (backgroundAudioCtx.state === 'suspended') backgroundAudioCtx.resume();
                 const buffer = backgroundAudioCtx.createBuffer(1, 1, 22050);
                 const source = backgroundAudioCtx.createBufferSource();
                 source.buffer = buffer;
@@ -346,7 +499,7 @@
                 const btn = document.getElementById('enable-audio-btn');
                 if(btn) {
                     btn.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-500 text-slate-950 flex items-center gap-1.5 shadow-md transition-all whitespace-nowrap cursor-pointer";
-                    btn.innerHTML = "🎧 Audio Unlocked";
+                    btn.innerHTML = "🎧 الصوت مفعل";
                 }
             } catch(e) {}
         }
@@ -354,8 +507,17 @@
         window.enableAndTestAudio = function(e) {
             if(e) e.stopPropagation();
             unlockAudioMobile();
-            speakText("Audio is active", true);
+            speakText("تم تفعيل الصوت", true);
         };
+
+        window.sendTypedMessage = function() {
+            const input = document.getElementById('custom-msg-input');
+            const text = input.value.trim();
+            if(text) {
+                speakCustomText(text);
+                input.value = '';
+            }
+        }
 
         window.speakCustomText = function(text) {
             broadcastState('CUSTOM_AUDIO', { text: text });
@@ -365,56 +527,99 @@
             const payload = { type: eventType, data: data };
             if (currentChannel) {
                 try {
-                    currentChannel.send({
-                        type: 'broadcast',
-                        event: 'battle_event',
-                        payload: payload
-                    });
+                    currentChannel.send({ type: 'broadcast', event: 'battle_event', payload: payload });
                 } catch(e) {}
             }
             handleEventLocally(payload);
         }
 
+        function syncStateToPlayers() {
+            if(currentRole === 'leader') {
+                broadcastState('SYNC_STATE', { players: state.players });
+            }
+        }
+
         function handleBroadcastEvent(msg) {
-            if (currentRole === 'leader') return;
             handleEventLocally(msg);
         }
 
         function handleEventLocally(msg) {
+            if (currentRole === 'leader') {
+                if (msg.type === 'PLAYER_JOIN') {
+                    let p = state.players.find(x => x.id === msg.data.id || x.name === msg.data.name);
+                    if (!p) {
+                        state.players.push({ ...msg.data, frozen: false, lastSeen: Date.now() });
+                    } else {
+                        p.id = msg.data.id;
+                        p.group = msg.data.group;
+                        p.marchMins = msg.data.marchMins;
+                        p.marchSecs = msg.data.marchSecs;
+                        p.lastSeen = Date.now();
+                    }
+                    savePlayers();
+                    renderPlayerTable();
+                    syncStateToPlayers();
+                }
+                if (msg.type === 'HEARTBEAT') {
+                    let p = state.players.find(x => x.id === msg.data.id);
+                    if (p) { p.lastSeen = Date.now(); }
+                }
+            }
+
+            if (currentRole === 'player') {
+                if (msg.type === 'SYNC_STATE') {
+                    let myData = msg.data.players.find(x => x.id === myPlayerId);
+                    const overlay = document.getElementById('disabled-overlay');
+                    if (myData && myData.frozen) {
+                        overlay.classList.remove('hidden');
+                    } else {
+                        overlay.classList.add('hidden');
+                    }
+                }
+            }
+
             if (msg.type === 'START_SEQUENCE') {
                 updateLiveUI(msg.data.currentLauncher, msg.data.secs, msg.data.isPrep);
                 renderBattleQueueUI(msg.data.currentIndex, msg.data.queue);
 
                 if (msg.data.isPrep) {
-                    if (msg.data.secs > 0) {
-                        speakText(String(msg.data.secs), true);
-                    }
+                    if (msg.data.secs > 0) speakText(String(msg.data.secs), true);
                 } else if (msg.data.currentLauncher) {
-                    if (msg.data.secs > 0) {
-                        speakText(String(msg.data.secs), true);
-                    } else if (msg.data.secs === 0) {
-                        speakText(msg.data.currentLauncher.name, true);
-                    }
+                    if (msg.data.secs > 0) speakText(String(msg.data.secs), true);
+                    else if (msg.data.secs === 0) speakText(msg.data.currentLauncher.name, true);
                 }
-            } else if (msg.type === 'CUSTOM_AUDIO') {
+            } 
+            else if (msg.type === 'CUSTOM_AUDIO') {
                 speakText(msg.data.text, true);
-                const targetDiv = document.getElementById('battle-current-target');
-                if(targetDiv) targetDiv.innerHTML = `📢 <span class="text-indigo-400 font-bold">${msg.data.text}</span>`;
-            } else if (msg.type === 'RESET') {
+                showTemporaryMessageOverlay(msg.data.text);
+            } 
+            else if (msg.type === 'RESET') {
                 clearSpeechQueue();
                 resetBattleEngineUI();
             }
         }
 
+        function showTemporaryMessageOverlay(text) {
+            const overlay = document.getElementById('msg-overlay');
+            const txtEl = document.getElementById('msg-overlay-text');
+            if(overlay && txtEl) {
+                txtEl.textContent = text;
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                    overlay.classList.remove('flex');
+                }, 4000);
+            }
+        }
+
         function speakText(text, urgent = false) {
             if (!('speechSynthesis' in window)) return;
-            
             if (urgent) {
                 speechQueue = [];
                 isSpeaking = false;
                 window.speechSynthesis.cancel();
             }
-
             speechQueue.push(String(text));
             processSpeechQueue();
         }
@@ -428,18 +633,10 @@
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'en-US';
                 utterance.rate = 0.95; 
-                utterance.pitch = 1.0; 
                 utterance.volume = 1.0;
                 
-                utterance.onend = () => {
-                    isSpeaking = false;
-                    setTimeout(processSpeechQueue, 30);
-                };
-                
-                utterance.onerror = () => {
-                    isSpeaking = false;
-                    setTimeout(processSpeechQueue, 30);
-                };
+                utterance.onend = () => { isSpeaking = false; setTimeout(processSpeechQueue, 30); };
+                utterance.onerror = () => { isSpeaking = false; setTimeout(processSpeechQueue, 30); };
                 
                 window.speechSynthesis.speak(utterance);
             } catch (e) {
@@ -451,9 +648,7 @@
         function clearSpeechQueue() {
             speechQueue = [];
             isSpeaking = false;
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-            }
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         }
 
         function calculateSchedule() {
@@ -461,10 +656,7 @@
             if (activePlayers.length === 0) return [];
 
             let mapped = activePlayers.map(p => ({
-                id: p.id,
-                name: p.name,
-                group: String(p.group),
-                marchSec: (p.marchMins * 60) + p.marchSecs
+                id: p.id, name: p.name, group: String(p.group), marchSec: (p.marchMins * 60) + p.marchSecs
             }));
 
             let maxMarch = Math.max(...mapped.map(m => m.marchSec));
@@ -475,35 +667,26 @@
 
             uniqueGroups.forEach((g, idx) => {
                 let settings = state.groupSettings[g] || { mode: 'staggered', gap: 1 };
-                
-                if (idx === 0) {
-                    groupArrivals[g] = currentBaseArrival;
-                } else {
+                if (idx === 0) groupArrivals[g] = currentBaseArrival;
+                else {
                     let prevGroup = uniqueGroups[idx - 1];
                     let prevSettings = state.groupSettings[prevGroup] || { mode: 'staggered', gap: 1 };
-                    
                     let transitionGap = prevSettings.gap || 2;
                     groupArrivals[g] = groupArrivals[prevGroup] + transitionGap;
                 }
             });
 
             let playerArrivals = {};
-            
             uniqueGroups.forEach(g => {
                 let gPlayers = mapped.filter(m => m.group === g);
                 let settings = state.groupSettings[g] || { mode: 'staggered', gap: 1 };
 
                 if (settings.mode === 'simultaneous') {
-                    let targetTime = groupArrivals[g];
-                    gPlayers.forEach(p => {
-                        playerArrivals[p.id] = targetTime;
-                    });
+                    gPlayers.forEach(p => { playerArrivals[p.id] = groupArrivals[g]; });
                 } else {
                     let baseTime = groupArrivals[g];
                     let intraGap = settings.gap || 1;
-                    gPlayers.forEach((p, pIdx) => {
-                        playerArrivals[p.id] = baseTime + (pIdx * intraGap);
-                    });
+                    gPlayers.forEach((p, pIdx) => { playerArrivals[p.id] = baseTime + (pIdx * intraGap); });
                 }
             });
 
@@ -513,17 +696,10 @@
             let delays = rawLaunches.map(l => l - minLaunch);
 
             let calculated = mapped.map((m, index) => ({
-                id: m.id,
-                name: m.name,
-                group: m.group,
-                marchSec: m.marchSec,
-                arrivalSec: targetArrivals[index],
-                delay: delays[index]
+                id: m.id, name: m.name, group: m.group, marchSec: m.marchSec, arrivalSec: targetArrivals[index], delay: delays[index]
             }));
 
-            // الترتيب تلقائياً حسب وقت الإطلاق (Delay) من الصغير للكبير (الأول فالأول في العد التنازلي)
             calculated.sort((a, b) => a.delay - b.delay);
-
             return calculated;
         }
 
@@ -532,12 +708,12 @@
             startBtn.addEventListener('click', () => {
                 clearSpeechQueue();
                 let schedule = calculateSchedule();
-                if (schedule.length === 0) return alert('No active players found!');
+                if (schedule.length === 0) return alert('لم يتم العثور على لاعبين نشطين!');
 
                 const selectedWave = document.getElementById('battle-wave-select').value;
                 let queue = schedule.filter(s => selectedWave === 'all' || s.group === selectedWave);
 
-                if (queue.length === 0) return alert('No players in this wave!');
+                if (queue.length === 0) return alert('لا يوجد لاعبين في هذه الموجة!');
 
                 battleEngine.queue = queue;
                 battleEngine.currentIndex = 0;
@@ -576,7 +752,6 @@
                 setTimeout(runSequentialTimer, 1000); 
             } else {
                 let remaining = waitTime;
-                
                 broadcastState('START_SEQUENCE', { queue: battleEngine.queue, currentIndex: battleEngine.currentIndex, currentLauncher: currentLauncher, secs: remaining, isPrep: false });
                 remaining--;
 
@@ -588,9 +763,7 @@
                         clearInterval(battleEngine.timerInterval);
                         battleEngine.currentIndex++;
                         setTimeout(runSequentialTimer, 1000);
-                    } else {
-                        remaining--;
-                    }
+                    } else { remaining--; }
                 }, 1000);
             }
         }
@@ -601,15 +774,15 @@
             const targetDiv = document.getElementById('battle-current-target');
             if(!statusDiv || !targetDiv) return;
             
-            statusDiv.textContent = 'STATUS: LIVE SEQUENCE IN PROGRESS';
+            statusDiv.textContent = 'الحالة: تسلسل مباشر قيد التقدم';
             statusDiv.className = "text-[10px] uppercase tracking-wider text-emerald-400 font-bold animate-pulse";
 
             if (isPrep) {
-                targetDiv.innerHTML = `⚠️ PREP: <span class="text-amber-400 text-xl">${secs}s</span>`;
+                targetDiv.innerHTML = `⚠️ استعداد: <span class="text-amber-400 text-xl">${secs}ث</span>`;
             } else if (secs > 0) {
-                targetDiv.innerHTML = `⏳ <b class="text-white">${launcher.name}</b> (G${launcher.group}) in: <span class="text-cyan-400 text-xl">${secs}s</span>`;
+                targetDiv.innerHTML = `⏳ <b class="text-white">${launcher.name}</b> (م${launcher.group}) في: <span class="text-cyan-400 text-xl">${secs}ث</span>`;
             } else {
-                targetDiv.innerHTML = `🔥 <span class="text-white underline font-extrabold text-xl">${launcher.name}</span> LAUNCH! 🔥`;
+                targetDiv.innerHTML = `🔥 <span class="text-white underline font-extrabold text-xl">${launcher.name}</span> إطلاق! 🔥`;
             }
         }
 
@@ -625,9 +798,9 @@
             const statusDiv = document.getElementById('battle-status');
             const targetDiv = document.getElementById('battle-current-target');
             if(!statusDiv || !targetDiv) return;
-            statusDiv.textContent = "STATUS: STANDBY";
+            statusDiv.textContent = "الحالة: وضع الاستعداد";
             statusDiv.className = "text-[10px] uppercase tracking-wider text-slate-400 font-bold";
-            targetDiv.textContent = "Waiting for Leader...";
+            targetDiv.textContent = "في انتظار القائد...";
             document.getElementById('battle-sequence-list').innerHTML = '';
         }
 
@@ -637,7 +810,7 @@
             let html = '';
             queueList.forEach((item, idx) => {
                 let badge = idx < activeIndex || activeIndex === -1 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : (idx === activeIndex ? 'bg-amber-500/20 text-amber-400 font-bold border-amber-500' : 'bg-kingshot-dark text-slate-400 border-kingshot-border');
-                html += `<div class="flex items-center justify-between p-2.5 rounded-lg border text-xs ${badge}"><span>#${idx+1} ${item.name} (G${item.group})</span><span class="font-bold">${idx === activeIndex ? '🔥 LAUNCH' : 'Pending'}</span></div>`;
+                html += `<div class="flex items-center justify-between p-2.5 rounded-lg border text-xs ${badge}"><span>#${idx+1} ${item.name} (م${item.group})</span><span class="font-bold">${idx === activeIndex ? '🔥 إطلاق' : 'قيد الانتظار'}</span></div>`;
             });
             container.innerHTML = html;
         }
@@ -658,9 +831,10 @@
                     if (p) { p.name = name; p.group = group; p.marchMins = mins; p.marchSecs = secs; }
                     cancelEdit();
                 } else {
-                    state.players.push({ id: Date.now().toString(), name, group, marchMins: mins, marchSecs: secs, frozen: false });
+                    state.players.push({ id: Date.now().toString(), name, group, marchMins: mins, marchSecs: secs, frozen: false, lastSeen: Date.now() });
                 }
                 savePlayers(); renderPlayerTable(); renderGroupSettingsUI(); this.reset();
+                syncStateToPlayers();
             });
         }
 
@@ -673,8 +847,8 @@
             document.getElementById('march-mins').value = p.marchMins;
             document.getElementById('march-secs').value = p.marchSecs;
             
-            document.getElementById('form-title').textContent = 'Edit Player';
-            document.getElementById('form-submit-btn').textContent = 'Update Player';
+            document.getElementById('form-title').textContent = 'تعديل لاعب';
+            document.getElementById('form-submit-btn').textContent = 'تحديث اللاعب';
             document.getElementById('cancel-edit-btn').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -682,8 +856,8 @@
         window.cancelEdit = function() {
             document.getElementById('edit-player-id').value = '';
             document.getElementById('add-player-form').reset();
-            document.getElementById('form-title').textContent = 'Add Player';
-            document.getElementById('form-submit-btn').textContent = 'Add Player';
+            document.getElementById('form-title').textContent = 'إضافة لاعب يدويًا';
+            document.getElementById('form-submit-btn').textContent = 'إضافة لاعب';
             document.getElementById('cancel-edit-btn').classList.add('hidden');
         }
 
@@ -699,6 +873,7 @@
 
             savePlayers();
             renderPlayerTable();
+            syncStateToPlayers();
         }
 
         function renderGroupSettingsUI() {
@@ -707,7 +882,7 @@
             
             const groups = [...new Set(state.players.map(p => p.group))];
             if (groups.length === 0) {
-                container.innerHTML = '<div class="text-xs text-slate-500">Add players to configure group settings.</div>';
+                container.innerHTML = '<div class="text-xs text-slate-500">أضف لاعبين لتهيئة إعدادات المجموعة.</div>';
                 return;
             }
 
@@ -717,14 +892,14 @@
                 html += `
                     <div class="bg-kingshot-dark p-2.5 rounded-lg border border-kingshot-border flex flex-col gap-2">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-slate-200">Group ${g}</span>
-                            <select onchange="updateGroupMode('${g}', this.value)" class="bg-kingshot-card border border-kingshot-border rounded px-2 py-1 text-[11px] text-slate-200 outline-none">
-                                <option value="staggered" ${setting.mode === 'staggered' ? 'selected' : ''}>Staggered (Sequential)</option>
-                                <option value="simultaneous" ${setting.mode === 'simultaneous' ? 'selected' : ''}>Simultaneous (All Together)</option>
+                            <span class="text-xs font-bold text-slate-200">مجموعة ${g}</span>
+                            <select onchange="updateGroupMode('${g}', this.value)" class="bg-kingshot-card border border-kingshot-border rounded px-2 py-1 text-[11px] text-slate-200 outline-none text-right">
+                                <option value="staggered" ${setting.mode === 'staggered' ? 'selected' : ''}>متدرج (تسلسلي)</option>
+                                <option value="simultaneous" ${setting.mode === 'simultaneous' ? 'selected' : ''}>متزامن (معاً)</option>
                             </select>
                         </div>
                         <div class="flex items-center justify-between gap-2">
-                            <span class="text-[10px] text-slate-400">Gap / Interval (Secs):</span>
+                            <span class="text-[10px] text-slate-400">فجوة / فاصل (ثواني):</span>
                             <input type="number" min="0" value="${setting.gap}" onchange="updateGroupGap('${g}', this.value)" class="w-20 bg-kingshot-card border border-kingshot-border rounded px-2 py-1 text-[11px] text-slate-100 outline-none text-center">
                         </div>
                     </div>
@@ -747,6 +922,22 @@
             renderPlayerTable();
         }
 
+        function updateOnlineIndicators() {
+            if(currentRole !== 'leader') return;
+            const now = Date.now();
+            state.players.forEach(p => {
+                const indicator = document.getElementById(`status-dot-${p.id}`);
+                if(indicator) {
+                    const isOnline = (now - (p.lastSeen || 0)) < 12000;
+                    if(isOnline) {
+                        indicator.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.8)] mx-auto";
+                    } else {
+                        indicator.className = "w-2.5 h-2.5 rounded-full bg-red-500 opacity-60 mx-auto";
+                    }
+                }
+            });
+        }
+
         function renderPlayerTable() {
             const tbody = document.getElementById('player-table-body');
             const emptyState = document.getElementById('empty-state');
@@ -755,6 +946,7 @@
             let schedule = calculateSchedule();
             let scheduleMap = {};
             schedule.forEach(s => { scheduleMap[s.id] = s; });
+            const now = Date.now();
 
             if (state.players.length === 0) {
                 emptyState.classList.remove('hidden');
@@ -762,23 +954,28 @@
                 emptyState.classList.add('hidden');
                 state.players.forEach((p, i) => {
                     let calc = scheduleMap[p.id];
-                    let calcText = p.frozen ? '<span class="text-slate-500">Frozen</span>' : (calc ? `Launch: <b class="text-cyan-400">+${calc.delay}s</b><br>Arrival: <b class="text-amber-400">${calc.arrivalSec}s</b>` : '-');
+                    let calcText = p.frozen ? '<span class="text-slate-500">مجمد</span>' : (calc ? `L: <b class="text-cyan-400">+${calc.delay}ث</b><br>A: <b class="text-amber-400">${calc.arrivalSec}ث</b>` : '-');
                     
+                    const isOnline = (now - (p.lastSeen || 0)) < 12000;
+                    const dotClass = isOnline ? "bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.8)]" : "bg-red-500 opacity-60";
+
                     tbody.innerHTML += `
-                        <tr class="border-b border-kingshot-border/60 hover:bg-slate-800/35 transition-colors ${p.frozen ? 'opacity-50 bg-blue-950/25' : ''}">
-                            <td class="py-3 px-2 text-center text-amber-400 font-bold text-[10px]">#${i+1}</td>
-                            <td class="py-3 px-3 text-white font-semibold">G${p.group} - ${p.name} <br><span class="text-[10px] text-slate-400 font-normal">March: ${p.marchMins}m ${p.marchSecs}s</span></td>
+                        <tr class="border-b border-kingshot-border/60 hover:bg-slate-800/35 transition-colors ${p.frozen ? 'opacity-55 bg-blue-950/25' : ''}">
+                            <td class="py-3 px-2 text-center">
+                                <div id="status-dot-${p.id}" class="w-2.5 h-2.5 rounded-full mx-auto ${dotClass}"></div>
+                            </td>
+                            <td class="py-3 px-3 text-white font-semibold">م${p.group} - ${p.name} <br><span class="text-[10px] text-slate-400 font-normal">د: ${p.marchMins}د ${p.marchSecs}ث</span></td>
                             <td class="py-3 px-3 text-center text-[11px]">${calcText}</td>
                             <td class="py-3 px-3 text-center">
-                                <button onclick="toggleFreeze('${p.id}')" class="px-2.5 py-1 rounded-md text-[10px] font-semibold border transition-all cursor-pointer ${p.frozen ? 'text-blue-400 border-blue-500/40 bg-blue-500/10' : 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10'}">${p.frozen ? 'Frozen' : 'Active'}</button>
+                                <button onclick="toggleFreeze('${p.id}')" class="px-2 py-1 rounded text-[10px] font-bold border transition-all cursor-pointer ${p.frozen ? 'text-red-400 border-red-500/40 bg-red-500/10' : 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10'}">${p.frozen ? 'معطل' : 'نشط'}</button>
                             </td>
                             <td class="py-3 px-3 text-center">
-                                <div class="flex items-content justify-center gap-1">
-                                    <button onclick="movePlayer('${p.id}', -1)" class="bg-slate-700/60 hover:bg-slate-600 text-white px-2 py-1 rounded text-[10px] transition-all cursor-pointer" title="Move Up">⬆️</button>
-                                    <button onclick="movePlayer('${p.id}', 1)" class="bg-slate-700/60 hover:bg-slate-600 text-white px-2 py-1 rounded text-[10px] transition-all cursor-pointer" title="Move Down">⬇️</button>
-                                    <button onclick="editPlayer('${p.id}')" class="bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/40 px-2.5 py-1 rounded text-[10px] transition-all font-semibold cursor-pointer">Edit</button>
-                                    <button onclick="deletePlayer('${p.id}')" class="bg-red-500/10 hover:bg-red-500/30 text-red-400 border border-red-500/30 px-2.5 py-1 rounded text-[10px] transition-all font-semibold cursor-pointer">Del</button>
-                                    </div>
+                                <div class="flex flex-wrap items-content justify-center gap-1">
+                                    <button onclick="movePlayer('${p.id}', -1)" class="bg-slate-700/60 hover:bg-slate-600 text-white px-2 py-1 rounded text-[10px] transition-all cursor-pointer">⬆️</button>
+                                    <button onclick="movePlayer('${p.id}', 1)" class="bg-slate-700/60 hover:bg-slate-600 text-white px-2 py-1 rounded text-[10px] transition-all cursor-pointer">⬇️</button>
+                                    <button onclick="editPlayer('${p.id}')" class="bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/40 px-2 py-1 rounded text-[10px] transition-all font-semibold cursor-pointer">تعديل</button>
+                                    <button onclick="deletePlayer('${p.id}')" class="bg-red-500/10 hover:bg-red-500/30 text-red-400 border border-red-500/30 px-2 py-1 rounded text-[10px] transition-all font-semibold cursor-pointer">حذف</button>
+                                </div>
                             </td>
                         </tr>`;
                 });
@@ -789,23 +986,29 @@
 
         window.toggleFreeze = function(id) { 
             let p = state.players.find(i => id === i.id); 
-            if (p) { p.frozen = !p.frozen; savePlayers(); renderPlayerTable(); } 
+            if (p) { 
+                p.frozen = !p.frozen; 
+                savePlayers(); 
+                renderPlayerTable(); 
+                syncStateToPlayers(); 
+            } 
         };
         
         window.deletePlayer = function(id) { 
             state.players = state.players.filter(i => i.id !== id); 
             savePlayers(); 
             renderPlayerTable(); 
+            syncStateToPlayers();
         };
 
         function updateWaveSelect() {
             const s = document.getElementById('battle-wave-select'); if(!s) return;
             const groups = [...new Set(state.players.map(p => p.group))];
-            s.innerHTML = '<option value="all">All Active Players</option>' + groups.map(g => `<option value="${g}">Group ${g}</option>`).join('');
+            s.innerHTML = '<option value="all">جميع اللاعبين النشطين</option>' + groups.map(g => `<option value="${g}">مجموعة ${g}</option>`).join('');
         }
 
-        function savePlayers() { localStorage.setItem('kingshot_players_v629', JSON.stringify(state.players)); }
-        function saveGroupSettings() { localStorage.setItem('kingshot_group_settings_v629', JSON.stringify(state.groupSettings)); }
+        function savePlayers() { localStorage.setItem('kingshot_players_v7', JSON.stringify(state.players)); }
+        function saveGroupSettings() { localStorage.setItem('kingshot_group_settings_v7', JSON.stringify(state.groupSettings)); }
         
         renderPlayerTable();
     </script>
