@@ -3,13 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KingshotLab - Realtime Cloud Battle Station v7.1 Secure</title>
-    <!-- Tailwind CSS CDN -->
+    <title>KingshotLab - Realtime Cloud Battle Station v7.7.1 Secure</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Supabase JS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <!-- PWA Setup -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#070b19">
@@ -17,19 +14,7 @@
     <script>
         if (typeof tailwind !== 'undefined') {
             tailwind.config = {
-                theme: {
-                    extend: {
-                        colors: {
-                            kingshot: {
-                                dark: '#070b19',
-                                card: '#0f172a',
-                                border: '#1e293b',
-                                blue: '#3b82f6',
-                                accent: '#60a5fa'
-                            }
-                        }
-                    }
-                }
+                theme: { extend: { colors: { kingshot: { dark: '#070b19', card: '#0f172a', border: '#1e293b', blue: '#3b82f6', accent: '#60a5fa' } } } }
             }
         }
     </script>
@@ -39,46 +24,50 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #070b19; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        @keyframes audioPulse { 0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.7);} 50%{box-shadow:0 0 0 14px rgba(16,185,129,0);} }
+        .audio-pulse { animation: audioPulse 2s infinite; }
+        @keyframes flashBorder { 0%{border-color:#10b981;} 50%{border-color:#facc15;} 100%{border-color:#10b981;} }
+        .msg-flash { animation: flashBorder 0.6s ease-out; }
+        @keyframes getReady { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.06);opacity:0.85;} }
+        .get-ready-pulse { animation: getReady 1s ease-in-out infinite; }
     </style>
 </head>
 <body class="bg-kingshot-dark text-slate-100 min-h-screen flex flex-col justify-between selection:bg-blue-500 selection:text-white" onclick="unlockAudioMobile()">
 
-    <!-- Disabled Overlay for Players -->
     <div id="disabled-overlay" class="hidden fixed inset-0 bg-red-950/95 z-[100] flex flex-col items-center justify-center p-4 backdrop-blur-md">
-        <div class="w-20 h-20 mb-4 rounded-full bg-red-600/20 flex items-center justify-center border border-red-500/50 animate-pulse">
-            <span class="text-4xl">🛑</span>
-        </div>
+        <div class="w-20 h-20 mb-4 rounded-full bg-red-600/20 flex items-center justify-center border border-red-500/50 animate-pulse"><span class="text-4xl">🛑</span></div>
         <h1 class="text-4xl font-bold text-red-500 tracking-wider mb-2 uppercase">Station Disabled</h1>
         <p class="text-red-300 text-sm">The leader has locked your station. Wait for further instructions.</p>
     </div>
 
-    <!-- Role Selection Modal -->
+    <div id="leader-conflict-overlay" class="hidden fixed inset-0 bg-blue-950/95 z-[110] flex flex-col items-center justify-center p-4 backdrop-blur-md">
+        <div class="w-20 h-20 mb-4 rounded-full bg-blue-600/20 flex items-center justify-center border border-blue-500/50"><span class="text-4xl">👑</span></div>
+        <h1 class="text-3xl font-bold text-blue-400 tracking-wider mb-2 uppercase text-center">Leader Already Active</h1>
+        <p class="text-blue-200 text-sm text-center max-w-md mb-6">This account is already controlling from another tab or device. Only <b>one Leader session</b> is allowed at a time.</p>
+        <button onclick="forceTakeLeadership()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-6 rounded-lg text-xs uppercase shadow-md transition-all border border-blue-400/30 active:scale-95 cursor-pointer">⚡ Force Take Over</button>
+    </div>
+
     <div id="role-modal" class="fixed inset-0 bg-kingshot-dark/95 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-kingshot-card border border-kingshot-border rounded-2xl p-6 max-w-md w-full shadow-2xl text-center space-y-6">
             <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center mx-auto shadow-lg shadow-blue-500/30 border border-blue-400/30">
-                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                </svg>
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
             </div>
             
             <div id="role-selection-buttons">
-                <h2 class="text-2xl font-bold tracking-wider text-white uppercase mb-1">KingshotLab V7.1</h2>
+                <h2 class="text-2xl font-bold tracking-wider text-white uppercase mb-1">KingshotLab V7.7.1</h2>
                 <p class="text-xs text-slate-400 mb-6">Select your operational role to continue (Secure Auth)</p>
                 <div class="grid grid-cols-2 gap-3">
-                    <button onclick="showLeaderLoginForm()" class="p-4 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold transition-all border border-blue-400/30 flex flex-col items-center gap-2 shadow-lg shadow-blue-600/20 active:scale-95 cursor-pointer">
-                        <span class="text-2xl">👑</span>
-                        <span class="uppercase text-sm tracking-wide">Leader</span>
-                    </button>
-                    <button onclick="showPlayerRegistration()" class="p-4 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold transition-all border border-emerald-400/30 flex flex-col items-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-95 cursor-pointer">
-                        <span class="text-2xl">🛡️</span>
-                        <span class="uppercase text-sm tracking-wide">Player</span>
-                    </button>
+                    <button onclick="showLeaderLoginForm()" class="p-4 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold transition-all border border-blue-400/30 flex flex-col items-center gap-2 shadow-lg shadow-blue-600/20 active:scale-95 cursor-pointer"><span class="text-2xl">👑</span><span class="uppercase text-sm tracking-wide">Leader</span></button>
+                    <button onclick="showPlayerRegistration()" class="p-4 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold transition-all border border-emerald-400/30 flex flex-col items-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-95 cursor-pointer"><span class="text-2xl">🛡️</span><span class="uppercase text-sm tracking-wide">Player</span></button>
                 </div>
             </div>
 
-            <!-- Leader Secure Login Form -->
             <div id="leader-login-form" class="hidden flex-col gap-4 text-left">
                 <h2 class="text-xl font-bold tracking-wider text-blue-400 uppercase text-center border-b border-kingshot-border pb-3">Leader Secure Login</h2>
+                <div>
+                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Room Code (you create this)</label>
+                    <input type="text" id="leader-room-code" placeholder="Enter Room Code" required class="w-full bg-kingshot-dark border border-amber-500/40 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-amber-500 outline-none text-center font-bold tracking-widest">
+                </div>
                 <div>
                     <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Leader Email</label>
                     <input type="email" id="leader-email" placeholder="leader@kingshot.com" required class="w-full bg-kingshot-dark border border-blue-500/30 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-blue-500 outline-none">
@@ -88,16 +77,11 @@
                     <input type="password" id="leader-password" placeholder="••••••••" required class="w-full bg-kingshot-dark border border-blue-500/30 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-blue-500 outline-none">
                 </div>
                 <div class="flex gap-2 pt-2">
-                    <button onclick="backToRoleSelect()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 rounded-lg text-xs uppercase transition-all active:scale-95 cursor-pointer">
-                        Back
-                    </button>
-                    <button onclick="loginAsLeaderSecure()" class="flex-[2] bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg text-xs uppercase shadow-md shadow-blue-600/20 transition-all border border-blue-400/30 active:scale-95 cursor-pointer">
-                        Leader Login
-                    </button>
+                    <button onclick="backToRoleSelect()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 rounded-lg text-xs uppercase transition-all active:scale-95 cursor-pointer">Back</button>
+                    <button onclick="loginAsLeaderSecure()" class="flex-[2] bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg text-xs uppercase shadow-md shadow-blue-600/20 transition-all border border-blue-400/30 active:scale-95 cursor-pointer">Leader Login</button>
                 </div>
             </div>
 
-            <!-- Player Registration Form (With Room Code) -->
             <div id="player-registration-form" class="hidden flex-col gap-4 text-left">
                 <h2 class="text-xl font-bold tracking-wider text-emerald-400 uppercase text-center border-b border-kingshot-border pb-3">Player Registration</h2>
                 <div>
@@ -105,126 +89,124 @@
                     <input type="text" id="reg-name" placeholder="e.g. Ghost" required class="w-full bg-kingshot-dark border border-emerald-500/30 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-emerald-500 outline-none">
                 </div>
                 <div>
-                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Secret Room Code</label>
-                    <input type="text" id="reg-room-code" placeholder="Enter Room Code (e.g. 1865)" required class="w-full bg-kingshot-dark border border-emerald-500/30 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-emerald-500 outline-none text-center font-bold tracking-widest">
+                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Room Code</label>
+                    <input type="text" id="reg-room-code" placeholder="Enter Room Code" required class="w-full bg-kingshot-dark border border-emerald-500/30 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-emerald-500 outline-none text-center font-bold tracking-widest">
                 </div>
                 <div class="flex gap-2 pt-2">
-                    <button onclick="backToRoleSelect()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 rounded-lg text-xs uppercase transition-all active:scale-95 cursor-pointer">
-                        Back
-                    </button>
-                    <button onclick="registerAndJoinAsPlayer()" class="flex-[2] bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-lg text-xs uppercase shadow-md shadow-emerald-600/20 transition-all border border-emerald-400/30 active:scale-95 cursor-pointer">
-                        Connect Station
-                    </button>
+                    <button onclick="backToRoleSelect()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 rounded-lg text-xs uppercase transition-all active:scale-95 cursor-pointer">Back</button>
+                    <button id="player-connect-btn" onclick="registerAndJoinAsPlayer(event)" class="flex-[2] bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-lg text-xs uppercase shadow-md shadow-emerald-600/20 transition-all border border-emerald-400/30 active:scale-95 cursor-pointer">Connect Station</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Header -->
     <header class="bg-kingshot-card border-b border-kingshot-border shadow-md sticky top-0 z-40">
         <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col gap-3">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-2">
                     <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shadow-md border border-blue-400/30">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                     </div>
-                    <h1 class="text-lg font-bold tracking-wider text-white uppercase flex items-center gap-1.5">
-                        KingshotLab <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">V7.1</span>
-                    </h1>
+                    <h1 class="text-lg font-bold tracking-wider text-white uppercase flex items-center gap-1.5">KingshotLab <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">V7.7.1</span></h1>
                 </div>
-
                 <div class="flex items-center gap-2">
                     <span id="connection-status" class="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)] animate-pulse" title="Disconnected"></span>
-                    <div class="bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-emerald-400 font-bold text-xs uppercase tracking-wider">
-                        Room: <span id="header-room-display">1865</span>
-                    </div>
+                    <div class="bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-emerald-400 font-bold text-xs uppercase tracking-wider">Room: <span id="header-room-display">---</span></div>
                 </div>
             </div>
-
             <div class="flex items-center justify-between gap-2 pt-2 border-t border-kingshot-border/60">
                 <div class="flex items-center gap-2">
                     <span id="current-role-badge" class="text-xs font-bold px-2.5 py-1 rounded-md bg-blue-500/20 text-blue-400 border border-blue-500/30 uppercase">Role: -</span>
                     <button onclick="resetRoleSelection()" class="text-[10px] text-slate-400 hover:text-white transition-colors underline uppercase cursor-pointer">Switch</button>
                 </div>
-
-                <button id="enable-audio-btn" onclick="enableAndTestAudio(event)" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition-all active:scale-95 whitespace-nowrap cursor-pointer">
-                    🔊 Enable Audio
-                </button>
+                <button id="enable-audio-btn" onclick="enableAndTestAudio(event)" class="hidden px-3 py-1.5 text-xs font-bold rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition-all active:scale-95 whitespace-nowrap cursor-pointer">🔊 Enable Audio</button>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="max-w-6xl w-full mx-auto px-4 py-4 flex-grow space-y-4">
 
-        <!-- Custom Messaging & Quick Commands (Leader Only) -->
-        <div class="leader-only bg-kingshot-card border border-indigo-500/30 rounded-xl p-4 shadow-lg space-y-3">
-            <h2 class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Command & Communications</h2>
-            
-            <div class="flex gap-2">
-                <input type="text" id="custom-msg-input" placeholder="Broadcast message to all players (e.g. Prepare team Alpha!)" class="flex-1 bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-indigo-500 outline-none">
-                <button onclick="sendTypedMessage()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-4 rounded-lg text-xs transition-all uppercase shadow-md shadow-indigo-600/20 active:scale-95 cursor-pointer border border-indigo-400/30">
-                    Send Broadcast
-                </button>
+        <div class="player-only hidden bg-kingshot-card border-2 border-emerald-500/40 rounded-xl p-5 shadow-lg space-y-4" id="player-audio-panel">
+            <div id="player-audio-gate" class="text-center">
+                <div class="text-5xl mb-3">🎧</div>
+                <h2 class="text-lg font-bold text-white uppercase mb-2 tracking-wider">Enable Audio</h2>
+                <p class="text-xs text-slate-400 mb-5 leading-relaxed">Tap the button below to hear countdowns, commands, and launches.</p>
+                <button onclick="playerEnableAudio(event)" class="audio-pulse w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white font-bold py-4 px-6 rounded-xl text-sm uppercase tracking-wider shadow-lg shadow-emerald-500/30 border-2 border-emerald-400/50 active:scale-95 cursor-pointer">🔊 TAP TO ENABLE AUDIO</button>
             </div>
-
-            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-kingshot-border/60">
-                <button onclick="speakCustomText('Get ready for battle')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-semibold py-2 px-3 rounded-lg text-xs transition-all border border-slate-600 uppercase active:scale-95 cursor-pointer">
-                    📢 Quick: Get Ready
-                </button>
-                <button onclick="speakCustomText('Return to chat')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-semibold py-2 px-3 rounded-lg text-xs transition-all border border-slate-600 uppercase active:scale-95 cursor-pointer">
-                    💬 Quick: Return to Chat
-                </button>
+            <div id="player-audio-active" class="hidden text-center">
+                <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-emerald-500/20 flex items-center justify-center border-2 border-emerald-500"><span class="text-3xl">✅</span></div>
+                <h2 class="text-lg font-bold text-emerald-400 uppercase tracking-wider">Audio Ready</h2>
+                <p class="text-xs text-slate-400 mt-1">Listening for commands...</p>
+                <div id="player-receiving-indicator" class="mt-4 text-[11px] text-slate-500 bg-kingshot-dark px-3 py-2 rounded border border-kingshot-border">📻 Last message: <span class="text-slate-300">—</span></div>
+                <button onclick="playerReEnableAudio(event)" class="mt-3 text-[10px] text-slate-500 hover:text-amber-400 underline uppercase cursor-pointer">Re-enable audio</button>
+            </div>
+            <div class="text-[10px] text-slate-500 grid grid-cols-2 gap-2 pt-2 border-t border-kingshot-border">
+                <div>🟢 Status: <span id="player-connected-status" class="font-bold text-amber-400">Connecting...</span></div>
+                <div>📨 Received: <span id="player-msg-count" class="font-bold text-cyan-400">0</span></div>
             </div>
         </div>
 
-        <!-- GROUP CUSTOMIZATION PANEL (Leader Only) -->
+        <div class="leader-only bg-kingshot-card border border-indigo-500/30 rounded-xl p-4 shadow-lg space-y-3">
+            <h2 class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Command & Communications</h2>
+            <div class="flex gap-2">
+                <input type="text" id="custom-msg-input" placeholder="Broadcast message to all players..." class="flex-1 bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-indigo-500 outline-none">
+                <button onclick="sendTypedMessage()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-4 rounded-lg text-xs transition-all uppercase shadow-md shadow-indigo-600/20 active:scale-95 cursor-pointer border border-indigo-400/30">Send</button>
+            </div>
+            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-kingshot-border/60">
+                <button onclick="speakCustomText('Get ready for battle')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-semibold py-2 px-3 rounded-lg text-xs transition-all border border-slate-600 uppercase active:scale-95 cursor-pointer">📢 Quick: Get Ready</button>
+                <button onclick="speakCustomText('Return to chat')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-semibold py-2 px-3 rounded-lg text-xs transition-all border border-slate-600 uppercase active:scale-95 cursor-pointer">💬 Quick: Return to Chat</button>
+            </div>
+        </div>
+
         <div class="leader-only bg-kingshot-card border border-blue-500/30 rounded-xl p-4 shadow-lg space-y-3">
             <h2 class="text-xs font-bold text-blue-400 uppercase tracking-wider">Flexible Group Settings</h2>
             <div id="group-settings-container" class="space-y-2"></div>
         </div>
 
-        <!-- LIVE BATTLE STATION CONSOLE -->
         <div class="bg-kingshot-card border border-amber-500/40 rounded-xl p-4 shadow-xl space-y-3">
             <div class="flex flex-col gap-2">
                 <h2 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
                     <svg class="w-4 h-4 text-amber-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                     Live Sequential Launch Console
                 </h2>
+                <div class="leader-only flex items-center gap-2 flex-wrap">
+                    <label class="text-[11px] text-slate-300 font-semibold uppercase">Prep Time:</label>
+                    <input type="number" id="prep-seconds" min="0" max="60" value="5" class="w-20 bg-kingshot-dark border border-amber-500/30 rounded-lg px-2 py-1.5 text-slate-100 text-xs outline-none text-center font-bold">
+                    <span class="text-[10px] text-slate-500">seconds countdown before launch</span>
+                </div>
                 <div class="leader-only flex items-center justify-between gap-2">
                     <label class="text-[11px] text-slate-300 font-semibold uppercase">Wave Filter:</label>
-                    <select id="battle-wave-select" class="bg-kingshot-dark border border-amber-500/30 rounded-lg px-3 py-1.5 text-slate-100 text-xs flex-1 outline-none">
-                        <option value="all">All Active Players</option>
-                    </select>
+                    <select id="battle-wave-select" class="bg-kingshot-dark border border-amber-500/30 rounded-lg px-3 py-1.5 text-slate-100 text-xs flex-1 outline-none"><option value="all">All Active Players</option></select>
                 </div>
             </div>
 
             <div class="flex flex-col gap-2.5 bg-kingshot-dark/70 p-3 rounded-xl border border-kingshot-border relative overflow-hidden">
-                <div id="msg-overlay" class="absolute inset-0 bg-indigo-900/90 hidden items-center justify-center p-2 z-10 text-center transition-all">
-                    <p id="msg-overlay-text" class="text-white font-bold text-sm uppercase tracking-wide"></p>
-                </div>
-                
+                <div id="msg-overlay" class="absolute inset-0 bg-indigo-900/90 hidden items-center justify-center p-2 z-10 text-center transition-all"><p id="msg-overlay-text" class="text-white font-bold text-sm uppercase tracking-wide"></p></div>
                 <div>
                     <div id="battle-status" class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Status: Standby</div>
                     <div id="battle-current-target" class="text-base font-bold text-amber-400 mt-0.5">Waiting for leader...</div>
                 </div>
-                
                 <div class="leader-only flex items-center gap-2 pt-1">
-                    <button id="start-battle-btn" class="flex-1 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg shadow-amber-600/20 transition-all text-xs uppercase tracking-wider border border-amber-400/30 active:scale-95 cursor-pointer">
-                        🚀 Start Sequence
-                    </button>
-                    <button id="reset-battle-btn" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 font-semibold py-2.5 px-3 rounded-xl border border-red-500/30 transition-all text-xs active:scale-95 cursor-pointer">
-                        Reset
-                    </button>
+                    <button id="start-battle-btn" class="flex-1 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg shadow-amber-600/20 transition-all text-xs uppercase tracking-wider border border-amber-400/30 active:scale-95 cursor-pointer">🚀 Start Sequence</button>
+                    <button id="reset-battle-btn" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 font-semibold py-2.5 px-3 rounded-xl border border-red-500/30 transition-all text-xs active:scale-95 cursor-pointer">Reset</button>
                 </div>
             </div>
-
             <div id="battle-sequence-list" class="space-y-2 max-h-48 overflow-y-auto"></div>
         </div>
 
-        <!-- Add / Edit Player Form (Leader Only) -->
+        <div class="leader-only bg-kingshot-card border border-purple-500/40 rounded-xl p-4 shadow-lg space-y-3">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+                <h2 class="text-xs font-bold text-purple-400 uppercase tracking-wider">📋 Export & Copy Tools</h2>
+                <div class="text-[10px] text-slate-300 font-mono bg-kingshot-dark border border-purple-500/30 px-2 py-0.5 rounded">🌐 UTC: <span id="utc-clock" class="text-cyan-400 font-bold">--:--:--</span></div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <button onclick="copyMarchTimes()" class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white font-bold py-2.5 px-4 rounded-lg text-xs uppercase shadow-md shadow-purple-600/20 transition-all border border-purple-400/30 active:scale-95 cursor-pointer">📄 Copy March Times</button>
+                <button onclick="copyLaunchTimesUTC()" class="bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 text-white font-bold py-2.5 px-4 rounded-lg text-xs uppercase shadow-md shadow-cyan-600/20 transition-all border border-cyan-400/30 active:scale-95 cursor-pointer">⏰ Copy Launch Times</button>
+                <button onclick="copyPlayersByGroup()" class="bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold py-2.5 px-4 rounded-lg text-xs uppercase shadow-md shadow-rose-600/20 transition-all border border-rose-400/30 active:scale-95 cursor-pointer">👥 Copy By Group</button>
+            </div>
+            <p class="text-[10px] text-slate-500 leading-tight">💡 <b class="text-rose-400">Copy By Group</b> lists all player names organized by their group.</p>
+        </div>
+
         <div class="leader-only bg-kingshot-card border border-kingshot-border rounded-xl p-4 shadow-xl">
             <h3 id="form-title" class="text-xs font-bold text-slate-200 uppercase tracking-wider mb-2.5">Add Player Manually</h3>
             <form id="add-player-form" class="space-y-3">
@@ -250,17 +232,12 @@
                     </div>
                 </div>
                 <div class="flex gap-2 pt-1">
-                    <button type="submit" id="form-submit-btn" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md shadow-blue-600/20 transition-all text-xs uppercase border border-blue-400/30 active:scale-95 cursor-pointer">
-                        Add Player
-                    </button>
-                    <button type="button" id="cancel-edit-btn" onclick="cancelEdit()" class="hidden bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 px-3 rounded-xl text-xs uppercase active:scale-95 cursor-pointer">
-                        Cancel
-                    </button>
+                    <button type="submit" id="form-submit-btn" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md shadow-blue-600/20 transition-all text-xs uppercase border border-blue-400/30 active:scale-95 cursor-pointer">Add Player</button>
+                    <button type="button" id="cancel-edit-btn" onclick="cancelEdit()" class="hidden bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 px-3 rounded-xl text-xs uppercase active:scale-95 cursor-pointer">Cancel</button>
                 </div>
             </form>
         </div>
 
-        <!-- Player Table (Leader Only) -->
         <div class="leader-only bg-kingshot-card border border-kingshot-border rounded-xl shadow-xl overflow-hidden mb-6 mt-4">
             <div class="bg-kingshot-dark/50 p-3 border-b border-kingshot-border flex justify-between items-center">
                 <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider">Connected Players</h3>
@@ -288,16 +265,77 @@
     <script>
         const CONFIG = {
             supabaseUrl: "https://rdadphlhonsoqghwwaua.supabase.co",
-            anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkYWRwaGxob25zb3FnaHd3YXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1MTIwNTMsImV4cCI6MjEwNjA4ODA1M30.mRwVaIH7RGl01rjntardLs8DyZIo0A0KYXqNNW0tJak", 
-            roomCode: "1865"
+            anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkYWRwaGxob25zb3FnaHd3YXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1MTIwNTMsImV4cCI6MjEwNjA4ODA1M30.mRwVaIH7RGl01rjntardLs8DyZIo0A0KYXqNNW0tJak"
         };
 
         let supabaseClient = null;
         let currentChannel = null;
-        let currentRole = ''; 
-        let myPlayerId = null; 
+        let currentRole = '';
+        let myPlayerId = null;
         let backgroundAudioCtx = null;
         let audioUnlocked = false;
+
+        let activeRoomCode = (localStorage.getItem('kingshot_room_code_v7') || '').toString();
+        let roomVerified = false;
+
+        const TAB_ID = 'TAB_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+        const LEADER_LOCK_KEY = 'kingshot_leader_lock_v7';
+        const LEADER_STALE_MS = 8000;
+        const LEADER_HEARTBEAT_MS = 2500;
+        let leaderHeartbeatInterval = null;
+        let roomOpenInterval = null;
+        let isLeaderTab = false;
+
+        function getLeaderLock() { try { const r = localStorage.getItem(LEADER_LOCK_KEY); return r ? JSON.parse(r) : null; } catch(e) { return null; } }
+        function isAnotherLeaderActive() { const l = getLeaderLock(); if (!l || l.tabId === TAB_ID) return false; return (Date.now() - l.ts) < LEADER_STALE_MS; }
+        function claimLeaderLock() { try { localStorage.setItem(LEADER_LOCK_KEY, JSON.stringify({ tabId: TAB_ID, ts: Date.now() })); isLeaderTab = true; startLeaderHeartbeat(); return true; } catch(e) { return false; } }
+        function releaseLeaderLock() {
+            try { const l = getLeaderLock(); if (l && l.tabId === TAB_ID) localStorage.removeItem(LEADER_LOCK_KEY); } catch(e) {}
+            isLeaderTab = false;
+            if (leaderHeartbeatInterval) { clearInterval(leaderHeartbeatInterval); leaderHeartbeatInterval = null; }
+            if (roomOpenInterval) { clearInterval(roomOpenInterval); roomOpenInterval = null; }
+        }
+        function startLeaderHeartbeat() {
+            if (leaderHeartbeatInterval) clearInterval(leaderHeartbeatInterval);
+            leaderHeartbeatInterval = setInterval(() => {
+                if (isLeaderTab) { try { localStorage.setItem(LEADER_LOCK_KEY, JSON.stringify({ tabId: TAB_ID, ts: Date.now() })); } catch(e) {} }
+            }, LEADER_HEARTBEAT_MS);
+        }
+        function startRoomOpenHeartbeat() {
+            if (roomOpenInterval) clearInterval(roomOpenInterval);
+            const ping = () => { if (currentRole === 'leader' && currentChannel) broadcastState('ROOM_OPEN', { code: activeRoomCode }); };
+            ping();
+            roomOpenInterval = setInterval(ping, 2000);
+        }
+        window.forceTakeLeadership = function() {
+            try {
+                localStorage.setItem(LEADER_LOCK_KEY, JSON.stringify({ tabId: TAB_ID, ts: Date.now() }));
+                isLeaderTab = true; startLeaderHeartbeat();
+                document.getElementById('leader-conflict-overlay').classList.add('hidden');
+                document.getElementById('role-modal').classList.add('hidden');
+                applyRoleUI('leader');
+                renderPlayerTable();
+                syncStateToPlayers();
+                startRoomOpenHeartbeat();
+                if (uiRefreshInterval) clearInterval(uiRefreshInterval);
+                uiRefreshInterval = setInterval(updateOnlineIndicators, 3000);
+            } catch(e) {}
+        };
+        function showLeaderConflictOverlay() { document.getElementById('leader-conflict-overlay').classList.remove('hidden'); }
+        window.addEventListener('beforeunload', () => { releaseLeaderLock(); });
+
+        const receivedMsgIds = new Set();
+        const MSG_HISTORY_MAX = 300;
+        function rememberMsgId(id) {
+            if (!id) return false;
+            if (receivedMsgIds.has(id)) return true;
+            receivedMsgIds.add(id);
+            if (receivedMsgIds.size > MSG_HISTORY_MAX) {
+                const arr = Array.from(receivedMsgIds);
+                arr.slice(0, Math.floor(MSG_HISTORY_MAX / 2)).forEach(x => receivedMsgIds.delete(x));
+            }
+            return false;
+        }
 
         let state = {
             players: JSON.parse(localStorage.getItem('kingshot_players_v7') || '[]'),
@@ -309,50 +347,110 @@
         let isSpeaking = false;
         let heartbeatInterval = null;
         let uiRefreshInterval = null;
+        let playerMsgCount = 0;
+
+        function numberToWord(n) {
+            const ones = ['zero','one','two','three','four','five','six','seven','eight','nine','ten',
+                          'eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+            const tens = ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+            n = parseInt(n);
+            if (isNaN(n)) return String(n);
+            if (n < 20) return ones[n];
+            if (n < 100) {
+                const t = Math.floor(n/10);
+                const o = n%10;
+                return tens[t] + (o ? '-' + ones[o] : '');
+            }
+            return String(n);
+        }
 
         window.addEventListener('DOMContentLoaded', async () => {
-            document.getElementById('header-room-display').textContent = CONFIG.roomCode;
+            document.getElementById('header-room-display').textContent = activeRoomCode || '---';
+            if (activeRoomCode) document.getElementById('leader-room-code').value = activeRoomCode;
             checkRolePrompt();
+            initVoices();
+            loadPrepSeconds();
 
             try {
                 if (window.supabase) {
                     supabaseClient = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.anonKey);
-                    
                     const { data: { session } } = await supabaseClient.auth.getSession();
-                    if (session) {
-                        currentRole = 'leader';
-                        document.getElementById('role-modal').classList.add('hidden');
-                        applyRoleUI('leader');
-                        if(uiRefreshInterval) clearInterval(uiRefreshInterval);
-                        uiRefreshInterval = setInterval(updateOnlineIndicators, 3000);
-                        renderPlayerTable();
-                    }
-
-                    currentChannel = supabaseClient.channel('room_' + CONFIG.roomCode, {
-                        config: { broadcast: { self: true } }
-                    });
-
-                    currentChannel.on('broadcast', { event: 'battle_event' }, (payload) => {
-                        handleBroadcastEvent(payload.payload);
-                    }).subscribe((status) => {
-                        const indicator = document.getElementById('connection-status');
-                        if (status === 'SUBSCRIBED') {
-                            if(indicator) {
-                                indicator.classList.remove('bg-red-500', 'shadow-[0_0_8px_rgba(239,68,68,0.8)]');
-                                indicator.classList.add('bg-emerald-500', 'shadow-[0_0_8px_rgba(16,185,129,0.8)]');
-                            }
+                    if (session && activeRoomCode) {
+                        if (isAnotherLeaderActive()) {
+                            showLeaderConflictOverlay();
                         } else {
-                            if(indicator) {
-                                indicator.classList.remove('bg-emerald-500', 'shadow-[0_0_8px_rgba(16,185,129,0.8)]');
-                                indicator.classList.add('bg-red-500', 'shadow-[0_0_8px_rgba(239,68,68,0.8)]');
-                            }
+                            claimLeaderLock();
+                            currentRole = 'leader';
+                            document.getElementById('role-modal').classList.add('hidden');
+                            applyRoleUI('leader');
+                            await subscribeToChannel(activeRoomCode);
+                            startRoomOpenHeartbeat();
+                            if (uiRefreshInterval) clearInterval(uiRefreshInterval);
+                            uiRefreshInterval = setInterval(updateOnlineIndicators, 3000);
+                            renderPlayerTable();
                         }
-                    });
+                    }
                 }
-            } catch(e) {
-                console.error("Connection error", e);
-            }
+            } catch(e) { console.error("Connection error", e); }
         });
+
+        function loadPrepSeconds() {
+            const saved = localStorage.getItem('kingshot_prep_seconds_v7');
+            const el = document.getElementById('prep-seconds');
+            if (el && saved !== null) el.value = saved;
+            if (el) {
+                el.addEventListener('change', () => {
+                    localStorage.setItem('kingshot_prep_seconds_v7', el.value);
+                });
+            }
+        }
+        function getPrepSeconds() {
+            const el = document.getElementById('prep-seconds');
+            const v = el ? parseInt(el.value) : 5;
+            return (isNaN(v) || v < 0) ? 5 : v;
+        }
+
+        function initVoices() {
+            if ('speechSynthesis' in window) {
+                try { window.speechSynthesis.getVoices(); } catch(e) {}
+                if (window.speechSynthesis.onvoiceschanged !== undefined) {
+                    window.speechSynthesis.onvoiceschanged = () => { try { window.speechSynthesis.getVoices(); } catch(e) {} };
+                }
+            }
+        }
+
+        async function subscribeToChannel(code) {
+            if (currentChannel) {
+                try { await currentChannel.unsubscribe(); } catch(e) {}
+                currentChannel = null;
+            }
+            return new Promise((resolve) => {
+                currentChannel = supabaseClient.channel('room_' + code, {
+                    config: { broadcast: { self: true } }
+                });
+                currentChannel.on('broadcast', { event: 'battle_event' }, (payload) => {
+                    handleBroadcastEvent(payload.payload);
+                });
+                currentChannel.subscribe((status) => {
+                    const indicator = document.getElementById('connection-status');
+                    const playerStatusEl = document.getElementById('player-connected-status');
+                    if (status === 'SUBSCRIBED') {
+                        if (indicator) {
+                            indicator.classList.remove('bg-red-500', 'shadow-[0_0_8px_rgba(239,68,68,0.8)]');
+                            indicator.classList.add('bg-emerald-500', 'shadow-[0_0_8px_rgba(16,185,129,0.8)]');
+                        }
+                        if (playerStatusEl) { playerStatusEl.textContent = "Connected ✅"; playerStatusEl.className = "font-bold text-emerald-400"; }
+                    } else {
+                        if (indicator) {
+                            indicator.classList.remove('bg-emerald-500', 'shadow-[0_0_8px_rgba(16,185,129,0.8)]');
+                            indicator.classList.add('bg-red-500', 'shadow-[0_0_8px_rgba(239,68,68,0.8)]');
+                        }
+                        if (playerStatusEl) { playerStatusEl.textContent = "Connecting... ⏳"; playerStatusEl.className = "font-bold text-amber-400"; }
+                    }
+                    resolve(status);
+                });
+            });
+        }
 
         function checkRolePrompt() {
             const modal = document.getElementById('role-modal');
@@ -364,13 +462,11 @@
             document.getElementById('leader-login-form').classList.remove('hidden');
             document.getElementById('leader-login-form').classList.add('flex');
         }
-
         window.showPlayerRegistration = function() {
             document.getElementById('role-selection-buttons').classList.add('hidden');
             document.getElementById('player-registration-form').classList.remove('hidden');
             document.getElementById('player-registration-form').classList.add('flex');
         }
-
         window.backToRoleSelect = function() {
             document.getElementById('role-selection-buttons').classList.remove('hidden');
             document.getElementById('leader-login-form').classList.add('hidden');
@@ -380,39 +476,49 @@
         }
 
         window.loginAsLeaderSecure = async function() {
+            const code = document.getElementById('leader-room-code').value.trim();
             const email = document.getElementById('leader-email').value.trim();
             const password = document.getElementById('leader-password').value.trim();
 
-            if (!email || !password) {
-                alert("❌ Please enter your email and password.");
-                return;
-            }
+            if (!code) { alert("❌ Please enter a Room Code."); return; }
+            if (code.length < 2 || code.length > 20) { alert("❌ Room Code must be 2–20 characters."); return; }
+            if (!email || !password) { alert("❌ Please enter your email and password."); return; }
+            if (isAnotherLeaderActive()) { showLeaderConflictOverlay(); return; }
 
             const btn = event.target;
             btn.textContent = "Verifying...";
             btn.disabled = true;
 
             try {
-                const { data, error } = await supabaseClient.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
-
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
                 if (error) {
                     alert("❌ Authentication failed: Invalid credentials or not a leader account.");
                     btn.textContent = "Leader Login";
                     btn.disabled = false;
                     return;
                 }
+                if (isAnotherLeaderActive()) {
+                    showLeaderConflictOverlay();
+                    btn.textContent = "Leader Login";
+                    btn.disabled = false;
+                    return;
+                }
 
+                activeRoomCode = code;
+                localStorage.setItem('kingshot_room_code_v7', code);
+                document.getElementById('header-room-display').textContent = code;
+
+                claimLeaderLock();
                 currentRole = 'leader';
                 document.getElementById('role-modal').classList.add('hidden');
                 applyRoleUI('leader');
                 unlockAudioMobile();
 
-                if(uiRefreshInterval) clearInterval(uiRefreshInterval);
-                uiRefreshInterval = setInterval(updateOnlineIndicators, 3000);
+                await subscribeToChannel(activeRoomCode);
+                startRoomOpenHeartbeat();
 
+                if (uiRefreshInterval) clearInterval(uiRefreshInterval);
+                uiRefreshInterval = setInterval(updateOnlineIndicators, 3000);
                 renderPlayerTable();
                 syncStateToPlayers();
             } catch(err) {
@@ -422,58 +528,87 @@
             }
         }
 
-        window.registerAndJoinAsPlayer = function() {
+        window.registerAndJoinAsPlayer = async function(e) {
+            if (e) e.preventDefault();
             const name = document.getElementById('reg-name').value.trim();
             const inputRoomCode = document.getElementById('reg-room-code').value.trim();
-            const group = "1";
-            const mins = 1;
-            const secs = 20;
 
-            if(!name) { alert("Please enter your name."); return; }
-            if(!inputRoomCode) { alert("Please enter the room code."); return; }
+            if (!name) { alert("Please enter your name."); return; }
+            if (!inputRoomCode) { alert("Please enter the room code."); return; }
 
-            if (inputRoomCode !== CONFIG.roomCode) {
-                alert("❌ Incorrect room code! Please ask the leader for the correct secret code.");
-                return;
+            const btn = document.getElementById('player-connect-btn');
+            const origText = btn.textContent;
+            btn.textContent = "Checking room...";
+            btn.disabled = true;
+
+            roomVerified = false;
+
+            try {
+                await subscribeToChannel(inputRoomCode);
+                await new Promise(r => setTimeout(r, 5000));
+
+                if (!roomVerified) {
+                    try { if (currentChannel) await currentChannel.unsubscribe(); } catch(err) {}
+                    currentChannel = null;
+                    alert("❌ Room not found. Please check the Room Code with your leader.");
+                    btn.textContent = origText;
+                    btn.disabled = false;
+                    return;
+                }
+
+                activeRoomCode = inputRoomCode;
+                document.getElementById('header-room-display').textContent = inputRoomCode;
+
+                myPlayerId = "PLY_" + Date.now().toString();
+                currentRole = 'player';
+
+                broadcastState('PLAYER_JOIN', { id: myPlayerId, name: name, configured: false });
+
+                if (heartbeatInterval) clearInterval(heartbeatInterval);
+                heartbeatInterval = setInterval(() => { broadcastState('HEARTBEAT', { id: myPlayerId }); }, 5000);
+
+                document.getElementById('role-modal').classList.add('hidden');
+                applyRoleUI('player');
+            } catch(err) {
+                console.error(err);
+                alert("Connection error. Please try again.");
+                btn.textContent = origText;
+                btn.disabled = false;
             }
-
-            myPlayerId = "PLY_" + Date.now().toString();
-            currentRole = 'player';
-            
-            broadcastState('PLAYER_JOIN', { id: myPlayerId, name, group, marchMins: mins, marchSecs: secs });
-            
-            if(heartbeatInterval) clearInterval(heartbeatInterval);
-            heartbeatInterval = setInterval(() => {
-                broadcastState('HEARTBEAT', { id: myPlayerId });
-            }, 5000);
-
-            const modal = document.getElementById('role-modal');
-            if (modal) modal.classList.add('hidden');
-            
-            applyRoleUI('player');
-            unlockAudioMobile();
         }
 
         window.resetRoleSelection = async function() {
-            if (currentRole === 'leader' && supabaseClient) {
-                await supabaseClient.auth.signOut();
+            if (currentRole === 'leader') {
+                releaseLeaderLock();
+                if (supabaseClient) { try { await supabaseClient.auth.signOut(); } catch(e) {} }
             }
             currentRole = '';
-            if(heartbeatInterval) clearInterval(heartbeatInterval);
-            if(uiRefreshInterval) clearInterval(uiRefreshInterval);
+            if (heartbeatInterval) clearInterval(heartbeatInterval);
+            if (uiRefreshInterval) clearInterval(uiRefreshInterval);
             document.getElementById('role-modal').classList.remove('hidden');
+            document.getElementById('leader-conflict-overlay').classList.add('hidden');
             backToRoleSelect();
         }
 
         function applyRoleUI(role) {
             const roleBadge = document.getElementById('current-role-badge');
             let roleDisplay = role === 'leader' ? 'Leader (Secure)' : 'Player';
-            if(roleBadge) roleBadge.textContent = `Role: ${roleDisplay}`;
-            
+            if (roleBadge) roleBadge.textContent = `Role: ${roleDisplay}`;
+
             document.querySelectorAll('.leader-only').forEach(el => {
                 if (role === 'player') el.classList.add('hidden');
                 else { el.classList.add('block'); el.classList.remove('hidden'); }
             });
+            document.querySelectorAll('.player-only').forEach(el => {
+                if (role === 'player') { el.classList.remove('hidden'); el.classList.add('block'); }
+                else { el.classList.add('hidden'); el.classList.remove('block'); }
+            });
+
+            const headerAudioBtn = document.getElementById('enable-audio-btn');
+            if (headerAudioBtn) {
+                if (role === 'leader') { headerAudioBtn.classList.remove('hidden'); headerAudioBtn.classList.add('flex'); }
+                else { headerAudioBtn.classList.add('hidden'); headerAudioBtn.classList.remove('flex'); }
+            }
         }
 
         window.unlockAudioMobile = function() {
@@ -484,84 +619,104 @@
                 if (backgroundAudioCtx.state === 'suspended') backgroundAudioCtx.resume();
                 const buffer = backgroundAudioCtx.createBuffer(1, 1, 22050);
                 const source = backgroundAudioCtx.createBufferSource();
-                source.buffer = buffer;
-                source.connect(backgroundAudioCtx.destination);
-                source.start(0);
+                source.buffer = buffer; source.connect(backgroundAudioCtx.destination); source.start(0);
 
                 if ('speechSynthesis' in window) {
-                    window.speechSynthesis.cancel();
-                    const dummyUtter = new SpeechSynthesisUtterance('');
-                    window.speechSynthesis.speak(dummyUtter);
+                    try { window.speechSynthesis.cancel(); } catch(e) {}
+                    const primer = new SpeechSynthesisUtterance('ready');
+                    primer.volume = 0.05; primer.rate = 5; primer.pitch = 2; primer.lang = 'en-US';
+                    const vlist = window.speechSynthesis.getVoices();
+                    const enV = vlist.find(v => v.lang && v.lang.startsWith('en'));
+                    if (enV) primer.voice = enV;
+                    window.speechSynthesis.speak(primer);
+                    setTimeout(() => { try { window.speechSynthesis.cancel(); } catch(e) {} }, 200);
                 }
-
                 audioUnlocked = true;
+
                 const btn = document.getElementById('enable-audio-btn');
-                if(btn) {
+                if(btn && currentRole === 'leader') {
                     btn.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-500 text-slate-950 flex items-center gap-1.5 shadow-md transition-all whitespace-nowrap cursor-pointer";
                     btn.innerHTML = "🎧 Audio Enabled";
                 }
-            } catch(e) {}
+            } catch(e) { console.error('Audio unlock failed:', e); }
         }
 
         window.enableAndTestAudio = function(e) {
             if(e) e.stopPropagation();
+            audioUnlocked = false;
             unlockAudioMobile();
-            speakText("Audio enabled successfully", true);
+            setTimeout(() => { speakText("Audio ready", true); }, 100);
+        };
+
+        window.playerEnableAudio = function(e) {
+            if (e) { e.stopPropagation(); e.preventDefault(); }
+            audioUnlocked = false;
+            unlockAudioMobile();
+            setTimeout(() => { speakText("Audio enabled. Ready to receive commands.", true); }, 150);
+            setTimeout(() => {
+                document.getElementById('player-audio-gate').classList.add('hidden');
+                document.getElementById('player-audio-active').classList.remove('hidden');
+            }, 400);
+        };
+        window.playerReEnableAudio = function(e) {
+            if (e) { e.stopPropagation(); e.preventDefault(); }
+            document.getElementById('player-audio-gate').classList.remove('hidden');
+            document.getElementById('player-audio-active').classList.add('hidden');
+            audioUnlocked = false;
         };
 
         window.sendTypedMessage = function() {
             const input = document.getElementById('custom-msg-input');
             const text = input.value.trim();
-            if(text) {
-                speakCustomText(text);
-                input.value = '';
-            }
+            if(text) { speakCustomText(text); input.value = ''; }
         }
-
-        window.speakCustomText = function(text) {
-            broadcastState('CUSTOM_AUDIO', { text: text });
-        };
+        window.speakCustomText = function(text) { broadcastState('CUSTOM_AUDIO', { text: text }); };
 
         function broadcastState(eventType, data) {
-            const payload = { type: eventType, data: data };
-            if (currentChannel) {
-                try {
-                    currentChannel.send({ type: 'broadcast', event: 'battle_event', payload: payload });
-                } catch(e) {}
-            }
-            handleEventLocally(payload);
+            const payload = { type: eventType, data: data, msgId: 'MSG_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8) };
+            if (currentChannel) { try { currentChannel.send({ type: 'broadcast', event: 'battle_event', payload: payload }); } catch(e) {} }
         }
-
-        function syncStateToPlayers() {
-            if(currentRole === 'leader') {
-                broadcastState('SYNC_STATE', { players: state.players });
-            }
-        }
+        function syncStateToPlayers() { if(currentRole === 'leader') broadcastState('SYNC_STATE', { players: state.players }); }
 
         function handleBroadcastEvent(msg) {
+            if (msg && msg.msgId) { if (rememberMsgId(msg.msgId)) return; }
             handleEventLocally(msg);
         }
 
         function handleEventLocally(msg) {
+            if (msg.type === 'ROOM_OPEN') { roomVerified = true; return; }
+
+            if (currentRole === 'leader' && !isLeaderTab) return;
+
+            if (currentRole === 'player') {
+                playerMsgCount++;
+                const el = document.getElementById('player-msg-count');
+                if (el) el.textContent = playerMsgCount;
+            }
+
             if (currentRole === 'leader') {
                 if (msg.type === 'PLAYER_JOIN') {
                     let p = state.players.find(x => x.id === msg.data.id || x.name === msg.data.name);
                     if (!p) {
-                        state.players.push({ ...msg.data, frozen: false, lastSeen: Date.now() });
+                        state.players.push({
+                            id: msg.data.id,
+                            name: msg.data.name,
+                            group: '?',
+                            marchMins: 0,
+                            marchSecs: 0,
+                            configured: false,
+                            frozen: false,
+                            lastSeen: Date.now()
+                        });
                     } else {
                         p.id = msg.data.id;
-                        p.group = msg.data.group;
-                        p.marchMins = msg.data.marchMins;
-                        p.marchSecs = msg.data.marchSecs;
                         p.lastSeen = Date.now();
                     }
-                    savePlayers();
-                    renderPlayerTable();
-                    syncStateToPlayers();
+                    savePlayers(); renderPlayerTable(); syncStateToPlayers();
                 }
                 if (msg.type === 'HEARTBEAT') {
                     let p = state.players.find(x => x.id === msg.data.id);
-                    if (p) { p.lastSeen = Date.now(); }
+                    if (p) p.lastSeen = Date.now();
                 }
             }
 
@@ -569,89 +724,95 @@
                 if (msg.type === 'SYNC_STATE') {
                     let myData = msg.data.players.find(x => x.id === myPlayerId);
                     const overlay = document.getElementById('disabled-overlay');
-                    if (myData && myData.frozen) {
-                        overlay.classList.remove('hidden');
-                    } else {
-                        overlay.classList.add('hidden');
-                    }
+                    if (myData && myData.frozen) overlay.classList.remove('hidden');
+                    else overlay.classList.add('hidden');
                 }
+            }
+
+            if (msg.type === 'GET_READY') {
+                const statusDiv = document.getElementById('battle-status');
+                const targetDiv = document.getElementById('battle-current-target');
+                if (statusDiv && targetDiv) {
+                    statusDiv.textContent = 'Status: Get Ready Phase';
+                    statusDiv.className = "text-[10px] uppercase tracking-wider text-amber-400 font-bold animate-pulse";
+                    targetDiv.innerHTML = `<span class="get-ready-pulse inline-block text-amber-300 text-xl font-extrabold uppercase">📢 ${msg.data.message}</span>`;
+                }
+                showPlayerReceivingIndicator(msg.data.message);
+                speakText(msg.data.message, true);
             }
 
             if (msg.type === 'START_SEQUENCE') {
                 updateLiveUI(msg.data.currentLauncher, msg.data.secs, msg.data.isPrep);
                 renderBattleQueueUI(msg.data.currentIndex, msg.data.queue);
-
-                if (msg.data.isPrep) {
-                    if (msg.data.secs > 0) speakText(String(msg.data.secs), true);
-                } else if (msg.data.currentLauncher) {
-                    if (msg.data.secs > 0) speakText(String(msg.data.secs), true);
-                    else if (msg.data.secs === 0) speakText(msg.data.currentLauncher.name, true);
+                let speechTxt = '';
+                if (msg.data.isPrep && msg.data.secs > 0) speechTxt = String(msg.data.secs);
+                else if (msg.data.currentLauncher) {
+                    if (msg.data.secs > 0) speechTxt = String(msg.data.secs);
+                    else if (msg.data.secs === 0) speechTxt = msg.data.currentLauncher.name;
                 }
-            } 
+                if (speechTxt) { showPlayerReceivingIndicator(speechTxt); speakText(speechTxt, true); }
+            }
             else if (msg.type === 'CUSTOM_AUDIO') {
+                showPlayerReceivingIndicator(msg.data.text);
                 speakText(msg.data.text, true);
                 showTemporaryMessageOverlay(msg.data.text);
-            } 
-            else if (msg.type === 'RESET') {
-                clearSpeechQueue();
-                resetBattleEngineUI();
             }
+            else if (msg.type === 'RESET') { clearSpeechQueue(); resetBattleEngineUI(); }
         }
 
+        function showPlayerReceivingIndicator(text) {
+            const el = document.getElementById('player-receiving-indicator');
+            if (!el) return;
+            el.innerHTML = `📻 Last message: <span class="text-amber-400 font-bold">${String(text).slice(0,40)}</span>`;
+            el.parentElement.classList.add('msg-flash');
+            setTimeout(() => { el.parentElement.classList.remove('msg-flash'); }, 700);
+        }
         function showTemporaryMessageOverlay(text) {
             const overlay = document.getElementById('msg-overlay');
             const txtEl = document.getElementById('msg-overlay-text');
             if(overlay && txtEl) {
                 txtEl.textContent = text;
-                overlay.classList.remove('hidden');
-                overlay.classList.add('flex');
-                setTimeout(() => {
-                    overlay.classList.add('hidden');
-                    overlay.classList.remove('flex');
-                }, 4000);
+                overlay.classList.remove('hidden'); overlay.classList.add('flex');
+                setTimeout(() => { overlay.classList.add('hidden'); overlay.classList.remove('flex'); }, 4000);
             }
         }
+
+        let lastSpokenText = '';
+        let lastSpokenTime = 0;
+        const SPEAK_DEDUPE_MS = 5000;
 
         function speakText(text, urgent = false) {
             if (!('speechSynthesis' in window)) return;
-            if (urgent) {
-                speechQueue = [];
-                isSpeaking = false;
-                window.speechSynthesis.cancel();
-            }
-            speechQueue.push(String(text));
+            const txt = String(text);
+            if (!txt.trim()) return;
+            const now = Date.now();
+            if (txt === lastSpokenText && (now - lastSpokenTime) < SPEAK_DEDUPE_MS) return;
+            lastSpokenText = txt; lastSpokenTime = now;
+            if (urgent) { speechQueue = []; isSpeaking = false; try { window.speechSynthesis.cancel(); } catch(e) {} }
+            speechQueue.push(txt);
             processSpeechQueue();
         }
-
         function processSpeechQueue() {
             if (isSpeaking || speechQueue.length === 0) return;
             isSpeaking = true;
             const text = speechQueue.shift();
-
             try {
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'en-US';
-                utterance.rate = 0.95; 
-                utterance.volume = 1.0;
-                
-                utterance.onend = () => { isSpeaking = false; setTimeout(processSpeechQueue, 30); };
-                utterance.onerror = () => { isSpeaking = false; setTimeout(processSpeechQueue, 30); };
-                
+                utterance.lang = 'en-US'; utterance.rate = 0.95; utterance.volume = 1.0;
+                const voices = window.speechSynthesis.getVoices();
+                const enVoice = voices.find(v => v.lang && v.lang.startsWith('en'));
+                if (enVoice) utterance.voice = enVoice;
+                let done = false;
+                const finish = () => { if (done) return; done = true; isSpeaking = false; setTimeout(processSpeechQueue, 30); };
+                utterance.onend = finish; utterance.onerror = finish;
+                setTimeout(finish, 8000);
                 window.speechSynthesis.speak(utterance);
-            } catch (e) {
-                isSpeaking = false;
-                setTimeout(processSpeechQueue, 30);
-            }
+            } catch (e) { isSpeaking = false; setTimeout(processSpeechQueue, 30); }
         }
-
-        function clearSpeechQueue() {
-            speechQueue = [];
-            isSpeaking = false;
-            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-        }
+        function clearSpeechQueue() { speechQueue = []; isSpeaking = false; if ('speechSynthesis' in window) window.speechSynthesis.cancel(); }
 
         function calculateSchedule() {
-            let activePlayers = state.players.filter(p => !p.frozen);
+            let activePlayers = state.players.filter(p => !p.frozen && p.configured !== false);
             if (activePlayers.length === 0) return [];
 
             let mapped = activePlayers.map(p => ({
@@ -662,16 +823,13 @@
             let uniqueGroups = [...new Set(mapped.map(m => m.group))];
 
             let groupArrivals = {};
-            let currentBaseArrival = maxMarch;
-
             uniqueGroups.forEach((g, idx) => {
                 let settings = state.groupSettings[g] || { mode: 'staggered', gap: 1 };
-                if (idx === 0) groupArrivals[g] = currentBaseArrival;
+                if (idx === 0) groupArrivals[g] = maxMarch;
                 else {
                     let prevGroup = uniqueGroups[idx - 1];
                     let prevSettings = state.groupSettings[prevGroup] || { mode: 'staggered', gap: 1 };
-                    let transitionGap = prevSettings.gap || 2;
-                    groupArrivals[g] = groupArrivals[prevGroup] + transitionGap;
+                    groupArrivals[g] = groupArrivals[prevGroup] + (prevSettings.gap || 2);
                 }
             });
 
@@ -679,7 +837,6 @@
             uniqueGroups.forEach(g => {
                 let gPlayers = mapped.filter(m => m.group === g);
                 let settings = state.groupSettings[g] || { mode: 'staggered', gap: 1 };
-
                 if (settings.mode === 'simultaneous') {
                     gPlayers.forEach(p => { playerArrivals[p.id] = groupArrivals[g]; });
                 } else {
@@ -697,7 +854,6 @@
             let calculated = mapped.map((m, index) => ({
                 id: m.id, name: m.name, group: m.group, marchSec: m.marchSec, arrivalSec: targetArrivals[index], delay: delays[index]
             }));
-
             calculated.sort((a, b) => a.delay - b.delay);
             return calculated;
         }
@@ -707,31 +863,56 @@
             startBtn.addEventListener('click', () => {
                 clearSpeechQueue();
                 let schedule = calculateSchedule();
-                if (schedule.length === 0) return alert('No active players found!');
+                if (schedule.length === 0) return alert('No configured active players found! Add march time via Edit.');
 
                 const selectedWave = document.getElementById('battle-wave-select').value;
                 let queue = schedule.filter(s => selectedWave === 'all' || s.group === selectedWave);
-
                 if (queue.length === 0) return alert('No players in this wave!');
 
                 battleEngine.queue = queue;
                 battleEngine.currentIndex = 0;
 
-                let prepRemaining = 3;
+                let readyMsg;
+                if (selectedWave === 'all') {
+                    readyMsg = 'All players get ready';
+                } else {
+                    readyMsg = `Group ${numberToWord(selectedWave)} get ready`;
+                }
+
+                const statusDiv = document.getElementById('battle-status');
+                const targetDiv = document.getElementById('battle-current-target');
+                statusDiv.textContent = 'Status: Get Ready Phase';
+                statusDiv.className = "text-[10px] uppercase tracking-wider text-amber-400 font-bold animate-pulse";
+                targetDiv.innerHTML = `<span class="get-ready-pulse inline-block text-amber-300 text-xl font-extrabold uppercase">📢 ${readyMsg}</span>`;
+
+                broadcastState('GET_READY', { message: readyMsg });
+                speakText(readyMsg, true);
+
                 if (battleEngine.timerInterval) clearInterval(battleEngine.timerInterval);
 
-                broadcastState('START_SEQUENCE', { queue: battleEngine.queue, currentIndex: 0, currentLauncher: battleEngine.queue[0], secs: prepRemaining, isPrep: true });
-                prepRemaining--;
-
-                battleEngine.timerInterval = setInterval(() => {
-                    if (prepRemaining > 0) {
-                        broadcastState('START_SEQUENCE', { queue: battleEngine.queue, currentIndex: 0, currentLauncher: battleEngine.queue[0], secs: prepRemaining, isPrep: true });
-                        prepRemaining--;
-                    } else {
-                        clearInterval(battleEngine.timerInterval);
+                const getReadyDelay = 2500;
+                setTimeout(() => {
+                    const prepSecs = getPrepSeconds();
+                    if (prepSecs <= 0) {
                         runSequentialTimer();
+                        return;
                     }
-                }, 1000);
+
+                    let prepRemaining = prepSecs;
+                    broadcastState('START_SEQUENCE', { queue: battleEngine.queue, currentIndex: 0, currentLauncher: battleEngine.queue[0], secs: prepRemaining, isPrep: true });
+                    prepRemaining--;
+
+                    battleEngine.timerInterval = setInterval(() => {
+                        if (prepRemaining > 0) {
+                            broadcastState('START_SEQUENCE', { queue: battleEngine.queue, currentIndex: 0, currentLauncher: battleEngine.queue[0], secs: prepRemaining, isPrep: true });
+                            prepRemaining--;
+                        } else {
+                            broadcastState('START_SEQUENCE', { queue: battleEngine.queue, currentIndex: 0, currentLauncher: battleEngine.queue[0], secs: 0, isPrep: true });
+                            clearInterval(battleEngine.timerInterval);
+                            setTimeout(runSequentialTimer, 1000);
+                        }
+                    }, 1000);
+                }, getReadyDelay);
             });
         }
 
@@ -740,7 +921,6 @@
                 broadcastState('START_SEQUENCE', { queue: battleEngine.queue, currentIndex: -1, currentLauncher: null, secs: 0, isPrep: false });
                 return;
             }
-
             const currentLauncher = battleEngine.queue[battleEngine.currentIndex];
             let prevDelay = battleEngine.currentIndex === 0 ? 0 : battleEngine.queue[battleEngine.currentIndex - 1].delay;
             let waitTime = currentLauncher.delay - prevDelay;
@@ -748,7 +928,7 @@
             if (waitTime <= 0) {
                 broadcastState('START_SEQUENCE', { queue: battleEngine.queue, currentIndex: battleEngine.currentIndex, currentLauncher: currentLauncher, secs: 0, isPrep: false });
                 battleEngine.currentIndex++;
-                setTimeout(runSequentialTimer, 1000); 
+                setTimeout(runSequentialTimer, 1000);
             } else {
                 let remaining = waitTime;
                 broadcastState('START_SEQUENCE', { queue: battleEngine.queue, currentIndex: battleEngine.currentIndex, currentLauncher: currentLauncher, secs: remaining, isPrep: false });
@@ -757,7 +937,6 @@
                 if (battleEngine.timerInterval) clearInterval(battleEngine.timerInterval);
                 battleEngine.timerInterval = setInterval(() => {
                     broadcastState('START_SEQUENCE', { queue: battleEngine.queue, currentIndex: battleEngine.currentIndex, currentLauncher: currentLauncher, secs: remaining, isPrep: false });
-                    
                     if (remaining === 0) {
                         clearInterval(battleEngine.timerInterval);
                         battleEngine.currentIndex++;
@@ -772,17 +951,11 @@
             const statusDiv = document.getElementById('battle-status');
             const targetDiv = document.getElementById('battle-current-target');
             if(!statusDiv || !targetDiv) return;
-            
             statusDiv.textContent = 'Status: Live Sequence in Progress';
             statusDiv.className = "text-[10px] uppercase tracking-wider text-emerald-400 font-bold animate-pulse";
-
-            if (isPrep) {
-                targetDiv.innerHTML = `⚠️ Prep: <span class="text-amber-400 text-xl">${secs}s</span>`;
-            } else if (secs > 0) {
-                targetDiv.innerHTML = `⏳ <b class="text-white">${launcher.name}</b> (G${launcher.group}) in: <span class="text-cyan-400 text-xl">${secs}s</span>`;
-            } else {
-                targetDiv.innerHTML = `🔥 <span class="text-white underline font-extrabold text-xl">${launcher.name}</span> Launch! 🔥`;
-            }
+            if (isPrep) targetDiv.innerHTML = `⚠️ Prep: <span class="text-amber-400 text-xl">${secs}s</span>`;
+            else if (secs > 0) targetDiv.innerHTML = `⏳ <b class="text-white">${launcher.name}</b> (G${launcher.group}) in: <span class="text-cyan-400 text-xl">${secs}s</span>`;
+            else targetDiv.innerHTML = `🔥 <span class="text-white underline font-extrabold text-xl">${launcher.name}</span> Launch! 🔥`;
         }
 
         const resetBtn = document.getElementById('reset-battle-btn');
@@ -792,7 +965,6 @@
                 broadcastState('RESET', {});
             });
         }
-
         function resetBattleEngineUI() {
             const statusDiv = document.getElementById('battle-status');
             const targetDiv = document.getElementById('battle-current-target');
@@ -802,7 +974,6 @@
             targetDiv.textContent = "Waiting for leader...";
             document.getElementById('battle-sequence-list').innerHTML = '';
         }
-
         function renderBattleQueueUI(activeIndex, queueList) {
             const container = document.getElementById('battle-sequence-list');
             if(!container || !queueList) return;
@@ -817,7 +988,7 @@
         const addPlayerForm = document.getElementById('add-player-form');
         if(addPlayerForm) {
             addPlayerForm.addEventListener('submit', function(e) {
-                e.preventDefault(); 
+                e.preventDefault();
                 const editId = document.getElementById('edit-player-id').value;
                 const name = document.getElementById('player-name').value.trim();
                 const group = document.getElementById('player-group').value.trim();
@@ -827,10 +998,13 @@
 
                 if (editId) {
                     let p = state.players.find(p => p.id === editId);
-                    if (p) { p.name = name; p.group = group; p.marchMins = mins; p.marchSecs = secs; }
+                    if (p) {
+                        p.name = name; p.group = group; p.marchMins = mins; p.marchSecs = secs;
+                        p.configured = true;
+                    }
                     cancelEdit();
                 } else {
-                    state.players.push({ id: Date.now().toString(), name, group, marchMins: mins, marchSecs: secs, frozen: false, lastSeen: Date.now() });
+                    state.players.push({ id: Date.now().toString(), name, group, marchMins: mins, marchSecs: secs, configured: true, frozen: false, lastSeen: Date.now() });
                 }
                 savePlayers(); renderPlayerTable(); renderGroupSettingsUI(); this.reset();
                 syncStateToPlayers();
@@ -842,16 +1016,14 @@
             if (!p) return;
             document.getElementById('edit-player-id').value = p.id;
             document.getElementById('player-name').value = p.name;
-            document.getElementById('player-group').value = p.group;
-            document.getElementById('march-mins').value = p.marchMins;
-            document.getElementById('march-secs').value = p.marchSecs;
-            
+            document.getElementById('player-group').value = (p.group === '?' ? '1' : p.group);
+            document.getElementById('march-mins').value = p.marchMins || 1;
+            document.getElementById('march-secs').value = p.marchSecs || 20;
             document.getElementById('form-title').textContent = 'Edit Player';
             document.getElementById('form-submit-btn').textContent = 'Update Player';
             document.getElementById('cancel-edit-btn').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
         window.cancelEdit = function() {
             document.getElementById('edit-player-id').value = '';
             document.getElementById('add-player-form').reset();
@@ -859,32 +1031,25 @@
             document.getElementById('form-submit-btn').textContent = 'Add Player';
             document.getElementById('cancel-edit-btn').classList.add('hidden');
         }
-
         window.movePlayer = function(id, direction) {
             const index = state.players.findIndex(p => p.id === id);
             if (index === -1) return;
             const newIndex = index + direction;
             if (newIndex < 0 || newIndex >= state.players.length) return;
-
             const temp = state.players[index];
             state.players[index] = state.players[newIndex];
             state.players[newIndex] = temp;
-
-            savePlayers();
-            renderPlayerTable();
-            syncStateToPlayers();
+            savePlayers(); renderPlayerTable(); syncStateToPlayers();
         }
 
         function renderGroupSettingsUI() {
             const container = document.getElementById('group-settings-container');
             if (!container) return;
-            
-            const groups = [...new Set(state.players.map(p => p.group))];
+            const groups = [...new Set(state.players.filter(p => p.configured !== false).map(p => p.group))];
             if (groups.length === 0) {
                 container.innerHTML = '<div class="text-xs text-slate-500">Add players to configure group settings.</div>';
                 return;
             }
-
             let html = '';
             groups.forEach(g => {
                 let setting = state.groupSettings[g] || { mode: 'staggered', gap: 1 };
@@ -906,19 +1071,15 @@
             });
             container.innerHTML = html;
         }
-
         window.updateGroupMode = function(group, mode) {
             if (!state.groupSettings[group]) state.groupSettings[group] = { mode: 'staggered', gap: 1 };
             state.groupSettings[group].mode = mode;
-            saveGroupSettings();
-            renderPlayerTable();
+            saveGroupSettings(); renderPlayerTable();
         }
-
         window.updateGroupGap = function(group, gap) {
             if (!state.groupSettings[group]) state.groupSettings[group] = { mode: 'staggered', gap: 1 };
             state.groupSettings[group].gap = parseInt(gap) || 0;
-            saveGroupSettings();
-            renderPlayerTable();
+            saveGroupSettings(); renderPlayerTable();
         }
 
         function updateOnlineIndicators() {
@@ -928,11 +1089,8 @@
                 const indicator = document.getElementById(`status-dot-${p.id}`);
                 if(indicator) {
                     const isOnline = (now - (p.lastSeen || 0)) < 12000;
-                    if(isOnline) {
-                        indicator.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.8)] mx-auto";
-                    } else {
-                        indicator.className = "w-2.5 h-2.5 rounded-full bg-red-500 opacity-60 mx-auto";
-                    }
+                    if(isOnline) indicator.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.8)] mx-auto";
+                    else indicator.className = "w-2.5 h-2.5 rounded-full bg-red-500 opacity-60 mx-auto";
                 }
             });
         }
@@ -941,30 +1099,35 @@
             const tbody = document.getElementById('player-table-body');
             const emptyState = document.getElementById('empty-state');
             if(!tbody) return; tbody.innerHTML = '';
-            
             let schedule = calculateSchedule();
             let scheduleMap = {};
             schedule.forEach(s => { scheduleMap[s.id] = s; });
             const now = Date.now();
 
-            if (state.players.length === 0) {
-                emptyState.classList.remove('hidden');
-            } else {
+            if (state.players.length === 0) emptyState.classList.remove('hidden');
+            else {
                 emptyState.classList.add('hidden');
-                state.players.forEach((p, i) => {
-                    let calc = scheduleMap[p.id];
-                    let calcText = p.frozen ? '<span class="text-slate-500">Frozen</span>' : (calc ? `L: <b class="text-cyan-400">+${calc.delay}s</b><br>A: <b class="text-amber-400">${calc.arrivalSec}s</b>` : '-');
-                    
+                state.players.forEach((p) => {
+                    const isConfigured = p.configured !== false;
                     const isOnline = (now - (p.lastSeen || 0)) < 12000;
                     const dotClass = isOnline ? "bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.8)]" : "bg-red-500 opacity-60";
 
+                    let playerInfo;
+                    let scheduleCell;
+                    if (!isConfigured) {
+                        playerInfo = `<span class="text-amber-400 font-bold">${p.name}</span> <span class="text-[10px] text-amber-500/70 font-normal">(new — not configured)</span>`;
+                        scheduleCell = `<span class="text-slate-500 text-[10px] uppercase">⚠️ Set march time</span>`;
+                    } else {
+                        playerInfo = `G${p.group} - ${p.name} <br><span class="text-[10px] text-slate-400 font-normal">March: ${p.marchMins}m ${p.marchSecs}s</span>`;
+                        let calc = scheduleMap[p.id];
+                        scheduleCell = p.frozen ? '<span class="text-slate-500">Frozen</span>' : (calc ? `L: <b class="text-cyan-400">+${calc.delay}s</b><br>A: <b class="text-amber-400">${calc.arrivalSec}s</b>` : '-');
+                    }
+
                     tbody.innerHTML += `
-                        <tr class="border-b border-kingshot-border/60 hover:bg-slate-800/35 transition-colors ${p.frozen ? 'opacity-55 bg-blue-950/25' : ''}">
-                            <td class="py-3 px-2 text-center">
-                                <div id="status-dot-${p.id}" class="w-2.5 h-2.5 rounded-full mx-auto ${dotClass}"></div>
-                            </td>
-                            <td class="py-3 px-3 text-white font-semibold">G${p.group} - ${p.name} <br><span class="text-[10px] text-slate-400 font-normal">March: ${p.marchMins}m ${p.marchSecs}s</span></td>
-                            <td class="py-3 px-3 text-center text-[11px]">${calcText}</td>
+                        <tr class="border-b border-kingshot-border/60 hover:bg-slate-800/35 transition-colors ${p.frozen ? 'opacity-55 bg-blue-950/25' : ''} ${!isConfigured ? 'bg-amber-950/20' : ''}">
+                            <td class="py-3 px-2 text-center"><div id="status-dot-${p.id}" class="w-2.5 h-2.5 rounded-full mx-auto ${dotClass}"></div></td>
+                            <td class="py-3 px-3 text-white font-semibold">${playerInfo}</td>
+                            <td class="py-3 px-3 text-center text-[11px]">${scheduleCell}</td>
                             <td class="py-3 px-3 text-center">
                                 <button onclick="toggleFreeze('${p.id}')" class="px-2 py-1 rounded text-[10px] font-bold border transition-all cursor-pointer ${p.frozen ? 'text-red-400 border-red-500/40 bg-red-500/10' : 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10'}">${p.frozen ? 'Disabled' : 'Active'}</button>
                             </td>
@@ -972,8 +1135,8 @@
                                 <div class="flex flex-wrap items-center justify-center gap-1">
                                     <button onclick="movePlayer('${p.id}', -1)" class="bg-slate-700/60 hover:bg-slate-600 text-white px-2 py-1 rounded text-[10px] transition-all cursor-pointer">⬆️</button>
                                     <button onclick="movePlayer('${p.id}', 1)" class="bg-slate-700/60 hover:bg-slate-600 text-white px-2 py-1 rounded text-[10px] transition-all cursor-pointer">⬇️</button>
-                                    <button onclick="editPlayer('${p.id}')" class="bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/40 px-2 py-1 rounded text-[10px] transition-all font-semibold cursor-pointer">Edit</button>
-                                    <button onclick="deletePlayer('${p.id}')" class="bg-red-500/10 hover:bg-red-500/30 text-red-400 border border-red-500/30 px-2 py-1 rounded text-[10px] transition-all font-semibold-semibold cursor-pointer">Delete</button>
+                                    <button onclick="editPlayer('${p.id}')" class="${!isConfigured ? 'bg-amber-500/30 hover:bg-amber-500/50 text-amber-200 border-amber-500/60 animate-pulse' : 'bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border-blue-500/40'} border px-2 py-1 rounded text-[10px] transition-all font-semibold cursor-pointer">${!isConfigured ? '⚙️ Set' : 'Edit'}</button>
+                                    <button onclick="deletePlayer('${p.id}')" class="bg-red-500/10 hover:bg-red-500/30 text-red-400 border border-red-500/30 px-2 py-1 rounded text-[10px] transition-all font-semibold cursor-pointer">Delete</button>
                                 </div>
                             </td>
                         </tr>`;
@@ -983,32 +1146,113 @@
             renderGroupSettingsUI();
         }
 
-        window.toggleFreeze = function(id) { 
-            let p = state.players.find(i => id === i.id); 
-            if (p) { 
-                p.frozen = !p.frozen; 
-                savePlayers(); 
-                renderPlayerTable(); 
-                syncStateToPlayers(); 
-            } 
+        window.toggleFreeze = function(id) {
+            let p = state.players.find(i => id === i.id);
+            if (p) { p.frozen = !p.frozen; savePlayers(); renderPlayerTable(); syncStateToPlayers(); }
         };
-        
-        window.deletePlayer = function(id) { 
-            state.players = state.players.filter(i => i.id !== id); 
-            savePlayers(); 
-            renderPlayerTable(); 
-            syncStateToPlayers();
+        window.deletePlayer = function(id) {
+            state.players = state.players.filter(i => i.id !== id);
+            savePlayers(); renderPlayerTable(); syncStateToPlayers();
         };
 
         function updateWaveSelect() {
             const s = document.getElementById('battle-wave-select'); if(!s) return;
-            const groups = [...new Set(state.players.map(p => p.group))];
+            const groups = [...new Set(state.players.filter(p => p.configured !== false).map(p => p.group))];
             s.innerHTML = '<option value="all">All Active Players</option>' + groups.map(g => `<option value="${g}">Group ${g}</option>`).join('');
         }
 
         function savePlayers() { localStorage.setItem('kingshot_players_v7', JSON.stringify(state.players)); }
         function saveGroupSettings() { localStorage.setItem('kingshot_group_settings_v7', JSON.stringify(state.groupSettings)); }
-        
+
+        function updateUTCClock() {
+            const el = document.getElementById('utc-clock');
+            if (!el) return;
+            const now = new Date();
+            const hh = String(now.getUTCHours()).padStart(2, '0');
+            const mm = String(now.getUTCMinutes()).padStart(2, '0');
+            const ss = String(now.getUTCSeconds()).padStart(2, '0');
+            el.textContent = `${hh}:${mm}:${ss}`;
+        }
+        setInterval(updateUTCClock, 1000); updateUTCClock();
+
+        function copyToClipboard(text, successMsg) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => { alert(successMsg + '\n\n' + text); }).catch(() => fallbackCopy(text, successMsg));
+            } else { fallbackCopy(text, successMsg); }
+        }
+        function fallbackCopy(text, successMsg) {
+            const ta = document.createElement('textarea');
+            ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+            document.body.appendChild(ta); ta.select();
+            try { document.execCommand('copy'); alert(successMsg + '\n\n' + text); }
+            catch (e) { alert('⚠️ Copy failed. Here is the text:\n\n' + text); }
+            document.body.removeChild(ta);
+        }
+
+        window.copyMarchTimes = function() {
+            if (state.players.length === 0) { alert('❌ No players to copy.'); return; }
+            let lines = [];
+            state.players.forEach(p => {
+                if (p.configured === false) return;
+                lines.push(`${p.name} ${p.marchMins}m${p.marchSecs}s`);
+            });
+            if (lines.length === 0) { alert('❌ No configured players.'); return; }
+            copyToClipboard(lines.join('\n'), '✅ March Times Copied!');
+        };
+
+        window.copyLaunchTimesUTC = function() {
+            const schedule = calculateSchedule();
+            if (schedule.length === 0) { alert('❌ No configured active players.'); return; }
+            const prepSecs = getPrepSeconds();
+            const nowMs = Date.now() + (prepSecs * 1000);
+            let lines = [];
+            schedule.forEach(p => {
+                const launchMs = nowMs + (p.delay * 1000);
+                const d = new Date(launchMs);
+                const hh = String(d.getUTCHours()).padStart(2, '0');
+                const mm = String(d.getUTCMinutes()).padStart(2, '0');
+                const ss = String(d.getUTCSeconds()).padStart(2, '0');
+                lines.push(`${p.name} ${hh}:${mm}:${ss}`);
+            });
+            copyToClipboard(lines.join('\n'), '✅ Launch Times (UTC) Copied!');
+        };
+
+        // ═══════════════════════════════════════════════════
+        // COPY PLAYERS BY GROUP (names only, no march time)
+        // ═══════════════════════════════════════════════════
+        window.copyPlayersByGroup = function() {
+            const activePlayers = state.players.filter(p => p.configured !== false && !p.frozen);
+            if (activePlayers.length === 0) {
+                alert('❌ No configured players to copy.');
+                return;
+            }
+
+            const groups = {};
+            activePlayers.forEach(p => {
+                const g = String(p.group);
+                if (!groups[g]) groups[g] = [];
+                groups[g].push(p);
+            });
+
+            const sortedGroups = Object.keys(groups).sort((a, b) => {
+                const na = parseInt(a), nb = parseInt(b);
+                if (!isNaN(na) && !isNaN(nb)) return na - nb;
+                return a.localeCompare(b);
+            });
+
+            let lines = [];
+            sortedGroups.forEach(g => {
+                lines.push(`Group ${g}`);
+                groups[g].forEach(p => {
+                    lines.push(p.name);
+                });
+                lines.push('');
+            });
+            while (lines.length && lines[lines.length - 1] === '') lines.pop();
+
+            copyToClipboard(lines.join('\n'), '✅ Players by Group Copied!');
+        };
+
         renderPlayerTable();
     </script>
 </body>
