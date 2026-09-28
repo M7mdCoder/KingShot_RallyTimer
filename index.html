@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KingshotLab - Realtime Cloud Battle Station v6.28</title>
+    <title>KingshotLab - Realtime Cloud Battle Station v6.29</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS CDN -->
@@ -53,7 +53,7 @@
                 </svg>
             </div>
             <div>
-                <h2 class="gaming-font text-2xl font-bold tracking-wider text-white uppercase">KingshotLab V6.28</h2>
+                <h2 class="gaming-font text-2xl font-bold tracking-wider text-white uppercase">KingshotLab V6.29</h2>
                 <p class="text-xs text-slate-400 mt-1">Select your operational role to continue</p>
             </div>
             <div class="grid grid-cols-2 gap-3">
@@ -80,7 +80,7 @@
                         </svg>
                     </div>
                     <h1 class="gaming-font text-lg font-bold tracking-wider text-white uppercase flex items-center gap-1.5">
-                        KingshotLab <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">V6.28</span>
+                        KingshotLab <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">V6.29</span>
                     </h1>
                 </div>
 
@@ -224,14 +224,14 @@
 
         let supabaseClient = null;
         let currentChannel = null;
-        let currentRole = ''; // يبدأ فارغاً تماماً لضمان ظهور نافذة الاختيار دائماً عند فتح الرابط
+        let currentRole = ''; 
         let backgroundAudioCtx = null;
         let audioUnlocked = false;
         const LEADER_PASSWORD = "123";
 
         let state = {
-            players: JSON.parse(localStorage.getItem('kingshot_players_v628') || '[]'),
-            groupSettings: JSON.parse(localStorage.getItem('kingshot_group_settings_v628') || '{}')
+            players: JSON.parse(localStorage.getItem('kingshot_players_v629') || '[]'),
+            groupSettings: JSON.parse(localStorage.getItem('kingshot_group_settings_v629') || '{}')
         };
 
         let battleEngine = {
@@ -244,7 +244,6 @@
         let isSpeaking = false;
 
         window.addEventListener('DOMContentLoaded', () => {
-            // إجبار ظهور نافذة اختيار الدور فور دخول الرابط
             checkRolePrompt();
 
             try {
@@ -276,7 +275,6 @@
 
         function checkRolePrompt() {
             const modal = document.getElementById('role-modal');
-            // مسح أي دور قديم مخزن لضمان ظهور النافذة عند فتح الرابط كطلبك
             currentRole = ''; 
             if (modal) {
                 modal.classList.remove('hidden');
@@ -514,7 +512,7 @@
             let minLaunch = Math.min(...rawLaunches);
             let delays = rawLaunches.map(l => l - minLaunch);
 
-            return mapped.map((m, index) => ({
+            let calculated = mapped.map((m, index) => ({
                 id: m.id,
                 name: m.name,
                 group: m.group,
@@ -522,6 +520,11 @@
                 arrivalSec: targetArrivals[index],
                 delay: delays[index]
             }));
+
+            // الترتيب تلقائياً حسب وقت الإطلاق (Delay) من الصغير للكبير (الأول فالأول في العد التنازلي)
+            calculated.sort((a, b) => a.delay - b.delay);
+
+            return calculated;
         }
 
         const startBtn = document.getElementById('start-battle-btn');
@@ -770,7 +773,7 @@
                                 <button onclick="toggleFreeze('${p.id}')" class="px-2.5 py-1 rounded-md text-[10px] font-semibold border transition-all cursor-pointer ${p.frozen ? 'text-blue-400 border-blue-500/40 bg-blue-500/10' : 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10'}">${p.frozen ? 'Frozen' : 'Active'}</button>
                             </td>
                             <td class="py-3 px-3 text-center">
-                                <div class="flex items-center justify-center gap-1">
+                                <div class="flex items-content justify-center gap-1">
                                     <button onclick="movePlayer('${p.id}', -1)" class="bg-slate-700/60 hover:bg-slate-600 text-white px-2 py-1 rounded text-[10px] transition-all cursor-pointer" title="Move Up">⬆️</button>
                                     <button onclick="movePlayer('${p.id}', 1)" class="bg-slate-700/60 hover:bg-slate-600 text-white px-2 py-1 rounded text-[10px] transition-all cursor-pointer" title="Move Down">⬇️</button>
                                     <button onclick="editPlayer('${p.id}')" class="bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/40 px-2.5 py-1 rounded text-[10px] transition-all font-semibold cursor-pointer">Edit</button>
@@ -785,7 +788,7 @@
         }
 
         window.toggleFreeze = function(id) { 
-            let p = state.players.find(i => i.id === id); 
+            let p = state.players.find(i => id === i.id); 
             if (p) { p.frozen = !p.frozen; savePlayers(); renderPlayerTable(); } 
         };
         
@@ -801,8 +804,8 @@
             s.innerHTML = '<option value="all">All Active Players</option>' + groups.map(g => `<option value="${g}">Group ${g}</option>`).join('');
         }
 
-        function savePlayers() { localStorage.setItem('kingshot_players_v628', JSON.stringify(state.players)); }
-        function saveGroupSettings() { localStorage.setItem('kingshot_group_settings_v628', JSON.stringify(state.groupSettings)); }
+        function savePlayers() { localStorage.setItem('kingshot_players_v629', JSON.stringify(state.players)); }
+        function saveGroupSettings() { localStorage.setItem('kingshot_group_settings_v629', JSON.stringify(state.groupSettings)); }
         
         renderPlayerTable();
     </script>
