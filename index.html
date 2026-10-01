@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KingshotLab - Realtime Cloud Battle Station v7.7.1 Secure</title>
+    <title>KingshotLab - Realtime Cloud Battle Station v8.1 Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
@@ -19,123 +19,257 @@
         }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Orbitron:wght@600;700;900&display=swap');
         body { font-family: 'Rajdhani', sans-serif; }
+        .display-font { font-family: 'Orbitron', sans-serif; letter-spacing: 0.05em; }
+        
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #070b19; }
-        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #3b82f6, #1e40af); border-radius: 3px; }
+        
         @keyframes audioPulse { 0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.7);} 50%{box-shadow:0 0 0 14px rgba(16,185,129,0);} }
         .audio-pulse { animation: audioPulse 2s infinite; }
         @keyframes flashBorder { 0%{border-color:#10b981;} 50%{border-color:#facc15;} 100%{border-color:#10b981;} }
         .msg-flash { animation: flashBorder 0.6s ease-out; }
         @keyframes getReady { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.06);opacity:0.85;} }
         .get-ready-pulse { animation: getReady 1s ease-in-out infinite; }
+        @keyframes dotPulse { 0%,100%{opacity:0.4;} 50%{opacity:1;} }
+        .dot-pulse { animation: dotPulse 1.4s infinite; }
+        
+        /* ═══ PREMIUM UI ═══ */
+        .premium-card {
+            background: linear-gradient(135deg, rgba(15,23,42,0.95) 0%, rgba(30,41,59,0.85) 100%);
+            border: 1px solid rgba(148,163,184,0.15);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        .premium-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(96,165,250,0.5), transparent);
+        }
+        .premium-card-gold::before {
+            background: linear-gradient(90deg, transparent, rgba(245,217,122,0.6), transparent);
+        }
+        
+        .premium-btn {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .premium-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.15);
+            filter: brightness(1.08);
+        }
+        .premium-btn:active {
+            transform: translateY(1px) scale(0.98);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+        .section-title::before {
+            content: '';
+            width: 3px;
+            height: 14px;
+            border-radius: 2px;
+            background: currentColor;
+            box-shadow: 0 0 8px currentColor;
+        }
+        
+        .glow-text-blue { text-shadow: 0 0 12px rgba(96,165,250,0.7), 0 0 4px rgba(59,130,246,0.5); }
+        .glow-text-gold { text-shadow: 0 0 12px rgba(245,217,122,0.7), 0 0 4px rgba(212,175,55,0.5); }
+        .glow-text-emerald { text-shadow: 0 0 12px rgba(16,185,129,0.7); }
+        
+        .logo-badge {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #06b6d4 100%);
+            box-shadow: 0 0 20px rgba(59,130,246,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+        
+        .header-strip {
+            background: linear-gradient(90deg, transparent 0%, rgba(59,130,246,0.5) 50%, transparent 100%);
+            height: 1px;
+        }
+        
+        .player-row-approved { border-left: 3px solid #10b981; }
+        .player-row-pending { border-left: 3px solid #f59e0b; }
+        .player-row-unconfigured { border-left: 3px solid #64748b; }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(245,217,122,0.15), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 2.5s infinite;
+        }
+        
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button { opacity: 0.5; }
+        
+        .premium-input {
+            transition: all 0.2s ease;
+        }
+        .premium-input:focus {
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.15), 0 0 12px rgba(59,130,246,0.3);
+        }
     </style>
 </head>
 <body class="bg-kingshot-dark text-slate-100 min-h-screen flex flex-col justify-between selection:bg-blue-500 selection:text-white" onclick="unlockAudioMobile()">
 
     <div id="disabled-overlay" class="hidden fixed inset-0 bg-red-950/95 z-[100] flex flex-col items-center justify-center p-4 backdrop-blur-md">
         <div class="w-20 h-20 mb-4 rounded-full bg-red-600/20 flex items-center justify-center border border-red-500/50 animate-pulse"><span class="text-4xl">🛑</span></div>
-        <h1 class="text-4xl font-bold text-red-500 tracking-wider mb-2 uppercase">Station Disabled</h1>
+        <h1 class="text-4xl font-bold text-red-500 tracking-wider mb-2 uppercase display-font">Station Disabled</h1>
         <p class="text-red-300 text-sm">The leader has locked your station. Wait for further instructions.</p>
     </div>
 
     <div id="leader-conflict-overlay" class="hidden fixed inset-0 bg-blue-950/95 z-[110] flex flex-col items-center justify-center p-4 backdrop-blur-md">
         <div class="w-20 h-20 mb-4 rounded-full bg-blue-600/20 flex items-center justify-center border border-blue-500/50"><span class="text-4xl">👑</span></div>
-        <h1 class="text-3xl font-bold text-blue-400 tracking-wider mb-2 uppercase text-center">Leader Already Active</h1>
+        <h1 class="text-3xl font-bold text-blue-400 tracking-wider mb-2 uppercase text-center display-font">Leader Already Active</h1>
         <p class="text-blue-200 text-sm text-center max-w-md mb-6">This account is already controlling from another tab or device. Only <b>one Leader session</b> is allowed at a time.</p>
-        <button onclick="forceTakeLeadership()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-6 rounded-lg text-xs uppercase shadow-md transition-all border border-blue-400/30 active:scale-95 cursor-pointer">⚡ Force Take Over</button>
+        <button onclick="forceTakeLeadership()" class="premium-btn bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-6 rounded-lg text-xs uppercase transition-all border border-blue-400/30 active:scale-95 cursor-pointer">⚡ Force Take Over</button>
+    </div>
+
+    <div id="pending-approval-overlay" class="hidden fixed inset-0 bg-kingshot-dark/98 z-[105] flex flex-col items-center justify-center p-4 backdrop-blur-md">
+        <div class="premium-card premium-card-gold border-2 border-amber-500/50 rounded-2xl p-8 max-w-md w-full shadow-2xl text-center space-y-5">
+            <div class="w-20 h-20 mx-auto rounded-full bg-amber-500/20 flex items-center justify-center border-2 border-amber-500/60 animate-pulse">
+                <span class="text-5xl">⏳</span>
+            </div>
+            <h2 class="text-2xl font-bold text-amber-400 tracking-wider uppercase display-font">Waiting for Approval</h2>
+            <p class="text-sm text-slate-400 leading-relaxed">Your request has been sent to the Leader.<br>Please wait for confirmation.</p>
+            <div class="bg-kingshot-dark border border-kingshot-border rounded-lg p-3 text-left space-y-1">
+                <div class="text-[11px] text-slate-400">Player Name: <span id="pending-name-display" class="text-white font-bold">—</span></div>
+                <div class="text-[11px] text-slate-400">Room: <span id="pending-room-display" class="text-cyan-400 font-bold">—</span></div>
+                <div class="text-[11px] text-slate-400">Status: <span class="text-amber-400 font-bold">Pending...</span></div>
+            </div>
+            <div class="flex items-center justify-center gap-2 pt-2">
+                <div class="w-2 h-2 rounded-full bg-amber-500 dot-pulse"></div>
+                <div class="w-2 h-2 rounded-full bg-amber-500 dot-pulse" style="animation-delay:0.2s"></div>
+                <div class="w-2 h-2 rounded-full bg-amber-500 dot-pulse" style="animation-delay:0.4s"></div>
+            </div>
+            <button onclick="cancelPlayerRequest()" class="text-[10px] text-slate-500 hover:text-red-400 underline uppercase cursor-pointer pt-2">Cancel Request</button>
+        </div>
+    </div>
+
+    <div id="rejected-overlay" class="hidden fixed inset-0 bg-red-950/98 z-[105] flex flex-col items-center justify-center p-4 backdrop-blur-md">
+        <div class="premium-card border-2 border-red-500/50 rounded-2xl p-8 max-w-md w-full shadow-2xl text-center space-y-5">
+            <div class="w-20 h-20 mx-auto rounded-full bg-red-500/20 flex items-center justify-center border-2 border-red-500/60">
+                <span class="text-5xl">❌</span>
+            </div>
+            <h2 class="text-2xl font-bold text-red-400 tracking-wider uppercase display-font">Access Denied</h2>
+            <p class="text-sm text-slate-400 leading-relaxed">The Leader rejected your request.<br>Please contact them for more information.</p>
+            <button onclick="backFromRejection()" class="premium-btn w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 px-6 rounded-lg text-xs uppercase shadow-md transition-all border border-red-400/30 active:scale-95 cursor-pointer">Back to Registration</button>
+        </div>
     </div>
 
     <div id="role-modal" class="fixed inset-0 bg-kingshot-dark/95 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-kingshot-card border border-kingshot-border rounded-2xl p-6 max-w-md w-full shadow-2xl text-center space-y-6">
-            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center mx-auto shadow-lg shadow-blue-500/30 border border-blue-400/30">
-                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        <div class="premium-card border border-kingshot-border rounded-2xl p-6 max-w-md w-full shadow-2xl text-center space-y-6">
+            <div class="logo-badge w-16 h-16 rounded-2xl flex items-center justify-center mx-auto shadow-lg border border-blue-400/30">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
             </div>
             
             <div id="role-selection-buttons">
-                <h2 class="text-2xl font-bold tracking-wider text-white uppercase mb-1">KingshotLab V7.7.1</h2>
-                <p class="text-xs text-slate-400 mb-6">Select your operational role to continue (Secure Auth)</p>
+                <h2 class="text-2xl font-bold tracking-wider text-white uppercase mb-1 display-font">KingshotLab <span class="text-amber-400">PRO</span></h2>
+                <p class="text-[10px] text-slate-500 uppercase tracking-widest mb-6">V8.1 · Realtime Battle Station</p>
                 <div class="grid grid-cols-2 gap-3">
-                    <button onclick="showLeaderLoginForm()" class="p-4 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold transition-all border border-blue-400/30 flex flex-col items-center gap-2 shadow-lg shadow-blue-600/20 active:scale-95 cursor-pointer"><span class="text-2xl">👑</span><span class="uppercase text-sm tracking-wide">Leader</span></button>
-                    <button onclick="showPlayerRegistration()" class="p-4 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold transition-all border border-emerald-400/30 flex flex-col items-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-95 cursor-pointer"><span class="text-2xl">🛡️</span><span class="uppercase text-sm tracking-wide">Player</span></button>
+                    <button onclick="showLeaderLoginForm()" class="premium-btn p-4 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 text-white font-bold transition-all border border-blue-400/30 flex flex-col items-center gap-2 active:scale-95 cursor-pointer"><span class="text-2xl">👑</span><span class="uppercase text-sm tracking-widest display-font">Leader</span></button>
+                    <button onclick="showPlayerRegistration()" class="premium-btn p-4 rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-800 hover:from-emerald-500 hover:to-emerald-700 text-white font-bold transition-all border border-emerald-400/30 flex flex-col items-center gap-2 active:scale-95 cursor-pointer"><span class="text-2xl">🛡️</span><span class="uppercase text-sm tracking-widest display-font">Player</span></button>
                 </div>
             </div>
 
             <div id="leader-login-form" class="hidden flex-col gap-4 text-left">
-                <h2 class="text-xl font-bold tracking-wider text-blue-400 uppercase text-center border-b border-kingshot-border pb-3">Leader Secure Login</h2>
+                <h2 class="text-lg font-bold tracking-widest text-blue-400 uppercase text-center border-b border-kingshot-border pb-3 display-font">Leader Login</h2>
                 <div>
-                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Room Code (you create this)</label>
-                    <input type="text" id="leader-room-code" placeholder="Enter Room Code" required class="w-full bg-kingshot-dark border border-amber-500/40 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-amber-500 outline-none text-center font-bold tracking-widest">
+                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold tracking-wider">Room Code</label>
+                    <input type="text" id="leader-room-code" placeholder="Enter Room Code" required class="premium-input w-full bg-kingshot-dark border border-amber-500/40 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-amber-500 outline-none text-center font-bold tracking-widest">
                 </div>
                 <div>
-                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Leader Email</label>
-                    <input type="email" id="leader-email" placeholder="leader@kingshot.com" required class="w-full bg-kingshot-dark border border-blue-500/30 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-blue-500 outline-none">
+                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold tracking-wider">Leader Email</label>
+                    <input type="email" id="leader-email" placeholder="leader@kingshot.com" required class="premium-input w-full bg-kingshot-dark border border-blue-500/30 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-blue-500 outline-none">
                 </div>
                 <div>
-                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Secure Password</label>
-                    <input type="password" id="leader-password" placeholder="••••••••" required class="w-full bg-kingshot-dark border border-blue-500/30 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-blue-500 outline-none">
+                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold tracking-wider">Password</label>
+                    <input type="password" id="leader-password" placeholder="••••••••" required class="premium-input w-full bg-kingshot-dark border border-blue-500/30 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-blue-500 outline-none">
                 </div>
                 <div class="flex gap-2 pt-2">
-                    <button onclick="backToRoleSelect()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 rounded-lg text-xs uppercase transition-all active:scale-95 cursor-pointer">Back</button>
-                    <button onclick="loginAsLeaderSecure()" class="flex-[2] bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg text-xs uppercase shadow-md shadow-blue-600/20 transition-all border border-blue-400/30 active:scale-95 cursor-pointer">Leader Login</button>
+                    <button onclick="backToRoleSelect()" class="premium-btn flex-1 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 rounded-lg text-xs uppercase transition-all active:scale-95 cursor-pointer">Back</button>
+                    <button onclick="loginAsLeaderSecure()" class="premium-btn flex-[2] bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold py-2.5 rounded-lg text-xs uppercase shadow-md transition-all border border-blue-400/30 active:scale-95 cursor-pointer">Login</button>
                 </div>
             </div>
 
             <div id="player-registration-form" class="hidden flex-col gap-4 text-left">
-                <h2 class="text-xl font-bold tracking-wider text-emerald-400 uppercase text-center border-b border-kingshot-border pb-3">Player Registration</h2>
+                <h2 class="text-lg font-bold tracking-widest text-emerald-400 uppercase text-center border-b border-kingshot-border pb-3 display-font">Player Registration</h2>
                 <div>
-                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Your Name / Handle</label>
-                    <input type="text" id="reg-name" placeholder="e.g. Ghost" required class="w-full bg-kingshot-dark border border-emerald-500/30 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-emerald-500 outline-none">
+                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold tracking-wider">Your Name / Handle</label>
+                    <input type="text" id="reg-name" placeholder="e.g. Ghost" required class="premium-input w-full bg-kingshot-dark border border-emerald-500/30 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-emerald-500 outline-none">
                 </div>
                 <div>
-                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Room Code</label>
-                    <input type="text" id="reg-room-code" placeholder="Enter Room Code" required class="w-full bg-kingshot-dark border border-emerald-500/30 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-emerald-500 outline-none text-center font-bold tracking-widest">
+                    <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold tracking-wider">Room Code</label>
+                    <input type="text" id="reg-room-code" placeholder="Enter Room Code" required class="premium-input w-full bg-kingshot-dark border border-emerald-500/30 rounded-lg px-3 py-2 text-slate-100 text-sm focus:border-emerald-500 outline-none text-center font-bold tracking-widest">
                 </div>
+                <p class="text-[10px] text-amber-400/80 leading-tight bg-amber-500/10 border border-amber-500/30 rounded p-2">⚠️ Your request will be sent to the Leader for approval.</p>
                 <div class="flex gap-2 pt-2">
-                    <button onclick="backToRoleSelect()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 rounded-lg text-xs uppercase transition-all active:scale-95 cursor-pointer">Back</button>
-                    <button id="player-connect-btn" onclick="registerAndJoinAsPlayer(event)" class="flex-[2] bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-lg text-xs uppercase shadow-md shadow-emerald-600/20 transition-all border border-emerald-400/30 active:scale-95 cursor-pointer">Connect Station</button>
+                    <button onclick="backToRoleSelect()" class="premium-btn flex-1 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 rounded-lg text-xs uppercase transition-all active:scale-95 cursor-pointer">Back</button>
+                    <button id="player-connect-btn" onclick="registerAndJoinAsPlayer(event)" class="premium-btn flex-[2] bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold py-2.5 rounded-lg text-xs uppercase shadow-md transition-all border border-emerald-400/30 active:scale-95 cursor-pointer">Request to Join</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <header class="bg-kingshot-card border-b border-kingshot-border shadow-md sticky top-0 z-40">
+    <header class="bg-kingshot-card border-b border-kingshot-border shadow-lg sticky top-0 z-40 relative">
+        <div class="header-strip absolute top-0 left-0 right-0"></div>
         <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col gap-3">
             <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                    <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shadow-md border border-blue-400/30">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                <div class="flex items-center space-x-3">
+                    <div class="logo-badge w-10 h-10 rounded-xl flex items-center justify-center shadow-lg border border-blue-400/30">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                     </div>
-                    <h1 class="text-lg font-bold tracking-wider text-white uppercase flex items-center gap-1.5">KingshotLab <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">V7.7.1</span></h1>
+                    <div>
+                        <h1 class="text-base font-bold tracking-widest text-white uppercase flex items-center gap-1.5 display-font">KingshotLab <span class="text-[10px] px-1.5 py-0.5 rounded bg-gradient-to-r from-amber-500/30 to-amber-400/20 text-amber-300 border border-amber-500/40 glow-text-gold">PRO</span></h1>
+                        <p class="text-[9px] text-slate-500 uppercase tracking-widest">Realtime Battle Station · V8.1</p>
+                    </div>
                 </div>
                 <div class="flex items-center gap-2">
                     <span id="connection-status" class="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)] animate-pulse" title="Disconnected"></span>
-                    <div class="bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-emerald-400 font-bold text-xs uppercase tracking-wider">Room: <span id="header-room-display">---</span></div>
+                    <div class="bg-gradient-to-r from-emerald-500/15 to-emerald-400/5 border border-emerald-500/40 px-3 py-1 rounded-lg text-emerald-400 font-bold text-xs uppercase tracking-widest display-font">Room: <span id="header-room-display">---</span></div>
                 </div>
             </div>
             <div class="flex items-center justify-between gap-2 pt-2 border-t border-kingshot-border/60">
                 <div class="flex items-center gap-2">
-                    <span id="current-role-badge" class="text-xs font-bold px-2.5 py-1 rounded-md bg-blue-500/20 text-blue-400 border border-blue-500/30 uppercase">Role: -</span>
+                    <span id="current-role-badge" class="text-xs font-bold px-2.5 py-1 rounded-md bg-blue-500/20 text-blue-400 border border-blue-500/30 uppercase tracking-wider">Role: -</span>
                     <button onclick="resetRoleSelection()" class="text-[10px] text-slate-400 hover:text-white transition-colors underline uppercase cursor-pointer">Switch</button>
                 </div>
-                <button id="enable-audio-btn" onclick="enableAndTestAudio(event)" class="hidden px-3 py-1.5 text-xs font-bold rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition-all active:scale-95 whitespace-nowrap cursor-pointer">🔊 Enable Audio</button>
+                <button id="enable-audio-btn" onclick="enableAndTestAudio(event)" class="hidden premium-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 flex items-center gap-1.5 shadow-md transition-all active:scale-95 whitespace-nowrap cursor-pointer">🔊 Enable Audio</button>
             </div>
         </div>
     </header>
 
     <main class="max-w-6xl w-full mx-auto px-4 py-4 flex-grow space-y-4">
 
-        <div class="player-only hidden bg-kingshot-card border-2 border-emerald-500/40 rounded-xl p-5 shadow-lg space-y-4" id="player-audio-panel">
+        <div class="player-only hidden premium-card border-2 border-emerald-500/40 rounded-xl p-5 shadow-lg space-y-4" id="player-audio-panel">
             <div id="player-audio-gate" class="text-center">
                 <div class="text-5xl mb-3">🎧</div>
-                <h2 class="text-lg font-bold text-white uppercase mb-2 tracking-wider">Enable Audio</h2>
+                <h2 class="text-lg font-bold text-white uppercase mb-2 tracking-widest display-font">Enable Audio</h2>
                 <p class="text-xs text-slate-400 mb-5 leading-relaxed">Tap the button below to hear countdowns, commands, and launches.</p>
-                <button onclick="playerEnableAudio(event)" class="audio-pulse w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white font-bold py-4 px-6 rounded-xl text-sm uppercase tracking-wider shadow-lg shadow-emerald-500/30 border-2 border-emerald-400/50 active:scale-95 cursor-pointer">🔊 TAP TO ENABLE AUDIO</button>
+                <button onclick="playerEnableAudio(event)" class="audio-pulse premium-btn w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white font-bold py-4 px-6 rounded-xl text-sm uppercase tracking-widest shadow-lg border-2 border-emerald-400/50 active:scale-95 cursor-pointer display-font">🔊 TAP TO ENABLE AUDIO</button>
             </div>
             <div id="player-audio-active" class="hidden text-center">
                 <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-emerald-500/20 flex items-center justify-center border-2 border-emerald-500"><span class="text-3xl">✅</span></div>
-                <h2 class="text-lg font-bold text-emerald-400 uppercase tracking-wider">Audio Ready</h2>
+                <h2 class="text-lg font-bold text-emerald-400 uppercase tracking-widest display-font">Audio Ready</h2>
                 <p class="text-xs text-slate-400 mt-1">Listening for commands...</p>
                 <div id="player-receiving-indicator" class="mt-4 text-[11px] text-slate-500 bg-kingshot-dark px-3 py-2 rounded border border-kingshot-border">📻 Last message: <span class="text-slate-300">—</span></div>
                 <button onclick="playerReEnableAudio(event)" class="mt-3 text-[10px] text-slate-500 hover:text-amber-400 underline uppercase cursor-pointer">Re-enable audio</button>
@@ -146,112 +280,144 @@
             </div>
         </div>
 
-        <div class="leader-only bg-kingshot-card border border-indigo-500/30 rounded-xl p-4 shadow-lg space-y-3">
-            <h2 class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Command & Communications</h2>
-            <div class="flex gap-2">
-                <input type="text" id="custom-msg-input" placeholder="Broadcast message to all players..." class="flex-1 bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-indigo-500 outline-none">
-                <button onclick="sendTypedMessage()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-4 rounded-lg text-xs transition-all uppercase shadow-md shadow-indigo-600/20 active:scale-95 cursor-pointer border border-indigo-400/30">Send</button>
+        <div class="player-only hidden premium-card border-2 border-cyan-500/40 rounded-xl p-4 shadow-lg space-y-3" id="player-info-panel">
+            <h2 class="section-title text-cyan-400">📋 My Battle Info</h2>
+            <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="bg-kingshot-dark rounded-lg p-3 border border-kingshot-border">
+                    <div class="text-[10px] uppercase text-slate-400 font-semibold mb-1 tracking-wider">Name</div>
+                    <div id="player-info-name" class="text-base font-bold text-white truncate">—</div>
+                </div>
+                <div class="bg-kingshot-dark rounded-lg p-3 border border-kingshot-border">
+                    <div class="text-[10px] uppercase text-slate-400 font-semibold mb-1 tracking-wider">Group</div>
+                    <div id="player-info-group" class="text-base font-bold text-amber-400">—</div>
+                </div>
+                <div class="bg-kingshot-dark rounded-lg p-3 border border-kingshot-border">
+                    <div class="text-[10px] uppercase text-slate-400 font-semibold mb-1 tracking-wider">March</div>
+                    <div id="player-info-march" class="text-base font-bold text-emerald-400">—</div>
+                </div>
             </div>
-            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-kingshot-border/60">
-                <button onclick="speakCustomText('Get ready for battle')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-semibold py-2 px-3 rounded-lg text-xs transition-all border border-slate-600 uppercase active:scale-95 cursor-pointer">📢 Quick: Get Ready</button>
-                <button onclick="speakCustomText('Return to chat')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-semibold py-2 px-3 rounded-lg text-xs transition-all border border-slate-600 uppercase active:scale-95 cursor-pointer">💬 Quick: Return to Chat</button>
+            <div id="player-info-status" class="text-center text-[10px] uppercase text-amber-400 font-bold tracking-wider">
+                ⚠️ Waiting for leader to configure...
             </div>
         </div>
 
-        <div class="leader-only bg-kingshot-card border border-blue-500/30 rounded-xl p-4 shadow-lg space-y-3">
-            <h2 class="text-xs font-bold text-blue-400 uppercase tracking-wider">Flexible Group Settings</h2>
+        <!-- ═══ WARNING: DUPLICATE MARCH TIMES (NEW) ═══ -->
+        <div class="leader-only hidden premium-card border-l-4 border-amber-500 rounded-xl p-4 shadow-lg space-y-2" id="march-conflicts-panel">
+            <h2 class="section-title text-amber-400">⚠️ Duplicate March Times Detected</h2>
+            <p class="text-[10px] text-slate-400 leading-relaxed">The following players have the same march time. This might cause overlapping launches.</p>
+            <div id="march-conflicts-list" class="space-y-2 pt-1"></div>
+        </div>
+
+        <div class="leader-only premium-card border-l-4 border-indigo-500 rounded-xl p-4 shadow-lg space-y-3">
+            <h2 class="section-title text-indigo-400">📡 Command & Communications</h2>
+            <div class="flex gap-2 flex-wrap">
+                <input type="text" id="custom-msg-input" placeholder="Broadcast message to all players..." class="premium-input flex-1 min-w-[200px] bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-indigo-500 outline-none">
+                <div class="flex items-center gap-1 bg-kingshot-dark border border-kingshot-border rounded-lg px-2">
+                    <label class="text-[9px] text-slate-500 uppercase tracking-wider">Repeat</label>
+                    <input type="number" id="msg-repeat-count" min="1" max="10" value="1" class="premium-input w-12 bg-transparent border-0 text-slate-100 text-xs text-center outline-none font-bold">
+                    <span class="text-[10px] text-slate-500">×</span>
+                </div>
+                <button onclick="sendTypedMessage()" class="premium-btn bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-bold py-2 px-5 rounded-lg text-xs transition-all uppercase shadow-md active:scale-95 cursor-pointer border border-indigo-400/30 tracking-widest">Send</button>
+            </div>
+            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-kingshot-border/60">
+                <button onclick="speakCustomText('Get ready for battle', getRepeatCount())" class="premium-btn bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-semibold py-2 px-3 rounded-lg text-xs transition-all border border-slate-600 uppercase active:scale-95 cursor-pointer">📢 Get Ready</button>
+                <button onclick="speakCustomText('Return to chat', getRepeatCount())" class="premium-btn bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-semibold py-2 px-3 rounded-lg text-xs transition-all border border-slate-600 uppercase active:scale-95 cursor-pointer">💬 Return to Chat</button>
+            </div>
+        </div>
+
+        <div class="leader-only premium-card border-l-4 border-blue-500 rounded-xl p-4 shadow-lg space-y-3">
+            <h2 class="section-title text-blue-400">⚙️ Flexible Group Settings</h2>
             <div id="group-settings-container" class="space-y-2"></div>
         </div>
 
-        <div class="bg-kingshot-card border border-amber-500/40 rounded-xl p-4 shadow-xl space-y-3">
+        <div class="premium-card premium-card-gold border border-amber-500/40 rounded-xl p-4 shadow-xl space-y-3">
             <div class="flex flex-col gap-2">
-                <h2 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                <h2 class="section-title text-amber-400">
                     <svg class="w-4 h-4 text-amber-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    Live Sequential Launch Console
+                    Live Launch Console
                 </h2>
                 <div class="leader-only flex items-center gap-2 flex-wrap">
-                    <label class="text-[11px] text-slate-300 font-semibold uppercase">Prep Time:</label>
-                    <input type="number" id="prep-seconds" min="0" max="60" value="5" class="w-20 bg-kingshot-dark border border-amber-500/30 rounded-lg px-2 py-1.5 text-slate-100 text-xs outline-none text-center font-bold">
-                    <span class="text-[10px] text-slate-500">seconds countdown before launch</span>
+                    <label class="text-[11px] text-slate-300 font-semibold uppercase tracking-wider">Prep Time:</label>
+                    <input type="number" id="prep-seconds" min="0" max="60" value="5" class="premium-input w-20 bg-kingshot-dark border border-amber-500/30 rounded-lg px-2 py-1.5 text-slate-100 text-xs outline-none text-center font-bold">
+                    <span class="text-[10px] text-slate-500">seconds before launch</span>
                 </div>
                 <div class="leader-only flex items-center justify-between gap-2">
-                    <label class="text-[11px] text-slate-300 font-semibold uppercase">Wave Filter:</label>
-                    <select id="battle-wave-select" class="bg-kingshot-dark border border-amber-500/30 rounded-lg px-3 py-1.5 text-slate-100 text-xs flex-1 outline-none"><option value="all">All Active Players</option></select>
+                    <label class="text-[11px] text-slate-300 font-semibold uppercase tracking-wider">Wave Filter:</label>
+                    <select id="battle-wave-select" class="premium-input bg-kingshot-dark border border-amber-500/30 rounded-lg px-3 py-1.5 text-slate-100 text-xs flex-1 outline-none"><option value="all">All Active Players</option></select>
                 </div>
             </div>
 
             <div class="flex flex-col gap-2.5 bg-kingshot-dark/70 p-3 rounded-xl border border-kingshot-border relative overflow-hidden">
-                <div id="msg-overlay" class="absolute inset-0 bg-indigo-900/90 hidden items-center justify-center p-2 z-10 text-center transition-all"><p id="msg-overlay-text" class="text-white font-bold text-sm uppercase tracking-wide"></p></div>
+                <div id="msg-overlay" class="absolute inset-0 bg-indigo-900/90 hidden items-center justify-center p-2 z-10 text-center transition-all"><p id="msg-overlay-text" class="text-white font-bold text-sm uppercase tracking-wider"></p></div>
                 <div>
-                    <div id="battle-status" class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Status: Standby</div>
-                    <div id="battle-current-target" class="text-base font-bold text-amber-400 mt-0.5">Waiting for leader...</div>
+                    <div id="battle-status" class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Status: Standby</div>
+                    <div id="battle-current-target" class="text-base font-bold text-amber-400 mt-0.5 display-font">Waiting for leader...</div>
                 </div>
                 <div class="leader-only flex items-center gap-2 pt-1">
-                    <button id="start-battle-btn" class="flex-1 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg shadow-amber-600/20 transition-all text-xs uppercase tracking-wider border border-amber-400/30 active:scale-95 cursor-pointer">🚀 Start Sequence</button>
-                    <button id="reset-battle-btn" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 font-semibold py-2.5 px-3 rounded-xl border border-red-500/30 transition-all text-xs active:scale-95 cursor-pointer">Reset</button>
+                    <button id="start-battle-btn" class="premium-btn flex-1 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg transition-all text-xs uppercase tracking-widest border border-amber-400/30 active:scale-95 cursor-pointer display-font">🚀 Start Sequence</button>
+                    <button id="reset-battle-btn" class="premium-btn bg-red-500/10 hover:bg-red-500/20 text-red-400 font-semibold py-2.5 px-3 rounded-xl border border-red-500/30 transition-all text-xs active:scale-95 cursor-pointer">Reset</button>
                 </div>
             </div>
             <div id="battle-sequence-list" class="space-y-2 max-h-48 overflow-y-auto"></div>
         </div>
 
-        <div class="leader-only bg-kingshot-card border border-purple-500/40 rounded-xl p-4 shadow-lg space-y-3">
+        <div class="leader-only premium-card border-l-4 border-purple-500 rounded-xl p-4 shadow-lg space-y-3">
             <div class="flex items-center justify-between flex-wrap gap-2">
-                <h2 class="text-xs font-bold text-purple-400 uppercase tracking-wider">📋 Export & Copy Tools</h2>
+                <h2 class="section-title text-purple-400">📋 Export & Copy Tools</h2>
                 <div class="text-[10px] text-slate-300 font-mono bg-kingshot-dark border border-purple-500/30 px-2 py-0.5 rounded">🌐 UTC: <span id="utc-clock" class="text-cyan-400 font-bold">--:--:--</span></div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                <button onclick="copyMarchTimes()" class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white font-bold py-2.5 px-4 rounded-lg text-xs uppercase shadow-md shadow-purple-600/20 transition-all border border-purple-400/30 active:scale-95 cursor-pointer">📄 Copy March Times</button>
-                <button onclick="copyLaunchTimesUTC()" class="bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 text-white font-bold py-2.5 px-4 rounded-lg text-xs uppercase shadow-md shadow-cyan-600/20 transition-all border border-cyan-400/30 active:scale-95 cursor-pointer">⏰ Copy Launch Times</button>
-                <button onclick="copyPlayersByGroup()" class="bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold py-2.5 px-4 rounded-lg text-xs uppercase shadow-md shadow-rose-600/20 transition-all border border-rose-400/30 active:scale-95 cursor-pointer">👥 Copy By Group</button>
+                <button onclick="copyMarchTimes()" class="premium-btn bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white font-bold py-2.5 px-4 rounded-lg text-xs uppercase shadow-md transition-all border border-purple-400/30 active:scale-95 cursor-pointer tracking-wider">📄 March Times</button>
+                <button onclick="copyLaunchTimesUTC()" class="premium-btn bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 text-white font-bold py-2.5 px-4 rounded-lg text-xs uppercase shadow-md transition-all border border-cyan-400/30 active:scale-95 cursor-pointer tracking-wider">⏰ Launch Times</button>
+                <button onclick="copyPlayersByGroup()" class="premium-btn bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold py-2.5 px-4 rounded-lg text-xs uppercase shadow-md transition-all border border-rose-400/30 active:scale-95 cursor-pointer tracking-wider">👥 By Group</button>
             </div>
-            <p class="text-[10px] text-slate-500 leading-tight">💡 <b class="text-rose-400">Copy By Group</b> lists all player names organized by their group.</p>
         </div>
 
-        <div class="leader-only bg-kingshot-card border border-kingshot-border rounded-xl p-4 shadow-xl">
-            <h3 id="form-title" class="text-xs font-bold text-slate-200 uppercase tracking-wider mb-2.5">Add Player Manually</h3>
+        <div class="leader-only premium-card border-l-4 border-slate-500 rounded-xl p-4 shadow-xl">
+            <h3 id="form-title" class="section-title text-slate-200 mb-2.5">➕ Add Player</h3>
             <form id="add-player-form" class="space-y-3">
                 <input type="hidden" id="edit-player-id" value="">
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Player Name</label>
-                        <input type="text" id="player-name" required placeholder="e.g. sweet" class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none">
+                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold tracking-wider">Player Name</label>
+                        <input type="text" id="player-name" required placeholder="e.g. sweet" class="premium-input w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none">
                     </div>
                     <div>
-                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Group</label>
-                        <input type="text" id="player-group" value="1" required class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none">
+                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold tracking-wider">Group</label>
+                        <input type="text" id="player-group" value="1" required class="premium-input w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">March (Mins)</label>
-                        <input type="number" id="march-mins" min="0" value="1" required class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none">
+                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold tracking-wider">March (Mins)</label>
+                        <input type="number" id="march-mins" min="0" value="1" required class="premium-input w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none">
                     </div>
                     <div>
-                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold">Secs</label>
-                        <input type="number" id="march-secs" min="0" max="59" value="20" required class="w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none">
+                        <label class="block text-[10px] uppercase text-slate-400 mb-1 font-semibold tracking-wider">Secs</label>
+                        <input type="number" id="march-secs" min="0" max="59" value="20" required class="premium-input w-full bg-kingshot-dark border border-kingshot-border rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-blue-500 outline-none">
                     </div>
                 </div>
                 <div class="flex gap-2 pt-1">
-                    <button type="submit" id="form-submit-btn" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md shadow-blue-600/20 transition-all text-xs uppercase border border-blue-400/30 active:scale-95 cursor-pointer">Add Player</button>
-                    <button type="button" id="cancel-edit-btn" onclick="cancelEdit()" class="hidden bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 px-3 rounded-xl text-xs uppercase active:scale-95 cursor-pointer">Cancel</button>
+                    <button type="submit" id="form-submit-btn" class="premium-btn flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md transition-all text-xs uppercase border border-blue-400/30 active:scale-95 cursor-pointer tracking-widest">Add Player</button>
+                    <button type="button" id="cancel-edit-btn" onclick="cancelEdit()" class="premium-btn hidden bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2.5 px-3 rounded-xl text-xs uppercase active:scale-95 cursor-pointer">Cancel</button>
                 </div>
             </form>
         </div>
 
-        <div class="leader-only bg-kingshot-card border border-kingshot-border rounded-xl shadow-xl overflow-hidden mb-6 mt-4">
-            <div class="bg-kingshot-dark/50 p-3 border-b border-kingshot-border flex justify-between items-center">
-                <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider">Connected Players</h3>
-                <span class="text-[10px] text-slate-400">🟢 Online | 🔴 Offline</span>
+        <div class="leader-only premium-card border border-kingshot-border rounded-xl shadow-xl overflow-hidden mb-6 mt-4">
+            <div class="bg-kingshot-dark/60 p-3 border-b border-kingshot-border flex justify-between items-center">
+                <h3 class="section-title text-slate-200">👥 Connected Players</h3>
+                <span class="text-[10px] text-slate-400">🟢 Online · 🔴 Offline · ⏳ Pending</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs">
                     <thead>
                         <tr class="bg-kingshot-dark/80 border-b border-kingshot-border uppercase text-slate-400">
-                            <th class="py-2.5 px-2 text-center">Status</th>
-                            <th class="py-2.5 px-3">Player & March</th>
-                            <th class="py-2.5 px-3 text-center">Launch Schedule</th>
-                            <th class="py-2.5 px-3 text-center">Control</th>
-                            <th class="py-2.5 px-3 text-center">Actions</th>
+                            <th class="py-2.5 px-2 text-center text-[10px] tracking-wider">Status</th>
+                            <th class="py-2.5 px-3 text-[10px] tracking-wider">Player & March</th>
+                            <th class="py-2.5 px-3 text-center text-[10px] tracking-wider">Schedule</th>
+                            <th class="py-2.5 px-3 text-center text-[10px] tracking-wider">Control</th>
+                            <th class="py-2.5 px-3 text-center text-[10px] tracking-wider">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="player-table-body" class="divide-y divide-kingshot-border/60"></tbody>
@@ -342,7 +508,7 @@
             groupSettings: JSON.parse(localStorage.getItem('kingshot_group_settings_v7') || '{}')
         };
 
-        let battleEngine = { queue: [], currentIndex: 0, timerInterval: null };
+        let battleEngine = { queue: [], currentIndex: 0, timerInterval: null, launchTimers: [], announcedIds: new Set() };
         let speechQueue = [];
         let isSpeaking = false;
         let heartbeatInterval = null;
@@ -408,6 +574,11 @@
             const el = document.getElementById('prep-seconds');
             const v = el ? parseInt(el.value) : 5;
             return (isNaN(v) || v < 0) ? 5 : v;
+        }
+        function getRepeatCount() {
+            const el = document.getElementById('msg-repeat-count');
+            const v = el ? parseInt(el.value) : 1;
+            return (isNaN(v) || v < 1) ? 1 : Math.min(v, 10);
         }
 
         function initVoices() {
@@ -493,13 +664,13 @@
                 const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
                 if (error) {
                     alert("❌ Authentication failed: Invalid credentials or not a leader account.");
-                    btn.textContent = "Leader Login";
+                    btn.textContent = "Login";
                     btn.disabled = false;
                     return;
                 }
                 if (isAnotherLeaderActive()) {
                     showLeaderConflictOverlay();
-                    btn.textContent = "Leader Login";
+                    btn.textContent = "Login";
                     btn.disabled = false;
                     return;
                 }
@@ -523,7 +694,7 @@
                 syncStateToPlayers();
             } catch(err) {
                 alert("Connection error with authentication server.");
-                btn.textContent = "Leader Login";
+                btn.textContent = "Login";
                 btn.disabled = false;
             }
         }
@@ -562,19 +733,55 @@
                 myPlayerId = "PLY_" + Date.now().toString();
                 currentRole = 'player';
 
-                broadcastState('PLAYER_JOIN', { id: myPlayerId, name: name, configured: false });
+                broadcastState('PLAYER_JOIN_REQUEST', { id: myPlayerId, name: name });
 
                 if (heartbeatInterval) clearInterval(heartbeatInterval);
                 heartbeatInterval = setInterval(() => { broadcastState('HEARTBEAT', { id: myPlayerId }); }, 5000);
 
                 document.getElementById('role-modal').classList.add('hidden');
+                document.getElementById('pending-name-display').textContent = name;
+                document.getElementById('pending-room-display').textContent = inputRoomCode;
+                document.getElementById('pending-approval-overlay').classList.remove('hidden');
+                
                 applyRoleUI('player');
+                document.getElementById('player-audio-panel').classList.add('hidden');
+                document.getElementById('player-info-panel').classList.add('hidden');
+                
+                btn.textContent = origText;
+                btn.disabled = false;
             } catch(err) {
                 console.error(err);
                 alert("Connection error. Please try again.");
                 btn.textContent = origText;
                 btn.disabled = false;
             }
+        }
+
+        window.cancelPlayerRequest = async function() {
+            if (currentChannel) {
+                broadcastState('PLAYER_LEFT', { id: myPlayerId });
+            }
+            document.getElementById('pending-approval-overlay').classList.add('hidden');
+            document.getElementById('role-modal').classList.remove('hidden');
+            document.getElementById('role-selection-buttons').classList.remove('hidden');
+            document.getElementById('player-registration-form').classList.add('hidden');
+            document.getElementById('player-registration-form').classList.remove('flex');
+            currentRole = '';
+            myPlayerId = null;
+            if (heartbeatInterval) clearInterval(heartbeatInterval);
+            if (currentChannel) { try { await currentChannel.unsubscribe(); } catch(e) {} currentChannel = null; }
+        }
+
+        window.backFromRejection = function() {
+            document.getElementById('rejected-overlay').classList.add('hidden');
+            document.getElementById('role-modal').classList.remove('hidden');
+            document.getElementById('role-selection-buttons').classList.remove('hidden');
+            document.getElementById('player-registration-form').classList.add('hidden');
+            document.getElementById('player-registration-form').classList.remove('flex');
+            currentRole = '';
+            myPlayerId = null;
+            if (heartbeatInterval) clearInterval(heartbeatInterval);
+            if (currentChannel) { try { currentChannel.unsubscribe(); } catch(e) {} currentChannel = null; }
         }
 
         window.resetRoleSelection = async function() {
@@ -587,6 +794,8 @@
             if (uiRefreshInterval) clearInterval(uiRefreshInterval);
             document.getElementById('role-modal').classList.remove('hidden');
             document.getElementById('leader-conflict-overlay').classList.add('hidden');
+            document.getElementById('pending-approval-overlay').classList.add('hidden');
+            document.getElementById('rejected-overlay').classList.add('hidden');
             backToRoleSelect();
         }
 
@@ -635,7 +844,7 @@
 
                 const btn = document.getElementById('enable-audio-btn');
                 if(btn && currentRole === 'leader') {
-                    btn.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-500 text-slate-950 flex items-center gap-1.5 shadow-md transition-all whitespace-nowrap cursor-pointer";
+                    btn.className = "premium-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-gradient-to-r from-emerald-500 to-emerald-600 text-slate-950 flex items-center gap-1.5 shadow-md transition-all whitespace-nowrap cursor-pointer";
                     btn.innerHTML = "🎧 Audio Enabled";
                 }
             } catch(e) { console.error('Audio unlock failed:', e); }
@@ -668,9 +877,13 @@
         window.sendTypedMessage = function() {
             const input = document.getElementById('custom-msg-input');
             const text = input.value.trim();
-            if(text) { speakCustomText(text); input.value = ''; }
+            const repeat = getRepeatCount();
+            if(text) { speakCustomText(text, repeat); input.value = ''; }
         }
-        window.speakCustomText = function(text) { broadcastState('CUSTOM_AUDIO', { text: text }); };
+        window.speakCustomText = function(text, repeatCount) {
+            const repeat = (repeatCount === undefined || repeatCount === null) ? 1 : repeatCount;
+            broadcastState('CUSTOM_AUDIO', { text: text, repeat: repeat });
+        };
 
         function broadcastState(eventType, data) {
             const payload = { type: eventType, data: data, msgId: 'MSG_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8) };
@@ -695,7 +908,7 @@
             }
 
             if (currentRole === 'leader') {
-                if (msg.type === 'PLAYER_JOIN') {
+                if (msg.type === 'PLAYER_JOIN_REQUEST' || msg.type === 'PLAYER_JOIN') {
                     let p = state.players.find(x => x.id === msg.data.id || x.name === msg.data.name);
                     if (!p) {
                         state.players.push({
@@ -706,26 +919,42 @@
                             marchSecs: 0,
                             configured: false,
                             frozen: false,
+                            approved: false,
                             lastSeen: Date.now()
                         });
                     } else {
                         p.id = msg.data.id;
                         p.lastSeen = Date.now();
                     }
-                    savePlayers(); renderPlayerTable(); syncStateToPlayers();
+                    savePlayers(); renderPlayerTable();
                 }
                 if (msg.type === 'HEARTBEAT') {
                     let p = state.players.find(x => x.id === msg.data.id);
                     if (p) p.lastSeen = Date.now();
                 }
+                if (msg.type === 'PLAYER_LEFT') {
+                    state.players = state.players.filter(i => i.id !== msg.data.id);
+                    savePlayers(); renderPlayerTable();
+                }
             }
 
             if (currentRole === 'player') {
+                if (msg.type === 'APPROVAL_RESULT' && msg.data.id === myPlayerId) {
+                    document.getElementById('pending-approval-overlay').classList.add('hidden');
+                    if (msg.data.approved) {
+                        document.getElementById('player-audio-panel').classList.remove('hidden');
+                        document.getElementById('player-info-panel').classList.remove('hidden');
+                        broadcastState('PLAYER_APPROVED_CONFIRM', { id: myPlayerId });
+                    } else {
+                        document.getElementById('rejected-overlay').classList.remove('hidden');
+                    }
+                }
                 if (msg.type === 'SYNC_STATE') {
                     let myData = msg.data.players.find(x => x.id === myPlayerId);
                     const overlay = document.getElementById('disabled-overlay');
                     if (myData && myData.frozen) overlay.classList.remove('hidden');
                     else overlay.classList.add('hidden');
+                    updatePlayerInfoPanel(myData);
                 }
             }
 
@@ -734,28 +963,38 @@
                 const targetDiv = document.getElementById('battle-current-target');
                 if (statusDiv && targetDiv) {
                     statusDiv.textContent = 'Status: Get Ready Phase';
-                    statusDiv.className = "text-[10px] uppercase tracking-wider text-amber-400 font-bold animate-pulse";
-                    targetDiv.innerHTML = `<span class="get-ready-pulse inline-block text-amber-300 text-xl font-extrabold uppercase">📢 ${msg.data.message}</span>`;
+                    statusDiv.className = "text-[10px] uppercase tracking-widest text-amber-400 font-bold animate-pulse";
+                    targetDiv.innerHTML = `<span class="get-ready-pulse inline-block text-amber-300 text-xl font-extrabold uppercase display-font">📢 ${msg.data.message}</span>`;
                 }
                 showPlayerReceivingIndicator(msg.data.message);
                 speakText(msg.data.message, true);
             }
 
-            if (msg.type === 'START_SEQUENCE') {
-                updateLiveUI(msg.data.currentLauncher, msg.data.secs, msg.data.isPrep);
-                renderBattleQueueUI(msg.data.currentIndex, msg.data.queue);
-                let speechTxt = '';
-                if (msg.data.isPrep && msg.data.secs > 0) speechTxt = String(msg.data.secs);
-                else if (msg.data.currentLauncher) {
-                    if (msg.data.secs > 0) speechTxt = String(msg.data.secs);
-                    else if (msg.data.secs === 0) speechTxt = msg.data.currentLauncher.name;
-                }
-                if (speechTxt) { showPlayerReceivingIndicator(speechTxt); speakText(speechTxt, true); }
+            if (msg.type === 'BATTLE_TIMELINE') {
+                renderBattleQueueUI(0, msg.data.queue);
+
+                const clockShift = Date.now() - msg.data.sentAtMs;
+                const localPrepStartMs = msg.data.prepStartMs + clockShift;
+                const localQueue = msg.data.queue.map(p => ({
+                    ...p,
+                    absoluteLaunchMs: p.absoluteLaunchMs + clockShift
+                }));
+
+                startLocalCountdown(localQueue, localPrepStartMs, msg.data.prepSecs);
             }
             else if (msg.type === 'CUSTOM_AUDIO') {
-                showPlayerReceivingIndicator(msg.data.text);
-                speakText(msg.data.text, true);
-                showTemporaryMessageOverlay(msg.data.text);
+                const repeat = msg.data.repeat || 1;
+                showPlayerReceivingIndicator(msg.data.text + (repeat > 1 ? ` (×${repeat})` : ''));
+                
+                // Clear current queue and push text N times
+                speechQueue = [];
+                isSpeaking = false;
+                try { window.speechSynthesis.cancel(); } catch(e) {}
+                for (let i = 0; i < repeat; i++) {
+                    speechQueue.push(msg.data.text);
+                }
+                processSpeechQueue();
+                showTemporaryMessageOverlay(msg.data.text + (repeat > 1 ? ` (×${repeat})` : ''));
             }
             else if (msg.type === 'RESET') { clearSpeechQueue(); resetBattleEngineUI(); }
         }
@@ -777,31 +1016,123 @@
             }
         }
 
+        function updatePlayerInfoPanel(myData) {
+            const nameEl = document.getElementById('player-info-name');
+            const groupEl = document.getElementById('player-info-group');
+            const marchEl = document.getElementById('player-info-march');
+            const statusEl = document.getElementById('player-info-status');
+            if (!nameEl) return;
+
+            if (!myData) {
+                nameEl.textContent = '—';
+                groupEl.textContent = '—';
+                marchEl.textContent = '—';
+                statusEl.textContent = '⚠️ Waiting for leader...';
+                statusEl.className = "text-center text-[10px] uppercase text-amber-400 font-bold tracking-wider";
+                return;
+            }
+
+            nameEl.textContent = myData.name || '—';
+
+            const isConfigured = myData.configured !== false && myData.approved === true;
+            if (isConfigured) {
+                groupEl.textContent = `G${myData.group}`;
+                marchEl.textContent = `${myData.marchMins}m ${myData.marchSecs}s`;
+                statusEl.textContent = '✅ Configured by leader — Ready to launch';
+                statusEl.className = "text-center text-[10px] uppercase text-emerald-400 font-bold tracking-wider";
+            } else if (myData.approved === false) {
+                groupEl.textContent = '—';
+                marchEl.textContent = '—';
+                statusEl.textContent = '⏳ Waiting for leader approval...';
+                statusEl.className = "text-center text-[10px] uppercase text-amber-400 font-bold tracking-wider";
+            } else {
+                groupEl.textContent = '—';
+                marchEl.textContent = '—';
+                statusEl.textContent = '⚠️ Waiting for leader to set march time...';
+                statusEl.className = "text-center text-[10px] uppercase text-amber-400 font-bold tracking-wider";
+            }
+        }
+
         let lastSpokenText = '';
         let lastSpokenTime = 0;
-        const SPEAK_DEDUPE_MS = 5000;
+        const SPEAK_DEDUPE_MS = 800;
+
+        function getEnglishVoice() {
+            try {
+                const voices = window.speechSynthesis.getVoices();
+                return voices.find(v => v.lang && v.lang.startsWith('en')) || null;
+            } catch(e) { return null; }
+        }
+
+        function speakNumber(n) {
+            try {
+                window.speechSynthesis.cancel();
+                const utt = new SpeechSynthesisUtterance(String(n));
+                utt.lang = 'en-US';
+                utt.rate = 2.0;
+                utt.pitch = 1.0;
+                utt.volume = 1.0;
+                const v = getEnglishVoice();
+                if (v) utt.voice = v;
+                setTimeout(() => {
+                    try { window.speechSynthesis.speak(utt); } catch(e) {}
+                }, 15);
+            } catch(e) {}
+        }
+
+        function speakName(name) {
+            try {
+                window.speechSynthesis.cancel();
+                const utt = new SpeechSynthesisUtterance(String(name));
+                utt.lang = 'en-US';
+                utt.rate = 1.0;
+                utt.pitch = 1.0;
+                utt.volume = 1.0;
+                const v = getEnglishVoice();
+                if (v) utt.voice = v;
+                setTimeout(() => {
+                    try { window.speechSynthesis.speak(utt); } catch(e) {}
+                }, 10);
+            } catch(e) {}
+        }
 
         function speakText(text, urgent = false) {
             if (!('speechSynthesis' in window)) return;
             const txt = String(text);
             if (!txt.trim()) return;
+            if (urgent) {
+                try { window.speechSynthesis.cancel(); } catch(e) {}
+                setTimeout(() => {
+                    try {
+                        const utt = new SpeechSynthesisUtterance(txt);
+                        utt.lang = 'en-US';
+                        utt.rate = 0.95;
+                        utt.volume = 1.0;
+                        const v = getEnglishVoice();
+                        if (v) utt.voice = v;
+                        window.speechSynthesis.speak(utt);
+                    } catch(e) {}
+                }, 30);
+                return;
+            }
             const now = Date.now();
             if (txt === lastSpokenText && (now - lastSpokenTime) < SPEAK_DEDUPE_MS) return;
             lastSpokenText = txt; lastSpokenTime = now;
-            if (urgent) { speechQueue = []; isSpeaking = false; try { window.speechSynthesis.cancel(); } catch(e) {} }
             speechQueue.push(txt);
             processSpeechQueue();
         }
+
         function processSpeechQueue() {
             if (isSpeaking || speechQueue.length === 0) return;
             isSpeaking = true;
             const text = speechQueue.shift();
             try {
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'en-US'; utterance.rate = 0.95; utterance.volume = 1.0;
-                const voices = window.speechSynthesis.getVoices();
-                const enVoice = voices.find(v => v.lang && v.lang.startsWith('en'));
-                if (enVoice) utterance.voice = enVoice;
+                utterance.lang = 'en-US';
+                utterance.rate = 0.95;
+                utterance.volume = 1.0;
+                const v = getEnglishVoice();
+                if (v) utterance.voice = v;
                 let done = false;
                 const finish = () => { if (done) return; done = true; isSpeaking = false; setTimeout(processSpeechQueue, 30); };
                 utterance.onend = finish; utterance.onerror = finish;
@@ -812,7 +1143,7 @@
         function clearSpeechQueue() { speechQueue = []; isSpeaking = false; if ('speechSynthesis' in window) window.speechSynthesis.cancel(); }
 
         function calculateSchedule() {
-            let activePlayers = state.players.filter(p => !p.frozen && p.configured !== false);
+            let activePlayers = state.players.filter(p => !p.frozen && p.configured !== false && p.approved === true);
             if (activePlayers.length === 0) return [];
 
             let mapped = activePlayers.map(p => ({
@@ -824,12 +1155,15 @@
 
             let groupArrivals = {};
             uniqueGroups.forEach((g, idx) => {
-                let settings = state.groupSettings[g] || { mode: 'staggered', gap: 1 };
                 if (idx === 0) groupArrivals[g] = maxMarch;
                 else {
                     let prevGroup = uniqueGroups[idx - 1];
-                    let prevSettings = state.groupSettings[prevGroup] || { mode: 'staggered', gap: 1 };
-                    groupArrivals[g] = groupArrivals[prevGroup] + (prevSettings.gap || 2);
+                    let prevSettings = state.groupSettings[prevGroup] || { mode: 'staggered', gap: 0 };
+                    // ═══ FIX: 0 is valid value, only default when truly undefined ═══
+                    let prevGap = (prevSettings.gap !== undefined && prevSettings.gap !== null && !isNaN(parseInt(prevSettings.gap))) 
+                                  ? parseInt(prevSettings.gap) 
+                                  : 2;
+                    groupArrivals[g] = groupArrivals[prevGroup] + prevGap;
                 }
             });
 
@@ -841,7 +1175,9 @@
                     gPlayers.forEach(p => { playerArrivals[p.id] = groupArrivals[g]; });
                 } else {
                     let baseTime = groupArrivals[g];
-                    let intraGap = settings.gap || 1;
+                    let intraGap = (settings.gap !== undefined && settings.gap !== null && !isNaN(parseInt(settings.gap)))
+                                   ? parseInt(settings.gap) 
+                                   : 1;
                     gPlayers.forEach((p, pIdx) => { playerArrivals[p.id] = baseTime + (pIdx * intraGap); });
                 }
             });
@@ -863,7 +1199,7 @@
             startBtn.addEventListener('click', () => {
                 clearSpeechQueue();
                 let schedule = calculateSchedule();
-                if (schedule.length === 0) return alert('No configured active players found! Add march time via Edit.');
+                if (schedule.length === 0) return alert('No approved & configured active players found!');
 
                 const selectedWave = document.getElementById('battle-wave-select').value;
                 let queue = schedule.filter(s => selectedWave === 'all' || s.group === selectedWave);
@@ -871,79 +1207,113 @@
 
                 battleEngine.queue = queue;
                 battleEngine.currentIndex = 0;
+                battleEngine.announcedIds = new Set();
 
                 let readyMsg;
-                if (selectedWave === 'all') {
-                    readyMsg = 'All players get ready';
-                } else {
-                    readyMsg = `Group ${numberToWord(selectedWave)} get ready`;
-                }
+                if (selectedWave === 'all') readyMsg = 'All players get ready';
+                else readyMsg = `Group ${numberToWord(selectedWave)} get ready`;
 
                 const statusDiv = document.getElementById('battle-status');
                 const targetDiv = document.getElementById('battle-current-target');
                 statusDiv.textContent = 'Status: Get Ready Phase';
-                statusDiv.className = "text-[10px] uppercase tracking-wider text-amber-400 font-bold animate-pulse";
-                targetDiv.innerHTML = `<span class="get-ready-pulse inline-block text-amber-300 text-xl font-extrabold uppercase">📢 ${readyMsg}</span>`;
+                statusDiv.className = "text-[10px] uppercase tracking-widest text-amber-400 font-bold animate-pulse";
+                targetDiv.innerHTML = `<span class="get-ready-pulse inline-block text-amber-300 text-xl font-extrabold uppercase display-font">📢 ${readyMsg}</span>`;
 
                 broadcastState('GET_READY', { message: readyMsg });
                 speakText(readyMsg, true);
 
                 if (battleEngine.timerInterval) clearInterval(battleEngine.timerInterval);
+                if (battleEngine.launchTimers) battleEngine.launchTimers.forEach(t => clearTimeout(t));
+                battleEngine.launchTimers = [];
 
                 const getReadyDelay = 2500;
+                const prepSecs = getPrepSeconds();
+                const prepStartMs = Date.now() + getReadyDelay;
+                const launchBaseMs = prepStartMs + (prepSecs * 1000);
+
+                queue.forEach(p => {
+                    p.absoluteLaunchMs = launchBaseMs + (p.delay * 1000);
+                });
+
+                const timelineData = {
+                    queue: queue.map(p => ({
+                        id: p.id, name: p.name, group: p.group,
+                        delay: p.delay, absoluteLaunchMs: p.absoluteLaunchMs
+                    })),
+                    prepStartMs: prepStartMs,
+                    prepSecs: prepSecs,
+                    launchBaseMs: launchBaseMs,
+                    sentAtMs: Date.now()
+                };
+
                 setTimeout(() => {
-                    const prepSecs = getPrepSeconds();
-                    if (prepSecs <= 0) {
-                        runSequentialTimer();
-                        return;
-                    }
-
-                    let prepRemaining = prepSecs;
-                    broadcastState('START_SEQUENCE', { queue: battleEngine.queue, currentIndex: 0, currentLauncher: battleEngine.queue[0], secs: prepRemaining, isPrep: true });
-                    prepRemaining--;
-
-                    battleEngine.timerInterval = setInterval(() => {
-                        if (prepRemaining > 0) {
-                            broadcastState('START_SEQUENCE', { queue: battleEngine.queue, currentIndex: 0, currentLauncher: battleEngine.queue[0], secs: prepRemaining, isPrep: true });
-                            prepRemaining--;
-                        } else {
-                            broadcastState('START_SEQUENCE', { queue: battleEngine.queue, currentIndex: 0, currentLauncher: battleEngine.queue[0], secs: 0, isPrep: true });
-                            clearInterval(battleEngine.timerInterval);
-                            setTimeout(runSequentialTimer, 1000);
-                        }
-                    }, 1000);
-                }, getReadyDelay);
+                    broadcastState('BATTLE_TIMELINE', timelineData);
+                }, 50);
             });
         }
 
-        function runSequentialTimer() {
-            if (battleEngine.currentIndex >= battleEngine.queue.length) {
-                broadcastState('START_SEQUENCE', { queue: battleEngine.queue, currentIndex: -1, currentLauncher: null, secs: 0, isPrep: false });
-                return;
-            }
-            const currentLauncher = battleEngine.queue[battleEngine.currentIndex];
-            let prevDelay = battleEngine.currentIndex === 0 ? 0 : battleEngine.queue[battleEngine.currentIndex - 1].delay;
-            let waitTime = currentLauncher.delay - prevDelay;
+        function startLocalCountdown(queue, prepStartMs, prepSecs) {
+            if (battleEngine.timerInterval) clearInterval(battleEngine.timerInterval);
+            if (battleEngine.launchTimers) battleEngine.launchTimers.forEach(t => clearTimeout(t));
+            battleEngine.launchTimers = [];
 
-            if (waitTime <= 0) {
-                broadcastState('START_SEQUENCE', { queue: battleEngine.queue, currentIndex: battleEngine.currentIndex, currentLauncher: currentLauncher, secs: 0, isPrep: false });
-                battleEngine.currentIndex++;
-                setTimeout(runSequentialTimer, 1000);
-            } else {
-                let remaining = waitTime;
-                broadcastState('START_SEQUENCE', { queue: battleEngine.queue, currentIndex: battleEngine.currentIndex, currentLauncher: currentLauncher, secs: remaining, isPrep: false });
-                remaining--;
-
-                if (battleEngine.timerInterval) clearInterval(battleEngine.timerInterval);
-                battleEngine.timerInterval = setInterval(() => {
-                    broadcastState('START_SEQUENCE', { queue: battleEngine.queue, currentIndex: battleEngine.currentIndex, currentLauncher: currentLauncher, secs: remaining, isPrep: false });
-                    if (remaining === 0) {
-                        clearInterval(battleEngine.timerInterval);
-                        battleEngine.currentIndex++;
-                        setTimeout(runSequentialTimer, 1000);
-                    } else { remaining--; }
-                }, 1000);
+            for (let i = prepSecs; i >= 1; i--) {
+                const targetMs = prepStartMs + ((prepSecs - i) * 1000);
+                const delay = Math.max(0, targetMs - Date.now());
+                const secValue = i;
+                const t = setTimeout(() => {
+                    updateLiveUI(null, secValue, true);
+                    showPlayerReceivingIndicator(String(secValue));
+                    speakNumber(secValue);
+                }, delay);
+                battleEngine.launchTimers.push(t);
             }
+
+            const launchBaseMs = prepStartMs + (prepSecs * 1000);
+            const actions = [];
+
+            queue.forEach((p, idx) => {
+                const prevLaunchMs = idx === 0 ? launchBaseMs : queue[idx - 1].absoluteLaunchMs;
+                const gapMs = p.absoluteLaunchMs - prevLaunchMs;
+                const gapSec = Math.floor(gapMs / 1000);
+
+                for (let c = gapSec; c >= 1; c--) {
+                    const timeMs = p.absoluteLaunchMs - (c * 1000);
+                    if (timeMs < prevLaunchMs + 100) continue;
+                    actions.push({
+                        timeMs: timeMs,
+                        action: () => {
+                            updateLiveUI(p, c, false);
+                            showPlayerReceivingIndicator(String(c));
+                            speakNumber(c);
+                        }
+                    });
+                }
+
+                actions.push({
+                    timeMs: p.absoluteLaunchMs,
+                    action: () => {
+                        updateLiveUI(p, 0, false);
+                        showPlayerReceivingIndicator(p.name);
+                        speakName(p.name);
+                        renderBattleQueueUI(idx, queue);
+                    }
+                });
+            });
+
+            actions.sort((a, b) => a.timeMs - b.timeMs);
+
+            actions.forEach(a => {
+                const delay = Math.max(0, a.timeMs - Date.now());
+                const t = setTimeout(a.action, delay);
+                battleEngine.launchTimers.push(t);
+            });
+
+            const lastLaunchMs = queue.length > 0 ? queue[queue.length - 1].absoluteLaunchMs : launchBaseMs;
+            const endT = setTimeout(() => {
+                broadcastState('START_SEQUENCE', { queue: queue, currentIndex: -1, currentLauncher: null, secs: 0, isPrep: false });
+            }, Math.max(0, lastLaunchMs - Date.now() + 1500));
+            battleEngine.launchTimers.push(endT);
         }
 
         function updateLiveUI(launcher, secs, isPrep) {
@@ -952,7 +1322,7 @@
             const targetDiv = document.getElementById('battle-current-target');
             if(!statusDiv || !targetDiv) return;
             statusDiv.textContent = 'Status: Live Sequence in Progress';
-            statusDiv.className = "text-[10px] uppercase tracking-wider text-emerald-400 font-bold animate-pulse";
+            statusDiv.className = "text-[10px] uppercase tracking-widest text-emerald-400 font-bold animate-pulse";
             if (isPrep) targetDiv.innerHTML = `⚠️ Prep: <span class="text-amber-400 text-xl">${secs}s</span>`;
             else if (secs > 0) targetDiv.innerHTML = `⏳ <b class="text-white">${launcher.name}</b> (G${launcher.group}) in: <span class="text-cyan-400 text-xl">${secs}s</span>`;
             else targetDiv.innerHTML = `🔥 <span class="text-white underline font-extrabold text-xl">${launcher.name}</span> Launch! 🔥`;
@@ -962,15 +1332,22 @@
         if(resetBtn) {
             resetBtn.addEventListener('click', () => {
                 if (battleEngine.timerInterval) clearInterval(battleEngine.timerInterval);
+                if (battleEngine.launchTimers) battleEngine.launchTimers.forEach(t => clearTimeout(t));
+                battleEngine.launchTimers = [];
                 broadcastState('RESET', {});
             });
         }
         function resetBattleEngineUI() {
+            if (battleEngine.timerInterval) clearInterval(battleEngine.timerInterval);
+            if (battleEngine.launchTimers) {
+                battleEngine.launchTimers.forEach(t => clearTimeout(t));
+                battleEngine.launchTimers = [];
+            }
             const statusDiv = document.getElementById('battle-status');
             const targetDiv = document.getElementById('battle-current-target');
             if(!statusDiv || !targetDiv) return;
             statusDiv.textContent = "Status: Standby";
-            statusDiv.className = "text-[10px] uppercase tracking-wider text-slate-400 font-bold";
+            statusDiv.className = "text-[10px] uppercase tracking-widest text-slate-400 font-bold";
             targetDiv.textContent = "Waiting for leader...";
             document.getElementById('battle-sequence-list').innerHTML = '';
         }
@@ -1001,10 +1378,11 @@
                     if (p) {
                         p.name = name; p.group = group; p.marchMins = mins; p.marchSecs = secs;
                         p.configured = true;
+                        p.approved = true;
                     }
                     cancelEdit();
                 } else {
-                    state.players.push({ id: Date.now().toString(), name, group, marchMins: mins, marchSecs: secs, configured: true, frozen: false, lastSeen: Date.now() });
+                    state.players.push({ id: Date.now().toString(), name, group, marchMins: mins, marchSecs: secs, configured: true, approved: true, frozen: false, lastSeen: Date.now() });
                 }
                 savePlayers(); renderPlayerTable(); renderGroupSettingsUI(); this.reset();
                 syncStateToPlayers();
@@ -1027,7 +1405,7 @@
         window.cancelEdit = function() {
             document.getElementById('edit-player-id').value = '';
             document.getElementById('add-player-form').reset();
-            document.getElementById('form-title').textContent = 'Add Player Manually';
+            document.getElementById('form-title').textContent = '➕ Add Player';
             document.getElementById('form-submit-btn').textContent = 'Add Player';
             document.getElementById('cancel-edit-btn').classList.add('hidden');
         }
@@ -1045,7 +1423,7 @@
         function renderGroupSettingsUI() {
             const container = document.getElementById('group-settings-container');
             if (!container) return;
-            const groups = [...new Set(state.players.filter(p => p.configured !== false).map(p => p.group))];
+            const groups = [...new Set(state.players.filter(p => p.configured !== false && p.approved === true).map(p => p.group))];
             if (groups.length === 0) {
                 container.innerHTML = '<div class="text-xs text-slate-500">Add players to configure group settings.</div>';
                 return;
@@ -1054,17 +1432,17 @@
             groups.forEach(g => {
                 let setting = state.groupSettings[g] || { mode: 'staggered', gap: 1 };
                 html += `
-                    <div class="bg-kingshot-dark p-2.5 rounded-lg border border-kingshot-border flex flex-col gap-2">
+                    <div class="bg-kingshot-dark p-3 rounded-lg border border-kingshot-border flex flex-col gap-2 hover:border-blue-500/40 transition-colors">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-slate-200">Group ${g}</span>
-                            <select onchange="updateGroupMode('${g}', this.value)" class="bg-kingshot-card border border-kingshot-border rounded px-2 py-1 text-[11px] text-slate-200 outline-none">
+                            <span class="text-xs font-bold text-slate-200 tracking-wider">Group ${g}</span>
+                            <select onchange="updateGroupMode('${g}', this.value)" class="premium-input bg-kingshot-card border border-kingshot-border rounded px-2 py-1 text-[11px] text-slate-200 outline-none">
                                 <option value="staggered" ${setting.mode === 'staggered' ? 'selected' : ''}>Staggered (Sequential)</option>
                                 <option value="simultaneous" ${setting.mode === 'simultaneous' ? 'selected' : ''}>Simultaneous (Together)</option>
                             </select>
                         </div>
                         <div class="flex items-center justify-between gap-2">
                             <span class="text-[10px] text-slate-400">Gap / Interval (secs):</span>
-                            <input type="number" min="0" value="${setting.gap}" onchange="updateGroupGap('${g}', this.value)" class="w-20 bg-kingshot-card border border-kingshot-border rounded px-2 py-1 text-[11px] text-slate-100 outline-none text-center">
+                            <input type="number" min="0" value="${setting.gap}" onchange="updateGroupGap('${g}', this.value)" class="premium-input w-20 bg-kingshot-card border border-kingshot-border rounded px-2 py-1 text-[11px] text-slate-100 outline-none text-center">
                         </div>
                     </div>
                 `;
@@ -1078,7 +1456,8 @@
         }
         window.updateGroupGap = function(group, gap) {
             if (!state.groupSettings[group]) state.groupSettings[group] = { mode: 'staggered', gap: 1 };
-            state.groupSettings[group].gap = parseInt(gap) || 0;
+            const parsed = parseInt(gap);
+            state.groupSettings[group].gap = isNaN(parsed) ? 0 : parsed;
             saveGroupSettings(); renderPlayerTable();
         }
 
@@ -1095,6 +1474,50 @@
             });
         }
 
+        // ═══════════════════════════════════════════════════
+        // DUPLICATE MARCH TIME DETECTION
+        // ═══════════════════════════════════════════════════
+        function detectDuplicateMarches() {
+            const activePlayers = state.players.filter(p => !p.frozen && p.configured !== false && p.approved === true);
+            const buckets = {};
+            activePlayers.forEach(p => {
+                const key = `${p.marchMins}m ${p.marchSecs}s`;
+                if (!buckets[key]) buckets[key] = [];
+                buckets[key].push(p);
+            });
+            const duplicates = Object.entries(buckets).filter(([_, arr]) => arr.length > 1);
+            return duplicates;
+        }
+
+        function renderMarchConflicts() {
+            const panel = document.getElementById('march-conflicts-panel');
+            const list = document.getElementById('march-conflicts-list');
+            if (!panel || !list) return;
+            
+            const duplicates = detectDuplicateMarches();
+            if (duplicates.length === 0) {
+                panel.classList.add('hidden');
+                return;
+            }
+            panel.classList.remove('hidden');
+            
+            let html = '';
+            duplicates.forEach(([marchTime, players]) => {
+                html += `
+                    <div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-2.5">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <span class="text-[10px] uppercase font-bold text-amber-400 tracking-wider">⏱️ ${marchTime}</span>
+                            <span class="text-[10px] text-amber-300/80">${players.length} players</span>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5">
+                            ${players.map(p => `<span class="text-[10px] bg-kingshot-dark px-2 py-0.5 rounded border border-amber-500/20 text-slate-200 font-semibold">${p.name} <span class="text-amber-500">·</span> G${p.group}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+        }
+
         function renderPlayerTable() {
             const tbody = document.getElementById('player-table-body');
             const emptyState = document.getElementById('empty-state');
@@ -1103,48 +1526,107 @@
             let scheduleMap = {};
             schedule.forEach(s => { scheduleMap[s.id] = s; });
             const now = Date.now();
+            
+            // ═══ Duplicate detection ═══
+            const duplicateMarchKeys = new Set();
+            const marchBuckets = {};
+            state.players.filter(p => p.approved === true && p.configured !== false && !p.frozen).forEach(p => {
+                const key = `${p.marchMins}m ${p.marchSecs}s`;
+                if (!marchBuckets[key]) marchBuckets[key] = [];
+                marchBuckets[key].push(p.id);
+            });
+            Object.values(marchBuckets).forEach(ids => { if (ids.length > 1) ids.forEach(id => duplicateMarchKeys.add(id)); });
 
             if (state.players.length === 0) emptyState.classList.remove('hidden');
             else {
                 emptyState.classList.add('hidden');
                 state.players.forEach((p) => {
-                    const isConfigured = p.configured !== false;
+                    const isApproved = p.approved === true;
                     const isOnline = (now - (p.lastSeen || 0)) < 12000;
                     const dotClass = isOnline ? "bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.8)]" : "bg-red-500 opacity-60";
+                    const isDuplicateMarch = duplicateMarchKeys.has(p.id);
 
                     let playerInfo;
                     let scheduleCell;
-                    if (!isConfigured) {
-                        playerInfo = `<span class="text-amber-400 font-bold">${p.name}</span> <span class="text-[10px] text-amber-500/70 font-normal">(new — not configured)</span>`;
-                        scheduleCell = `<span class="text-slate-500 text-[10px] uppercase">⚠️ Set march time</span>`;
+                    let controlCell;
+                    let actionsCell;
+                    let rowClass = '';
+
+                    if (!isApproved) {
+                        rowClass = 'player-row-pending';
+                        playerInfo = `<span class="text-amber-300 font-bold">⏳ ${p.name}</span> <span class="text-[10px] text-amber-500/80 font-normal">(pending)</span>`;
+                        scheduleCell = `<span class="text-amber-400 text-[10px] uppercase font-bold animate-pulse">⏳ Waiting</span>`;
+                        controlCell = `<span class="text-slate-600 text-[10px]">—</span>`;
+                        actionsCell = `
+                            <div class="flex flex-wrap items-center justify-center gap-1">
+                                <button onclick="approvePlayer('${p.id}')" class="premium-btn bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-300 border-2 border-emerald-500/60 px-3 py-1.5 rounded text-[10px] transition-all font-bold cursor-pointer">✅ Approve</button>
+                                <button onclick="rejectPlayer('${p.id}')" class="premium-btn bg-red-500/20 hover:bg-red-500/40 text-red-300 border-2 border-red-500/60 px-3 py-1.5 rounded text-[10px] transition-all font-bold cursor-pointer">❌ Reject</button>
+                            </div>
+                        `;
+                    } else if (p.configured === false) {
+                        rowClass = 'player-row-unconfigured';
+                        playerInfo = `<span class="text-white font-bold">${p.name}</span> <span class="text-[10px] text-slate-400">(not configured)</span>`;
+                        scheduleCell = `<span class="text-slate-500 text-[10px] uppercase">⚠️ Set march</span>`;
+                        controlCell = `<span class="text-slate-600 text-[10px]">—</span>`;
+                        actionsCell = `
+                            <div class="flex flex-wrap items-center justify-center gap-1">
+                                <button onclick="editPlayer('${p.id}')" class="premium-btn bg-amber-500/30 hover:bg-amber-500/50 text-amber-200 border border-amber-500/60 animate-pulse px-2 py-1 rounded text-[10px] transition-all font-semibold cursor-pointer">⚙️ Set</button>
+                                <button onclick="deletePlayer('${p.id}')" class="premium-btn bg-red-500/10 hover:bg-red-500/30 text-red-400 border border-red-500/30 px-2 py-1 rounded text-[10px] transition-all font-semibold cursor-pointer">Delete</button>
+                            </div>
+                        `;
                     } else {
-                        playerInfo = `G${p.group} - ${p.name} <br><span class="text-[10px] text-slate-400 font-normal">March: ${p.marchMins}m ${p.marchSecs}s</span>`;
+                        rowClass = 'player-row-approved';
+                        const dupBadge = isDuplicateMarch ? `<span class="ml-1 text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1 rounded" title="Same march as another player">⚠️ DUP</span>` : '';
+                        playerInfo = `G${p.group} - ${p.name}${dupBadge} <br><span class="text-[10px] text-slate-400 font-normal">March: ${p.marchMins}m ${p.marchSecs}s</span>`;
                         let calc = scheduleMap[p.id];
                         scheduleCell = p.frozen ? '<span class="text-slate-500">Frozen</span>' : (calc ? `L: <b class="text-cyan-400">+${calc.delay}s</b><br>A: <b class="text-amber-400">${calc.arrivalSec}s</b>` : '-');
+                        controlCell = `<button onclick="toggleFreeze('${p.id}')" class="premium-btn px-2 py-1 rounded text-[10px] font-bold border transition-all cursor-pointer ${p.frozen ? 'text-red-400 border-red-500/40 bg-red-500/10' : 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10'}">${p.frozen ? 'Disabled' : 'Active'}</button>`;
+                        actionsCell = `
+                            <div class="flex flex-wrap items-center justify-center gap-1">
+                                <button onclick="movePlayer('${p.id}', -1)" class="premium-btn bg-slate-700/60 hover:bg-slate-600 text-white px-2 py-1 rounded text-[10px] transition-all cursor-pointer">⬆️</button>
+                                <button onclick="movePlayer('${p.id}', 1)" class="premium-btn bg-slate-700/60 hover:bg-slate-600 text-white px-2 py-1 rounded text-[10px] transition-all cursor-pointer">⬇️</button>
+                                <button onclick="editPlayer('${p.id}')" class="premium-btn bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/40 px-2 py-1 rounded text-[10px] transition-all font-semibold cursor-pointer">Edit</button>
+                                <button onclick="deletePlayer('${p.id}')" class="premium-btn bg-red-500/10 hover:bg-red-500/30 text-red-400 border border-red-500/30 px-2 py-1 rounded text-[10px] transition-all font-semibold cursor-pointer">Delete</button>
+                            </div>
+                        `;
                     }
 
                     tbody.innerHTML += `
-                        <tr class="border-b border-kingshot-border/60 hover:bg-slate-800/35 transition-colors ${p.frozen ? 'opacity-55 bg-blue-950/25' : ''} ${!isConfigured ? 'bg-amber-950/20' : ''}">
+                        <tr class="border-b border-kingshot-border/60 hover:bg-slate-800/35 transition-colors ${rowClass} ${!isApproved ? 'bg-amber-950/40' : ''} ${p.frozen ? 'opacity-55 bg-blue-950/25' : ''}">
                             <td class="py-3 px-2 text-center"><div id="status-dot-${p.id}" class="w-2.5 h-2.5 rounded-full mx-auto ${dotClass}"></div></td>
                             <td class="py-3 px-3 text-white font-semibold">${playerInfo}</td>
                             <td class="py-3 px-3 text-center text-[11px]">${scheduleCell}</td>
-                            <td class="py-3 px-3 text-center">
-                                <button onclick="toggleFreeze('${p.id}')" class="px-2 py-1 rounded text-[10px] font-bold border transition-all cursor-pointer ${p.frozen ? 'text-red-400 border-red-500/40 bg-red-500/10' : 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10'}">${p.frozen ? 'Disabled' : 'Active'}</button>
-                            </td>
-                            <td class="py-3 px-3 text-center">
-                                <div class="flex flex-wrap items-center justify-center gap-1">
-                                    <button onclick="movePlayer('${p.id}', -1)" class="bg-slate-700/60 hover:bg-slate-600 text-white px-2 py-1 rounded text-[10px] transition-all cursor-pointer">⬆️</button>
-                                    <button onclick="movePlayer('${p.id}', 1)" class="bg-slate-700/60 hover:bg-slate-600 text-white px-2 py-1 rounded text-[10px] transition-all cursor-pointer">⬇️</button>
-                                    <button onclick="editPlayer('${p.id}')" class="${!isConfigured ? 'bg-amber-500/30 hover:bg-amber-500/50 text-amber-200 border-amber-500/60 animate-pulse' : 'bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border-blue-500/40'} border px-2 py-1 rounded text-[10px] transition-all font-semibold cursor-pointer">${!isConfigured ? '⚙️ Set' : 'Edit'}</button>
-                                    <button onclick="deletePlayer('${p.id}')" class="bg-red-500/10 hover:bg-red-500/30 text-red-400 border border-red-500/30 px-2 py-1 rounded text-[10px] transition-all font-semibold cursor-pointer">Delete</button>
-                                </div>
-                            </td>
+                            <td class="py-3 px-3 text-center">${controlCell}</td>
+                            <td class="py-3 px-3 text-center">${actionsCell}</td>
                         </tr>`;
                 });
             }
             updateWaveSelect();
             renderGroupSettingsUI();
+            renderMarchConflicts();
         }
+
+        window.approvePlayer = function(id) {
+            let p = state.players.find(i => i.id === id);
+            if (!p) return;
+            p.approved = true;
+            p.configured = false;
+            savePlayers();
+            renderPlayerTable();
+            broadcastState('APPROVAL_RESULT', { id: id, approved: true });
+            syncStateToPlayers();
+        };
+
+        window.rejectPlayer = function(id) {
+            let p = state.players.find(i => i.id === id);
+            if (!p) return;
+            broadcastState('APPROVAL_RESULT', { id: id, approved: false });
+            setTimeout(() => {
+                state.players = state.players.filter(i => i.id !== id);
+                savePlayers();
+                renderPlayerTable();
+            }, 500);
+        };
 
         window.toggleFreeze = function(id) {
             let p = state.players.find(i => id === i.id);
@@ -1157,7 +1639,7 @@
 
         function updateWaveSelect() {
             const s = document.getElementById('battle-wave-select'); if(!s) return;
-            const groups = [...new Set(state.players.filter(p => p.configured !== false).map(p => p.group))];
+            const groups = [...new Set(state.players.filter(p => p.configured !== false && p.approved === true).map(p => p.group))];
             s.innerHTML = '<option value="all">All Active Players</option>' + groups.map(g => `<option value="${g}">Group ${g}</option>`).join('');
         }
 
@@ -1193,7 +1675,7 @@
             if (state.players.length === 0) { alert('❌ No players to copy.'); return; }
             let lines = [];
             state.players.forEach(p => {
-                if (p.configured === false) return;
+                if (p.configured === false || p.approved !== true) return;
                 lines.push(`${p.name} ${p.marchMins}m${p.marchSecs}s`);
             });
             if (lines.length === 0) { alert('❌ No configured players.'); return; }
@@ -1204,7 +1686,7 @@
             const schedule = calculateSchedule();
             if (schedule.length === 0) { alert('❌ No configured active players.'); return; }
             const prepSecs = getPrepSeconds();
-            const nowMs = Date.now() + (prepSecs * 1000);
+            const nowMs = Date.now() + 2500 + (prepSecs * 1000);
             let lines = [];
             schedule.forEach(p => {
                 const launchMs = nowMs + (p.delay * 1000);
@@ -1217,13 +1699,10 @@
             copyToClipboard(lines.join('\n'), '✅ Launch Times (UTC) Copied!');
         };
 
-        // ═══════════════════════════════════════════════════
-        // COPY PLAYERS BY GROUP (names only, no march time)
-        // ═══════════════════════════════════════════════════
         window.copyPlayersByGroup = function() {
-            const activePlayers = state.players.filter(p => p.configured !== false && !p.frozen);
+            const activePlayers = state.players.filter(p => p.configured !== false && !p.frozen && p.approved === true);
             if (activePlayers.length === 0) {
-                alert('❌ No configured players to copy.');
+                alert('❌ No approved players to copy.');
                 return;
             }
 
